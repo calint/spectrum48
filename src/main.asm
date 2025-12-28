@@ -19,10 +19,24 @@ main_loop:
     ld a, BORDER_RENDER ; visualize render tile map phase
     out ($fe), a
 
-    ; increment camera_x for scrolling
-    ld a, (camera_x)
-    inc a
-    ld (camera_x), a
+input:
+    ; check 'A' (left) and 'D' (right)
+    ld bc, $fdfe        ; row A, S, D, F, G
+    in a, (c)           ; read port
+
+.check_a:
+    bit 0, a            ; bit 0 is 'A'
+    jr nz, .check_d     ; if not pressed, check d
+    ld hl, camera_x
+    dec (hl)            ; move camera left
+
+.check_d:
+    bit 2, a            ; bit 2 is 'D'
+    jr nz, .done        ; if not pressed, check w row
+    ld hl, camera_x
+    inc (hl)            ; move camera right
+
+.done:
 
     ld c, 0             ; c = current loop column (0-31)
 column_loop:
