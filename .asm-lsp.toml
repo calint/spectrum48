@@ -1,0 +1,9 @@
+version = "0.1"
+
+[default_config]
+assembler = "gas"
+instruction_set = "z80"
+
+[default_config.opts]
+diagnostics = false
+default_diagnostics = false
