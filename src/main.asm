@@ -15,7 +15,7 @@ main_loop:
     ld a, BORDER_VBLANK
     out ($fe), a        ; set border
     halt                ; sleep until the start of the next frame
-  
+ 
     ld a, BORDER_RENDER ; visualize render tile map phase
     out ($fe), a
 
