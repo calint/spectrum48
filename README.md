@@ -2,10 +2,11 @@
 
 ## intention
 
-* learn cpu z80 by writing assemble for spectrum 48
+* learn cpu z80 by writing assembler for spectrum 48
 * render a tile map
-* a sprite implementation
+* sprite implementation
 * read keyboard
+* control sprite drawn over tile map
 
 ## tools
 
