@@ -3,7 +3,7 @@ org $8000
 BORDER_VBLANK: equ 1
 BORDER_RENDER: equ 14
 
-camera_x: defb 0
+camera_x: defb 1
 
 start:
     ld hl, $5800        ; attribute start
@@ -16,26 +16,27 @@ start:
 main_loop:
     ld a, BORDER_VBLANK
     out ($fe), a        ; set border
-
     halt                ; sleep until the start of the next frame
+    ld a, BORDER_RENDER ; visualize render tile map phase
+    out ($fe), a
 
     ld de, $4000        ; screen address
 
-    ld a, BORDER_RENDER
-    out ($fe), a
-
+    ; get tile index from map[0][camera_x]
     ld h, tile_map / 256
     ld a, (camera_x)
     ld l, a
     ld a, (hl)
-    add a, a
-    add a, a
-    add a, a
 
+    ; calculate charset address (a * 8)
     ld l, a
-    ld h, 0
+    ld h, 0              ; hl = index (0-255)
+    add hl, hl           ; x2
+    add hl, hl           ; x4
+    add hl, hl           ; x8
+
     ld bc, charset
-    add hl, bc
+    add hl, bc           ; hl = pointer to tile pixels
 
     ; first row
     ld a, (hl)
@@ -75,28 +76,20 @@ main_loop:
 
     ld a, (hl)
     ld (de), a
-    inc d
 
     ; second row
-    ld a, d
-    sub 8
-    ld d, a
-
-    ld a, e
-    add a, 32
-    ld e, a
-
+    ld de, $4020        
     ld h, tile_map / 256
+    inc h
     ld a, (camera_x)
-    add a, 1
     ld l, a
     ld a, (hl)
-    add a, a
-    add a, a
-    add a, a
 
     ld l, a
     ld h, 0
+    add hl, hl
+    add hl, hl
+    add hl, hl
     ld bc, charset
     add hl, bc
 
@@ -137,15 +130,11 @@ main_loop:
 
     ld a, (hl)
     ld (de), a
-
     jp main_loop
 
-; data sections
+org ($ + 255) & $ff00
 tile_map:
-    defb 1, 2, 3, 4
-    defb 1, 1, 1, 1
-    defb 1, 1, 1, 1
-    defb 1, 1, 1, 1
+    include "tile_map.asm"
 
 charset:
     include "charset.asm"
