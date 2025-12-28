@@ -1,16 +1,32 @@
 org $8000
 
-border: equ 5
+BORDER_VBLANK: equ 1
+BORDER_RENDER: equ 14
 
-camera_x: defb 3
+camera_x: defb 0
 
 start:
-    ld a, border
+    ld hl, $5800        ; attribute start
+    ld (hl), 7          ; white on black
+    ld de, $5801        ; destination is one byte ahead
+    ld bc, 767          ; remaining bytes to fill
+    ldir                ; fastest hardware copy loop
+
+
+main_loop:
+    ld a, BORDER_VBLANK
     out ($fe), a        ; set border
+
+    halt                ; sleep until the start of the next frame
 
     ld de, $4000        ; screen address
 
-    ld hl, tile_map
+    ld a, BORDER_RENDER
+    out ($fe), a
+
+    ld h, tile_map / 256
+    ld a, (camera_x)
+    ld l, a
     ld a, (hl)
     add a, a
     add a, a
@@ -70,8 +86,10 @@ start:
     add a, 32
     ld e, a
 
-    ld hl, tile_map
-    inc l
+    ld h, tile_map / 256
+    ld a, (camera_x)
+    add a, 1
+    ld l, a
     ld a, (hl)
     add a, a
     add a, a
@@ -120,7 +138,7 @@ start:
     ld a, (hl)
     ld (de), a
 
-    ret
+    jp main_loop
 
 ; data sections
 tile_map:
