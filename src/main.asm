@@ -3,7 +3,7 @@ org $8000
 BORDER_VBLANK: equ 1
 BORDER_RENDER: equ 14
 
-camera_x: defb 1
+camera_x: defb 2
 
 start:
     ld hl, $5800        ; attribute start
@@ -20,11 +20,16 @@ main_loop:
     ld a, BORDER_RENDER ; visualize render tile map phase
     out ($fe), a
 
-    ld de, $4000        ; screen address
+    ld c, 0             ; c = current loop column (0-31)
+column_loop:
+    ; row 0 starts at $4000. column is at $4000 + C
+    ld d, $40
+    ld e, c             ; de = $4000, $4001, etc.
 
     ; get tile index from map[0][camera_x]
-    ld h, tile_map / 256
+    ld h, (tile_map / 256) + 0
     ld a, (camera_x)
+    add a, c
     ld l, a
     ld a, (hl)
 
@@ -34,11 +39,12 @@ main_loop:
     add hl, hl           ; x2
     add hl, hl           ; x4
     add hl, hl           ; x8
-
+    push bc
     ld bc, charset
     add hl, bc           ; hl = pointer to tile pixels
+    pop bc
 
-    ; first row
+    ; first row of pixels
     ld a, (hl)
     ld (de), a
     inc hl
@@ -78,10 +84,14 @@ main_loop:
     ld (de), a
 
     ; second row
-    ld de, $4020        
-    ld h, tile_map / 256
-    inc h
+    ld d, $40
+    ld a, c
+    add a, 32
+    ld e, a
+
+    ld h, (tile_map / 256) + 1
     ld a, (camera_x)
+    add a, c
     ld l, a
     ld a, (hl)
 
@@ -90,8 +100,10 @@ main_loop:
     add hl, hl
     add hl, hl
     add hl, hl
+    push bc
     ld bc, charset
     add hl, bc
+    pop bc
 
     ld a, (hl)
     ld (de), a
@@ -130,6 +142,13 @@ main_loop:
 
     ld a, (hl)
     ld (de), a
+
+    inc c
+    ld a, c
+    cp 32
+
+    jp nz, column_loop
+
     jp main_loop
 
 org ($ + 255) & $ff00
