@@ -1,35 +1,27 @@
 org $8000
 
 border: equ 5
-camera_x: equ 0
+
+camera_x: defb 3
 
 start:
     ld a, border
     out ($fe), a        ; set border
 
-    ld de, $4000        ; top-left of screen
-    ld bc, tile_map
+    ld de, $4000        ; screen address
 
-    ; 1. get tile index from map
-    ld hl, tile_map     ; point hl to map
-    ld bc, camera_x
+    ld hl, tile_map
+    ld a, (hl)
+    add a, a
+    add a, a
+    add a, a
+
+    ld l, a
+    ld h, 0
+    ld bc, charset
     add hl, bc
-    ld a, (hl)          ; a = 0 (the first byte)
 
-    ; 2. calculate charset address (a * 8)
-    ; we use 'add a, a' three times to multiply by 8
-    add a, a            ; a = index * 2
-    add a, a            ; a = index * 4
-    add a, a            ; a = index * 8
-
-    ; add the base address of charset to our offset
-    ld l, a             ; put offset in l
-    ld h, 0             ; clear h
-    ld bc, charset      ; get base address
-    add hl, bc          ; hl now points to the first pixel byte
-
-    ; 4. unrolled blit (8 scanlines)
-    ; we load a byte, write it, move pointers, and repeat
+    ; first row
     ld a, (hl)
     ld (de), a
     inc hl
@@ -68,7 +60,6 @@ start:
     ld a, (hl)
     ld (de), a
     inc d
-    ; we don't need to inc hl/d on the last one
 
     ; second row
     ld a, d
@@ -76,29 +67,21 @@ start:
     ld d, a
 
     ld a, e
-    add a, 32           ; move down one character row (32 bytes)
-    ld e, a             ; de now points to $4020 (row 1, col 0)
+    add a, 32
+    ld e, a
 
-    ; 1. get tile index from map
-    ld hl, tile_map     ; point hl to map
-    ld bc, 1
+    ld hl, tile_map
+    inc l
+    ld a, (hl)
+    add a, a
+    add a, a
+    add a, a
+
+    ld l, a
+    ld h, 0
+    ld bc, charset
     add hl, bc
-    ld a, (hl)          ; a = 0 (the first byte)
 
-    ; 2. calculate charset address (a * 8)
-    ; we use 'add a, a' three times to multiply by 8
-    add a, a            ; a = index * 2
-    add a, a            ; a = index * 4
-    add a, a            ; a = index * 8
-
-    ; add the base address of charset to our offset
-    ld l, a             ; put offset in l
-    ld h, 0             ; clear h
-    ld bc, charset      ; get base address
-    add hl, bc          ; hl now points to the first pixel byte
-
-    ; 4. unrolled blit (8 scanlines)
-    ; we load a byte, write it, move pointers, and repeat
     ld a, (hl)
     ld (de), a
     inc hl
@@ -136,16 +119,15 @@ start:
 
     ld a, (hl)
     ld (de), a
-    ; we don't need to inc hl/d on the last one
 
     ret
 
 ; data sections
 tile_map:
-    defb 0, 1, 0, 1
-    defb 1, 0, 1, 0
-    defb 0, 1, 0, 1
-    defb 1, 0, 1, 0
+    defb 1, 0, 1, 1
+    defb 1, 1, 1, 1
+    defb 1, 1, 1, 1
+    defb 1, 1, 1, 1
 
 charset:
 ; tile 0
