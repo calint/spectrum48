@@ -1,0 +1,45 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "tile-map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "charset-1.tsx": {
+            "scaleInDock": 4,
+            "scaleInEditor": 8
+        },
+        "tile-map.tmx": {
+            "scale": 3.3108,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1913.1327775764166,
+                "y": 78.37984777093149
+            }
+        }
+    },
+    "last.imagePath": "/home/c/w/c64/resources",
+    "map.height": 25,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "map.width": 256,
+    "openFiles": [
+        "charset-1.tsx",
+        "tile-map.tmx"
+    ],
+    "project": "world.tiled-project",
+    "recentFiles": [
+        "charset-1.tsx",
+        "tile-map.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 8,
+        "width": 8
+    }
+}
