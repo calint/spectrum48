@@ -5,10 +5,12 @@ generate code to render a column using an unrolled loop
 """
 
 print("    ;")
-print("    ; generated code, do not edit")
+print("    ; generated code by `gen-render-rows.py`, do not edit")
 print("    ;")
 print()
 print("    ; input: IXL = tile map column offset, IXH = screen column number")
+print("    ; clobbers: A, B, C, D, E, H, L")
+print()
 
 for row in range(24):
     if row < 8:

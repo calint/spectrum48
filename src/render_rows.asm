@@ -1,8 +1,10 @@
     ;
-    ; generated code, do not edit
+    ; generated code by `gen-render-rows.py`, do not edit
     ;
 
     ; input: IXL = tile map column offset, IXH = screen column number
+    ; clobbers: A, B, C, D, E, H, L
+
     ; row 0
     ; place DE to screen destination of tile bitmap
     ld d, $40
