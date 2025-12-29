@@ -41,7 +41,9 @@ main_loop:
 ;render:
     ld a, 0             ; c = current loop column (0-31)
 .loop:
+    ld ixh, a           ; save A
     include "render_rows.asm"
+    ld a, ixh           ; restore A
     inc a
     cp 32
     jp nz, .loop

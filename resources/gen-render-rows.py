@@ -16,10 +16,6 @@ for row in range(24):
 
     e_offset = row_in_third * 32
 
-    if row == 0:
-        print("    ld ixh, a")
-        print()
-
     print(f"    ; row {row}")
     print("    ; place DE to screen destination of tile bitmap")
     print(f"    ld d, ${base_d:02X}")
@@ -55,5 +51,3 @@ for row in range(24):
         if scanline < 7:
             print("    inc d")
     print()
-
-print("    ld a, ixh")

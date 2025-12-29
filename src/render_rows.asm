@@ -1,5 +1,3 @@
-    ld ixh, a
-
     ; row 0
     ; place DE to screen destination of tile bitmap
     ld d, $40
@@ -1506,4 +1504,3 @@
     ld (de), a
     inc hl
 
-    ld a, ixh
