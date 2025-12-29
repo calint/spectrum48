@@ -19,12 +19,12 @@ main_loop:
     ld a, BORDER_RENDER ; visualize render tile map phase
     out ($fe), a
 
-input:
+;input:
     ; check 'A' (left) and 'D' (right)
     ld bc, $fdfe        ; row A, S, D, F, G
     in a, (c)           ; read port
 
-.check_a:
+;.check_a:
     bit 0, a            ; bit 0 is 'A'
     jr nz, .check_d     ; if not pressed, check d
     ld hl, camera_x
@@ -38,13 +38,14 @@ input:
 
 .done:
 
+;render:
     ld c, 0             ; c = current loop column (0-31)
-column_loop:
+.loop:
     include "render_rows.asm"
     inc c
     ld a, c
     cp 32
-    jp nz, column_loop
+    jp nz, .loop
 
     jp main_loop
 
