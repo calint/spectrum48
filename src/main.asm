@@ -2,7 +2,7 @@ org $8000
 BORDER_VBLANK: equ 1
 BORDER_RENDER: equ 14
 
-camera_x: defb 1
+camera_x: defb 0
 
 start:
     ld hl, $5800        ; attribute start
