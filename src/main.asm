@@ -41,7 +41,7 @@ main_loop:
 ;render:
     ld a, (camera_x)
     ld ixl, a
-    ld a, 0             ; c = current loop column (0-31)
+    ld a, 0             ; current loop column (0-31)
 .loop:
     ld ixh, a           ; save A
     include "render_rows.asm"

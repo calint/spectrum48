@@ -2,7 +2,7 @@
     ; generated code, do not edit
     ;
 
-    ; input: IXL = tile map column offset, IXH = column number
+    ; input: IXL = tile map column offset, IXH = screen column number
     ; row 0
     ; place DE to screen destination of tile bitmap
     ld d, $40
