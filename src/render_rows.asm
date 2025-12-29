@@ -1,4 +1,4 @@
-    ld ixh, c
+    ld ixh, a
 
     ; row 0
     ; place DE to screen destination of tile bitmap
@@ -1506,4 +1506,4 @@
     ld (de), a
     inc hl
 
-    ld c, ixh
+    ld a, ixh

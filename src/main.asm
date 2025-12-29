@@ -39,11 +39,10 @@ main_loop:
 .done:
 
 ;render:
-    ld c, 0             ; c = current loop column (0-31)
+    ld a, 0             ; c = current loop column (0-31)
 .loop:
     include "render_rows.asm"
-    inc c
-    ld a, c
+    inc a
     cp 32
     jp nz, .loop
 

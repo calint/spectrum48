@@ -17,7 +17,7 @@ for row in range(24):
     e_offset = row_in_third * 32
 
     if row == 0:
-        print("    ld ixh, c")
+        print("    ld ixh, a")
         print()
 
     print(f"    ; row {row}")
@@ -56,4 +56,4 @@ for row in range(24):
             print("    inc d")
     print()
 
-print("    ld c, ixh")
+print("    ld a, ixh")
