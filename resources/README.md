@@ -19,16 +19,8 @@
 
 * run `update.sh` to refresh generated source in `../src/`
 
-## miscellaneous
-
-### standard c64 charset
-
-![standard c64 charset](c64_upp.gif)
-
 ### source generators
 
 * `gen-charset.py`
-* `gen-render-to-screen.py`
-* `gen-sprites-state-update.py`
+* `gen-render-rows.py`
 * `gen-tile-map.py`
-* `gen-sprites-data.py`
