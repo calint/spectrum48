@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-generate unrolled z80 code for rendering all 24 tile rows on zx spectrum 48k
+generate code to render a column using an unrolled loop
+    IXH: column number
 """
 
 for row in range(24):
