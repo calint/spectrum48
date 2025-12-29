@@ -2,6 +2,7 @@
     ; generated code, do not edit
     ;
 
+    ; input: IXL = tile map column offset, IXH = column number
     ; row 0
     ; place DE to screen destination of tile bitmap
     ld d, $40
@@ -9,7 +10,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 0
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -71,7 +72,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 1
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -133,7 +134,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 2
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -195,7 +196,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 3
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -257,7 +258,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 4
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -319,7 +320,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 5
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -381,7 +382,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 6
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -443,7 +444,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 7
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -503,7 +504,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 8
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -565,7 +566,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 9
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -627,7 +628,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 10
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -689,7 +690,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 11
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -751,7 +752,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 12
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -813,7 +814,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 13
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -875,7 +876,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 14
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -937,7 +938,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 15
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -997,7 +998,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 16
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1059,7 +1060,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 17
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1121,7 +1122,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 18
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1183,7 +1184,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 19
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1245,7 +1246,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 20
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1307,7 +1308,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 21
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1369,7 +1370,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 22
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number
@@ -1431,7 +1432,7 @@
     ; DE now at screen destination
     ; place HL at tile
     ld h, (tile_map / 256) + 23
-    ld a, (camera_x)
+    ld a, ixl
     add a, ixh
     ld l, a
     ; load A with tile number

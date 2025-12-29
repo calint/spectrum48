@@ -8,6 +8,7 @@ print("    ;")
 print("    ; generated code, do not edit")
 print("    ;")
 print()
+print("    ; input: IXL = tile map column offset, IXH = screen column number")
 
 for row in range(24):
     if row < 8:
@@ -34,7 +35,7 @@ for row in range(24):
     print("    ; DE now at screen destination")
     print("    ; place HL at tile")
     print(f"    ld h, (tile_map / 256) + {row}")
-    print("    ld a, (camera_x)")
+    print("    ld a, ixl")
     print("    add a, ixh")
     print("    ld l, a")
     print("    ; load A with tile number")

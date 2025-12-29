@@ -2,7 +2,7 @@ org $8000
 BORDER_VBLANK: equ 1
 BORDER_RENDER: equ 14
 
-camera_x: defb 2
+camera_x: defb 1
 
 start:
     ld hl, $5800        ; attribute start
@@ -39,6 +39,8 @@ main_loop:
 .done:
 
 ;render:
+    ld a, (camera_x)
+    ld ixl, a
     ld a, 0             ; c = current loop column (0-31)
 .loop:
     ld ixh, a           ; save A
