@@ -3,7 +3,7 @@
     ;
 
     ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256
-    ;    input: ixl = tile map column offset, ixh = screen column number
+    ;    input: IXL = tile map column offset, IXH = screen column number
     ; clobbers: A, B, C, D, E, H, L
 
     ld a, ixl

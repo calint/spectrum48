@@ -9,7 +9,7 @@ print("    ; generated code by `gen-render-rows.py`, do not edit")
 print("    ;")
 print()
 print("    ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256")
-print("    ;    input: ixl = tile map column offset, ixh = screen column number")
+print("    ;    input: IXL = tile map column offset, IXH = screen column number")
 print("    ; clobbers: A, B, C, D, E, H, L")
 print()
 
