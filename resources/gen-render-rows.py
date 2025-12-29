@@ -4,6 +4,11 @@ generate code to render a column using an unrolled loop
     IXH: column number
 """
 
+print("    ;")
+print("    ; generated code, do not edit")
+print("    ;")
+print()
+
 for row in range(24):
     if row < 8:
         base_d = 0x40
@@ -48,7 +53,7 @@ for row in range(24):
         print(f"    ; scanline {scanline}")
         print("    ld a, (hl)")
         print("    ld (de), a")
-        print("    inc hl")
         if scanline < 7:
+            print("    inc hl")
             print("    inc d")
     print()

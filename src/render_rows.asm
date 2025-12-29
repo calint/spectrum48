@@ -1,3 +1,7 @@
+    ;
+    ; generated code, do not edit
+    ;
+
     ; row 0
     ; place DE to screen destination of tile bitmap
     ld d, $40
@@ -57,7 +61,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 1
     ; place DE to screen destination of tile bitmap
@@ -120,7 +123,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 2
     ; place DE to screen destination of tile bitmap
@@ -183,7 +185,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 3
     ; place DE to screen destination of tile bitmap
@@ -246,7 +247,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 4
     ; place DE to screen destination of tile bitmap
@@ -309,7 +309,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 5
     ; place DE to screen destination of tile bitmap
@@ -372,7 +371,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 6
     ; place DE to screen destination of tile bitmap
@@ -435,7 +433,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 7
     ; place DE to screen destination of tile bitmap
@@ -498,7 +495,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 8
     ; place DE to screen destination of tile bitmap
@@ -559,7 +555,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 9
     ; place DE to screen destination of tile bitmap
@@ -622,7 +617,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 10
     ; place DE to screen destination of tile bitmap
@@ -685,7 +679,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 11
     ; place DE to screen destination of tile bitmap
@@ -748,7 +741,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 12
     ; place DE to screen destination of tile bitmap
@@ -811,7 +803,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 13
     ; place DE to screen destination of tile bitmap
@@ -874,7 +865,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 14
     ; place DE to screen destination of tile bitmap
@@ -937,7 +927,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 15
     ; place DE to screen destination of tile bitmap
@@ -1000,7 +989,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 16
     ; place DE to screen destination of tile bitmap
@@ -1061,7 +1049,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 17
     ; place DE to screen destination of tile bitmap
@@ -1124,7 +1111,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 18
     ; place DE to screen destination of tile bitmap
@@ -1187,7 +1173,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 19
     ; place DE to screen destination of tile bitmap
@@ -1250,7 +1235,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 20
     ; place DE to screen destination of tile bitmap
@@ -1313,7 +1297,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 21
     ; place DE to screen destination of tile bitmap
@@ -1376,7 +1359,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 22
     ; place DE to screen destination of tile bitmap
@@ -1439,7 +1421,6 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
     ; row 23
     ; place DE to screen destination of tile bitmap
@@ -1502,5 +1483,4 @@
     ; scanline 7
     ld a, (hl)
     ld (de), a
-    inc hl
 
