@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 """
-generate code to render a column using an unrolled loop
-    IXH: column number
+generate optimized code to render a column using an unrolled loop
+assumes charset is 2k aligned: org ($ + 2047) & $f800
 """
 
 print("    ;")
 print("    ; generated code by `gen-render-rows.py`, do not edit")
 print("    ;")
 print()
-print("    ; input: IXL = tile map column offset, IXH = screen column number")
+print("    ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256")
+print("    ;    input: ixl = tile map column offset, ixh = screen column number")
 print("    ; clobbers: A, B, C, D, E, H, L")
+print()
+
+# pre-calculate the column index once to save 2 instructions per row
+print("    ld a, ixl")
+print("    add a, ixh")
+print("    ld c, a          ; C = constant tile map column")
 print()
 
 for row in range(24):
@@ -26,36 +33,39 @@ for row in range(24):
     e_offset = row_in_third * 32
 
     print(f"    ; row {row}")
-    print("    ; place DE to screen destination of tile bitmap")
+
+    # screen pointer DE
     print(f"    ld d, ${base_d:02X}")
     if e_offset == 0:
         print("    ld e, ixh")
     else:
         print("    ld a, ixh")
         print(f"    add a, {e_offset}")
-        print("    ld e, a")
-    print("    ; DE now at screen destination")
-    print("    ; place HL at tile")
-    print(f"    ld h, (tile_map / 256) + {row}")
-    print("    ld a, ixl")
-    print("    add a, ixh")
-    print("    ld l, a")
-    print("    ; load A with tile number")
-    print("    ld a, (hl)")
-    print("    ; place HL at tile bitmap")
-    print("    ld l, a")
-    print("    ld h, 0")
-    print("    add hl, hl")
-    print("    add hl, hl")
-    print("    add hl, hl")
-    print("    ld bc, charset")
-    print("    add hl, bc")
-    print("    ; HL now at tile bitmap")
+        print("    ld e, a          ; DE = screen dest")
 
+    # tile map pointer HL
+    print(f"    ld h, (tile_map / 256) + {row}")
+    print("    ld l, c")
+    print("    ld a, (hl)       ; A = tile index")
+
+    # tile bitmap pointer to HL
+    print("    ld l, a          ; backup index")
+    print("    and %11100000    ; get top 3 bits for high byte")
+    print("    rlca             ; shift to bottom")
+    print("    rlca")
+    print("    rlca")
+    print("    add a, (charset / 256) & $ff")
+    print("    ld h, a          ; H = charset page")
+    print("    ld a, l")
+    print("    add a, a         ; x2")
+    print("    add a, a         ; x4")
+    print("    add a, a         ; x8")
+    print("    ld l, a          ; HL = bitmap address")
+
+    # unrolled scanline copy
     for scanline in range(8):
-        print(f"    ; scanline {scanline}")
         print("    ld a, (hl)")
-        print("    ld (de), a")
+        print("    ld (de), a       ; copy scanline")
         if scanline < 7:
             print("    inc hl")
             print("    inc d")

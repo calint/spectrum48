@@ -52,11 +52,12 @@ main_loop:
 
     jp main_loop
 
+org ($ + 2047) & $ff00
+charset:
+    include "charset.asm"
+
 org ($ + 255) & $ff00
 tile_map:
     include "tile_map.asm"
-
-charset:
-    include "charset.asm"
 
 end start

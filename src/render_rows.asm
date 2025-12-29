@@ -2,1488 +2,1229 @@
     ; generated code by `gen-render-rows.py`, do not edit
     ;
 
-    ; input: IXL = tile map column offset, IXH = screen column number
+    ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256
+    ;    input: ixl = tile map column offset, ixh = screen column number
     ; clobbers: A, B, C, D, E, H, L
 
-    ; row 0
-    ; place DE to screen destination of tile bitmap
-    ld d, $40
-    ld e, ixh
-    ; DE now at screen destination
-    ; place HL at tile
-    ld h, (tile_map / 256) + 0
     ld a, ixl
     add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld c, a          ; C = constant tile map column
+
+    ; row 0
+    ld d, $40
+    ld e, ixh
+    ld h, (tile_map / 256) + 0
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 1
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 32
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 1
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 2
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 64
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 2
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 3
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 96
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 3
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 4
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 128
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 4
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 5
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 160
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 5
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 6
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 192
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 6
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 7
-    ; place DE to screen destination of tile bitmap
     ld d, $40
     ld a, ixh
     add a, 224
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 7
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 8
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld e, ixh
-    ; DE now at screen destination
-    ; place HL at tile
     ld h, (tile_map / 256) + 8
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 9
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 32
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 9
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 10
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 64
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 10
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 11
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 96
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 11
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 12
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 128
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 12
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 13
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 160
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 13
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 14
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 192
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 14
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 15
-    ; place DE to screen destination of tile bitmap
     ld d, $48
     ld a, ixh
     add a, 224
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 15
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 16
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld e, ixh
-    ; DE now at screen destination
-    ; place HL at tile
     ld h, (tile_map / 256) + 16
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 17
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 32
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 17
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 18
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 64
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 18
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 19
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 96
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 19
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 20
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 128
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 20
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 21
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 160
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 21
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 22
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 192
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 22
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
     ; row 23
-    ; place DE to screen destination of tile bitmap
     ld d, $50
     ld a, ixh
     add a, 224
-    ld e, a
-    ; DE now at screen destination
-    ; place HL at tile
+    ld e, a          ; DE = screen dest
     ld h, (tile_map / 256) + 23
-    ld a, ixl
-    add a, ixh
-    ld l, a
-    ; load A with tile number
+    ld l, c
+    ld a, (hl)       ; A = tile index
+    ld l, a          ; backup index
+    and %11100000    ; get top 3 bits for high byte
+    rlca             ; shift to bottom
+    rlca
+    rlca
+    add a, (charset / 256) & $ff
+    ld h, a          ; H = charset page
+    ld a, l
+    add a, a         ; x2
+    add a, a         ; x4
+    add a, a         ; x8
+    ld l, a          ; HL = bitmap address
     ld a, (hl)
-    ; place HL at tile bitmap
-    ld l, a
-    ld h, 0
-    add hl, hl
-    add hl, hl
-    add hl, hl
-    ld bc, charset
-    add hl, bc
-    ; HL now at tile bitmap
-    ; scanline 0
-    ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 1
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 2
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 3
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 4
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 5
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 6
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
     inc hl
     inc d
-    ; scanline 7
     ld a, (hl)
-    ld (de), a
+    ld (de), a       ; copy scanline
 
