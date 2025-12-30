@@ -229,8 +229,8 @@ render_sprite:
     push hl                     ; save screen address start of line
 
     ; fetch sprite bytes
-    ld d, (ix+0)                ; load left sprite byte
-    ld e, (ix+1)                ; load right sprite byte
+    ld d, (ix + 0)               ; load left sprite byte
+    ld e, (ix + 1)               ; load right sprite byte
 
     ; shift 16-bit row right by (render_sprite_shift_amt)
     ; we need to shift DE into a 3rd byte (C)
