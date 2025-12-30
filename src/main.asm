@@ -18,6 +18,8 @@ camera_x_prv: db $ff
 
 hero_x: db 100
 hero_y: db 100
+hero_x_prv: db 100
+hero_y_prv: db 100
 
 ; used by `render_sprite`
 render_sprite_collision: db 0 ; if non-zero sprite collided with drawn content
@@ -41,11 +43,11 @@ main_loop:
     halt                ; sleep until the start of the next frame
  
     ; check if camera position changed triggering a re-draw of tile map
-    ; ld hl, camera_x_prv
-    ; ld a, (camera_x)
-    ; cp (hl)
-    ; jp z, render_sprites
-    ; ld (hl), a
+    ld hl, camera_x_prv
+    ld a, (camera_x)
+    cp (hl)
+    jp z, render_sprites
+    ld (hl), a
 
 ;-------------------------------------------------------------------------------
 render_tile_map:
@@ -73,6 +75,13 @@ render_sprites:
     xor a
     ld (sprites_collision_bit), a
 
+    ; wipe hero from old position before move
+    ld a, (hero_x_prv)
+    ld b, a                     ; B is old x
+    ld a, (hero_y_prv)
+    ld c, a                     ; C is old y
+    call restore_sprite_background
+
     ; render hero
     ld a, (hero_x)
     ld b, a
@@ -99,6 +108,11 @@ input:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_INPUT
     out ($fe), a
+
+    ld a, (hero_x)
+    ld (hero_x_prv), a          ; save hero_x to previous
+    ld a, (hero_y)
+    ld (hero_y_prv), a          ; save hero_y to previous
 
 .check_camera:
     ; check 'A' (left) and 'D' (right)
@@ -155,9 +169,9 @@ input:
 
 ; ------------------------------------------------------------------------------
 ; renders a sprite
-; inputs:  b = x coordinate (0-255 pixels)
-;          c = y coordinate (0-191 pixels)
-;          ix = pointer to sprite data
+; inputs:  B = x coordinate (0-255 pixels)
+;          C = y coordinate (0-191 pixels)
+;          IX = pointer to sprite data
 ; outputs: render_sprite_collision = non-zero if rendered over content
 ; clobbers: A, B, C, D, E, H, L, IX
 ; ------------------------------------------------------------------------------
@@ -289,6 +303,119 @@ shift_done:
  
     pop bc                      ; restore loop counter
     djnz draw_loop
+    ret
+
+; ------------------------------------------------------------------------------
+; draws a 8x8 tile to the screen
+; inputs ixh=screen_x a=screen_y
+; ------------------------------------------------------------------------------
+draw_single_tile
+    push af                     ; save screen row in A
+    
+    ; get tile id from map
+    ld h, high tile_map         ; tile_map base in H
+    add a, h                    ; A is base high byte plus row
+    ld h, a                     ; H is now the correct high byte
+    
+    ld a, (camera_x)            ; get current camera offset in A
+    add a, ixh                  ; add screen x in IXH
+    ld l, a                     ; L is final map column
+    ld a, (hl)                  ; A is tile id from HL
+    
+    ; get charset address
+    ld l, a
+    ld h, 0
+    add hl, hl                  ; shift HL left 3 for id * 8
+    add hl, hl
+    add hl, hl
+    ld de, charset
+    add hl, de                  ; HL is bitmap source
+    ex de, hl                   ; DE is source
+    
+    ; calculate screen address
+    pop af                      ; A is screen row
+    ld b, a                     ; save row in B
+    and %00011000               ; isolate row bits 3 4
+    or $40                      ; screen base 4000
+    ld h, a                     ; screen high byte in H
+    
+    ld a, b
+    and %00000111               ; isolate row bits 0 to 2
+    rrca
+    rrca
+    rrca                        ; move bits to 5 6 7
+    or ixh                      ; add screen column IXH
+    ld l, a                     ; screen low byte in L
+    
+    ; copy 8 bytes
+    ld b, 8                     ; 8 scanlines in B
+.char_loop
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+    djnz .char_loop
+    
+    ret
+
+; ------------------------------------------------------------------------------
+; restores tiles from tile_map for a 16x16 sprite area
+; inputs  B = x pixel C = y pixel
+; ------------------------------------------------------------------------------
+restore_sprite_background
+    ; calculate starting tile column x / 8
+    ld a, b
+    rrca
+    rrca
+    rrca
+    and $1f
+    ld d, a             ; D is screen column 0 to 31
+
+    ; calculate starting tile row y / 8
+    ld a, c
+    rrca
+    rrca
+    rrca
+    and $1f
+    ld e, a             ; E is screen row 0 to 23
+
+    ld b, 3             ; loop 3 columns
+.col_loop
+    push bc
+    push de             ; save current screen D and E
+
+    ld a, d
+    cp 32               ; check screen boundary
+    jr nc, .next_col
+
+    ld b, 3             ; loop 3 rows
+.row_loop
+    push bc
+    push de
+
+    ld a, e
+    cp 24               ; check vertical boundary
+    jr nc, .next_row
+
+    ; prepare for draw_single_tile
+    ld a, (camera_x)
+    add a, d            ; map x is camera plus D
+    ld ixl, a           ; IXL is map column
+    ld ixh, d           ; IXH is screen column
+    ld a, e             ; A is screen row
+    call draw_single_tile
+
+.next_row
+    pop de
+    inc e               ; next row down in E
+    pop bc
+    djnz .row_loop
+
+.next_col
+    pop de
+    inc d               ; next column right in D
+    pop bc
+    djnz .col_loop
     ret
 
 ;-------------------------------------------------------------------------------
