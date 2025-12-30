@@ -214,7 +214,7 @@ render_sprite:
     ; prepare shift counter
     ld a, b
     and $07                     ; x % 8 (shift amount)
-    ld (.shift_amt), a ; save for later loop
+    ld (.shift_amt), a          ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
 
@@ -288,15 +288,15 @@ render_sprite:
     inc h                       ; increment high byte (pixel row)
     ld a, h
     and $07                     ; check if we crossed 8-line char boundary
-    jr nz, .move_down_scanline_done ; if not 0 then return 
+    jr nz, .move_down_scanline_done ; if not 0 then continue
 
     ; if wrapped 0-7 then fix the address
     ld a, l
     add a, 32                   ; move to next character row
     ld l, a
-    ; if carry then moved to next third, standard handling is ok
+    ; if carry then moved to next third, standard handling is ok, continue
     jr c, .move_down_scanline_done
-    ; otherwise, subtract 8 from H to stay in correct third
+    ; otherwise, subtract 8 from H to stay in correct third and continue
     ld a, h
     sub 8
     ld h, a
