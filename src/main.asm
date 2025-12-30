@@ -238,32 +238,29 @@ shift_done:
     ; advance pointers
     pop hl                      ; restore start of line address
 
-    call .move_down_scanline    ; helper to move HL down 1 pixel row
-
-    inc ix                      ; move sprite pointer +2
-    inc ix
- 
-    pop bc                      ; restore loop counter
-    djnz draw_loop
-    ret
-
-; helper: calculate pixel row down logic for spectrum layout
-.move_down_scanline:
+    ; move down scanline
     inc h                       ; increment high byte (pixel row)
     ld a, h
     and $07                     ; check if we crossed 8-line char boundary
-    ret nz                      ; if not 0 then return 
+    jr nz, .move_down_scanline_done ; if not 0 then return 
 
     ; if wrapped 0-7 then fix the address
     ld a, l
     add a, 32                   ; move to next character row
     ld l, a
     ; if carry then moved to next third, standard handling is ok
-    ret c
+    jr c, .move_down_scanline_done
     ; otherwise, subtract 8 from H to stay in correct third
     ld a, h
     sub 8
     ld h, a
+.move_down_scanline_done:
+
+    inc ix                      ; move sprite pointer +2
+    inc ix
+ 
+    pop bc                      ; restore loop counter
+    djnz draw_loop
     ret
 
 ;-------------------------------------------------------------------------------
