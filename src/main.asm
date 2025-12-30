@@ -23,13 +23,16 @@ render_sprite_shift_amt: db 0 ; temporary
 
 ;-------------------------------------------------------------------------------
 start:
+;-------------------------------------------------------------------------------
     ld hl, $5800        ; attribute start
     ld (hl), 7          ; white on black
     ld de, $5801        ; destination is one byte ahead
     ld bc, 767          ; remaining bytes to fill
     ldir                ; fastest hardware copy loop
 
+;-------------------------------------------------------------------------------
 main_loop:
+;-------------------------------------------------------------------------------
     ld a, BORDER_VBLANK
     out ($fe), a        ; set border
     halt                ; sleep until the start of the next frame
@@ -37,7 +40,9 @@ main_loop:
     ld a, BORDER_RENDER_TILE_MAP
     out ($fe), a
 
+;-------------------------------------------------------------------------------
 render_tile_map:
+;-------------------------------------------------------------------------------
     ld a, (camera_x)
     ld ixl, a
     ld a, 0             ; current loop column (0-31)
@@ -49,7 +54,9 @@ render_tile_map:
     cp 32
     jp nz, .loop
 
+;-------------------------------------------------------------------------------
 render_sprites:
+;-------------------------------------------------------------------------------
     ld a, BORDER_RENDER_SPRITES
     out ($fe), a
 
@@ -77,62 +84,64 @@ render_sprites:
     ld hl, $401f
     ld (hl), a
 
+;-------------------------------------------------------------------------------
 input:
+;-------------------------------------------------------------------------------
     ld a, BORDER_INPUT
     out ($fe), a
 
+.check_camera:
     ; check 'A' (left) and 'D' (right)
     ld bc, $fdfe        ; row A, S, D, F, G
     in a, (c)           ; read port
 
 .check_a:
-    bit 0, a            ; bit 0 is 'A'
-    jr nz, .check_d     ; if not pressed, check d
+    bit 0, a
+    jr nz, .check_d
     ld hl, camera_x
-    dec (hl)            ; move camera left
+    dec (hl)
 
 .check_d:
-    bit 2, a            ; bit 2 is 'D'
-    jr nz, .check_camera_done     ; if not pressed, check w row
+    bit 2, a
+    jr nz, .check_camera_done
     ld hl, camera_x
-    inc (hl)            ; move camera right
+    inc (hl)
 
 .check_camera_done:
-    ; read keyboard row for Z, X, C, V (port $BFFD)
-    ld bc, $fefe        ; row select
+
+.check_hero:
+    ld bc, $fefe        ; row for Z, X, C, V
     in a, (c)           ; read row (0 = pressed)
 
 .check_z:
-    ; left = Z (bit 0)
     bit 1, a
     jr nz, .check_x
     ld hl, hero_x
     dec (hl)
 
 .check_x:
-    ; right = X (bit 1)
     bit 2, a
     jr nz, .check_c
-    ld hl, hero_x
+    ld hl, hero_y
     inc (hl)
 
 .check_c:
-    ; up = C (bit 2)
     bit 3, a
     jr nz, .check_v
     ld hl, hero_y
     dec (hl)
 
 .check_v:
-    ; down = V (bit 3)
     bit 4, a
-    jr nz, .done
-    ld hl, hero_y
+    jr nz, .check_hero_done
+    ld hl, hero_x
     inc (hl)
 
-.done:
+.check_hero_done:
 
+;-------------------------------------------------------------------------------
     jp main_loop
+;-------------------------------------------------------------------------------
 
 ; ------------------------------------------------------------------------------
 ; renders a sprite
