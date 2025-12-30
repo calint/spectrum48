@@ -11,7 +11,7 @@ HERO_SPRITE_BIT: equ 1
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
-sprites_collision_bit: db 0   ; 8 bits for sprite collisions
+sprites_collision_bits: db 0   ; 8 bits for sprite collisions
 
 camera_x: db 0
 camera_x_prv: db $ff
@@ -23,7 +23,7 @@ hero_y_prv: db 100
 
 ; used by `render_sprite`
 render_sprite_collision: db 0 ; if non-zero sprite collided with drawn content
-render_sprite_shift_amt: db 0 ; temporary
+render_sprite_shift_amt: db 0 ; temporary subroutine internal
 
 ;-------------------------------------------------------------------------------
 start:
@@ -73,14 +73,20 @@ render_sprites:
     out ($fe), a
 
     xor a
-    ld (sprites_collision_bit), a
+    ld (sprites_collision_bits), a
 
     ; wipe hero from old position before move
     ld a, (hero_x_prv)
     ld b, a                     ; B is old x
     ld a, (hero_y_prv)
     ld c, a                     ; C is old y
+
     call restore_sprite_background
+
+    ld a, (hero_x)
+    ld (hero_x_prv), a          ; save hero_x to previous
+    ld a, (hero_y)
+    ld (hero_y_prv), a          ; save hero_y to previous
 
     ; render hero
     ld a, (hero_x)
@@ -92,14 +98,14 @@ render_sprites:
     ld a, (render_sprite_collision)
     or a
     jr z, .no_collision
-    ld a, (sprites_collision_bit)
+    ld a, (sprites_collision_bits)
     or HERO_SPRITE_BIT
-    ld (sprites_collision_bit), a
+    ld (sprites_collision_bits), a
 .no_collision:
     ; done render hero
 
 
-    ld a, (sprites_collision_bit)
+    ld a, (sprites_collision_bits)
     ld hl, $401f
     ld (hl), a
 
@@ -108,11 +114,6 @@ input:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_INPUT
     out ($fe), a
-
-    ld a, (hero_x)
-    ld (hero_x_prv), a          ; save hero_x to previous
-    ld a, (hero_y)
-    ld (hero_y_prv), a          ; save hero_y to previous
 
 .check_camera:
     ; check 'A' (left) and 'D' (right)
@@ -214,7 +215,7 @@ render_sprite:
  
     ld b, 16                    ; loop counter (16 lines)
 
-draw_loop:
+.draw_loop:
     push bc                     ; save loop counter
     push hl                     ; save screen address start of line
 
@@ -228,16 +229,16 @@ draw_loop:
 
     ld a, (render_sprite_shift_amt)
     or a                        ; check if shift is 0
-    jr z, shift_done            ; skip if no shift needed (fast path)
+    jr z, .shift_done            ; skip if no shift needed (fast path)
  
     ld b, a                     ; B = shift counter
-shift_bits:
+.shift_bits:
     srl d                       ; shift left byte, bit 0 goes to carry
     rr e                        ; rotate right byte, carry goes into bit 7
     rr c                        ; rotate spill byte, carry goes into bit 7
-    djnz shift_bits
+    djnz .shift_bits
 
-shift_done:
+.shift_done:
     ; we now have 3 bytes to draw: D, E, C
     ; D = left, E = middle, C = right (spill)
 
@@ -302,26 +303,26 @@ shift_done:
     inc ix
  
     pop bc                      ; restore loop counter
-    djnz draw_loop
+    djnz .draw_loop
     ret
 
 ; ------------------------------------------------------------------------------
 ; draws a 8x8 tile to the screen
-; inputs ixh=screen_x a=screen_y
+; inputs IXH=screen_x A=screen_y
 ; ------------------------------------------------------------------------------
 draw_single_tile
     push af                     ; save screen row in A
-    
+ 
     ; get tile id from map
     ld h, high tile_map         ; tile_map base in H
     add a, h                    ; A is base high byte plus row
     ld h, a                     ; H is now the correct high byte
-    
+ 
     ld a, (camera_x)            ; get current camera offset in A
     add a, ixh                  ; add screen x in IXH
     ld l, a                     ; L is final map column
     ld a, (hl)                  ; A is tile id from HL
-    
+ 
     ; get charset address
     ld l, a
     ld h, 0
@@ -331,14 +332,14 @@ draw_single_tile
     ld de, charset
     add hl, de                  ; HL is bitmap source
     ex de, hl                   ; DE is source
-    
+
     ; calculate screen address
     pop af                      ; A is screen row
     ld b, a                     ; save row in B
     and %00011000               ; isolate row bits 3 4
     or $40                      ; screen base 4000
     ld h, a                     ; screen high byte in H
-    
+
     ld a, b
     and %00000111               ; isolate row bits 0 to 2
     rrca
@@ -346,7 +347,7 @@ draw_single_tile
     rrca                        ; move bits to 5 6 7
     or ixh                      ; add screen column IXH
     ld l, a                     ; screen low byte in L
-    
+
     ; copy 8 bytes
     ld b, 8                     ; 8 scanlines in B
 .char_loop
@@ -355,12 +356,12 @@ draw_single_tile
     inc de                      ; next source in DE
     inc h                       ; next screen line in H
     djnz .char_loop
-    
+ 
     ret
 
 ; ------------------------------------------------------------------------------
 ; restores tiles from tile_map for a 16x16 sprite area
-; inputs  B = x pixel C = y pixel
+; inputs  b = x pixel c = y pixel
 ; ------------------------------------------------------------------------------
 restore_sprite_background
     ; calculate starting tile column x / 8
@@ -397,10 +398,7 @@ restore_sprite_background
     cp 24               ; check vertical boundary
     jr nc, .next_row
 
-    ; prepare for draw_single_tile
-    ld a, (camera_x)
-    add a, d            ; map x is camera plus D
-    ld ixl, a           ; IXL is map column
+    ; draw_single_tile handles camera_x automatically
     ld ixh, d           ; IXH is screen column
     ld a, e             ; A is screen row
     call draw_single_tile
