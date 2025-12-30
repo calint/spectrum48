@@ -94,7 +94,9 @@ render_sprites:
     ld a, (hero_y)
     ld c, a
     ld ix, sprites_data_8
+
     call render_sprite
+    
     ; update sprites collision bits
     ld a, (render_sprite_collision)
     or a
