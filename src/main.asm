@@ -238,7 +238,7 @@ shift_done:
     ; advance pointers
     pop hl                      ; restore start of line address
 
-    call move_down_scanline     ; helper to move HL down 1 pixel row
+    call .move_down_scanline    ; helper to move HL down 1 pixel row
 
     inc ix                      ; move sprite pointer +2
     inc ix
@@ -248,7 +248,7 @@ shift_done:
     ret
 
 ; helper: calculate pixel row down logic for spectrum layout
-move_down_scanline:
+.move_down_scanline:
     inc h                       ; increment high byte (pixel row)
     ld a, h
     and $07                     ; check if we crossed 8-line char boundary
