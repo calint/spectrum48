@@ -23,7 +23,6 @@ hero_y_prv: db 100
 
 ; used by `render_sprite`
 render_sprite_collision: db 0 ; if non-zero sprite collided with drawn content
-render_sprite_shift_amt: db 0 ; temporary subroutine internal
 
 ;-------------------------------------------------------------------------------
 start:
@@ -211,7 +210,7 @@ render_sprite:
     ; prepare shift counter
     ld a, b
     and $07                     ; x % 8 (shift amount)
-    ld (render_sprite_shift_amt), a ; save for later loop
+    ld (.shift_amt), a ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
 
@@ -227,7 +226,7 @@ render_sprite:
     ; we need to shift DE into a 3rd byte (C)
     ld c, 0                     ; C will hold the "spillover" bits
 
-    ld a, (render_sprite_shift_amt)
+    ld a, (.shift_amt)
     or a                        ; check if shift is 0
     jr z, .shift_done            ; skip if no shift needed (fast path)
  
@@ -305,6 +304,9 @@ render_sprite:
     pop bc                      ; restore loop counter
     djnz .draw_loop
     ret
+
+    ; temporaries for this subrouting
+    .shift_amt: db 0 ; temporary subroutine internal
 
 ; ------------------------------------------------------------------------------
 ; draws a 8x8 tile to the screen
