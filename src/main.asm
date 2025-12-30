@@ -148,8 +148,8 @@ input:
 ; inputs:  b = x coordinate (0-255 pixels)
 ;          c = y coordinate (0-191 pixels)
 ;          ix = pointer to sprite data
-; ouputs:  render_sprite_collision = non-zero if rendered over content
-; clobbers: 
+; outputs: render_sprite_collision = non-zero if rendered over content
+; clobbers: A, B, C, D, E, H, L, IX
 ; ------------------------------------------------------------------------------
 render_sprite:
     xor a
