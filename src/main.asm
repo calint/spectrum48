@@ -316,7 +316,7 @@ render_sprite:
     ret
 
     ; temporaries for this subrouting
-    .shift_amt: db 0 ; temporary subroutine internal
+    .shift_amt: db 0
 
 ; ------------------------------------------------------------------------------
 ; draws a 8x8 tile to the screen
