@@ -3,7 +3,9 @@ org $8000
 ; constants
 ;-------------------------------------------------------------------------------
 BORDER_VBLANK: equ 1
-BORDER_RENDER: equ 14
+BORDER_RENDER_TILE_MAP: equ 14
+BORDER_RENDER_SPRITES: equ 4
+BORDER_INPUT: equ 9
 HERO_SPRITE_BIT: equ 1
 
 ;-------------------------------------------------------------------------------
@@ -32,10 +34,53 @@ main_loop:
     out ($fe), a        ; set border
     halt                ; sleep until the start of the next frame
  
-    ld a, BORDER_RENDER ; visualize render tile map phase
+    ld a, BORDER_RENDER_TILE_MAP
     out ($fe), a
 
+render_tile_map:
+    ld a, (camera_x)
+    ld ixl, a
+    ld a, 0             ; current loop column (0-31)
+.loop:
+    ld ixh, a           ; save A
+    include "render_rows.asm"
+    ld a, ixh           ; restore A
+    inc a
+    cp 32
+    jp nz, .loop
+
+render_sprites:
+    ld a, BORDER_RENDER_SPRITES
+    out ($fe), a
+
+    xor a
+    ld (sprites_collision_bit), a
+
+    ; render hero
+    ld a, (hero_x)
+    ld b, a
+    ld a, (hero_y)
+    ld c, a
+    ld ix, sprites_data_8
+    call render_sprite
+    ld a, (render_sprite_collision)
+    or a
+    jr z, .no_collision
+    ld a, (sprites_collision_bit)
+    or HERO_SPRITE_BIT
+    ld (sprites_collision_bit), a
+.no_collision:
+    ; done render hero
+
+
+    ld a, (sprites_collision_bit)
+    ld hl, $401f
+    ld (hl), a
+
 input:
+    ld a, BORDER_INPUT
+    out ($fe), a
+
     ; check 'A' (left) and 'D' (right)
     ld bc, $fdfe        ; row A, S, D, F, G
     in a, (c)           ; read port
@@ -86,42 +131,6 @@ input:
     inc (hl)
 
 .done:
-
-render:
-    ld a, (camera_x)
-    ld ixl, a
-    ld a, 0             ; current loop column (0-31)
-.loop:
-    ld ixh, a           ; save A
-    include "render_rows.asm"
-    ld a, ixh           ; restore A
-    inc a
-    cp 32
-    jp nz, .loop
-
-    xor a
-    ld (sprites_collision_bit), a
-
-    ; render hero
-    ld a, (hero_x)
-    ld b, a
-    ld a, (hero_y)
-    ld c, a
-    ld ix, sprites_data_8
-    call render_sprite
-    ld a, (render_sprite_collision)
-    or a
-    jr z, .no_collision
-    ld a, (sprites_collision_bit)
-    or HERO_SPRITE_BIT
-    ld (sprites_collision_bit), a
-.no_collision:
-    ; done render hero
-
-
-    ld a, (sprites_collision_bit)
-    ld hl, $401f
-    ld (hl), a
 
     jp main_loop
 
