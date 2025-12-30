@@ -4,9 +4,22 @@ org $8000
 ;-------------------------------------------------------------------------------
 BORDER_VBLANK: equ 1
 BORDER_RENDER: equ 14
+HERO_SPRITE_BIT: equ 1
 
 ;-------------------------------------------------------------------------------
+; variables
+;-------------------------------------------------------------------------------
+sprites_collision_bit: db 0   ; 8 bits for sprite collisions
 
+camera_x: db 0
+hero_x: db 100
+hero_y: db 100
+
+; used by `render_sprite`
+render_sprite_collision: db 0 ; if non-zero sprite collided with drawn content
+render_sprite_shift_amt: db 0 ; temporary
+
+;-------------------------------------------------------------------------------
 start:
     ld hl, $5800        ; attribute start
     ld (hl), 7          ; white on black
@@ -86,36 +99,49 @@ render:
     cp 32
     jp nz, .loop
 
+    xor a
+    ld (sprites_collision_bit), a
+
+    ; render hero
     ld a, (hero_x)
     ld b, a
     ld a, (hero_y)
     ld c, a
     ld ix, sprites_data_8
     call render_sprite
+    ld a, (render_sprite_collision)
+    or a
+    jr z, .no_collision
+    ld a, (sprites_collision_bit)
+    or HERO_SPRITE_BIT
+    ld (sprites_collision_bit), a
+.no_collision:
+    ; done render hero
 
-    ld a, (sprite_collision)
+
+    ld a, (sprites_collision_bit)
     ld hl, $401f
     ld (hl), a
+
     jp main_loop
 
-hero_x: defb 0
-hero_y: defb 0
-sprite_collision: defb 0
-
-; ----------------------------------------------------------------
+; ------------------------------------------------------------------------------
+; renders a sprite
 ; inputs:  b = x coordinate (0-255 pixels)
 ;          c = y coordinate (0-191 pixels)
 ;          ix = pointer to sprite data
-; ----------------------------------------------------------------
+; ouputs:  render_sprite_collision = non-zero if rendered over content
+; clobbers: 
+; ------------------------------------------------------------------------------
 render_sprite:
     xor a
-    ld (sprite_collision), a
+    ld (render_sprite_collision), a
 
-    ; --- step 1: calculate screen address ---
-    ld a, c                     ; y to a
+    ; calculate screen address
+    ld a, c                     ; y to A
     and $07                     ; mask 00000111 (y bits 0-2)
-    or $40                      ; add base address (e.g., $d0)
-    ld h, a                     ; store in h
+    or $40                      ; add base address
+    ld h, a                     ; store in H
 
     ld a, c
     rra                         ; rotate y bits to position
@@ -123,26 +149,26 @@ render_sprite:
     rra
     and $18                     ; isolate y bits 3-4 (sector offset)
     or h
-    ld h, a                     ; h is now correct
+    ld h, a                     ; H is now correct
 
     ld a, c
     rla                         ; rotate y bits 5-7 to position
     rla
     and $e0                     ; isolate them
-    ld l, a                     ; start l
+    ld l, a                     ; start L
 
-    ld a, b                     ; x to a
+    ld a, b                     ; x to A
     rra
     rra
     rra
     and $1f                     ; x / 8 (column 0-31)
-    or l                        ; combine with l
-    ld l, a                     ; hl now points to screen byte
+    or l                        ; combine with L
+    ld l, a                     ; HL now points to screen byte
 
-    ; --- step 2: prepare shift counter ---
+    ; prepare shift counter
     ld a, b
     and $07                     ; x % 8 (shift amount)
-    ld (shift_amt), a           ; save for later loop
+    ld (render_sprite_shift_amt), a ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
 
@@ -150,19 +176,19 @@ draw_loop:
     push bc                     ; save loop counter
     push hl                     ; save screen address start of line
 
-    ; --- step 3: fetch sprite bytes ---
+    ; fetch sprite bytes
     ld d, (ix+0)                ; load left sprite byte
     ld e, (ix+1)                ; load right sprite byte
 
-    ; --- step 4: shift 16-bit row right by (shift_amt) ---
-    ; we need to shift de into a 3rd byte (let's use c)
-    ld c, 0                     ; c will hold the "spillover" bits
+    ; shift 16-bit row right by (render_sprite_shift_amt)
+    ; we need to shift DE into a 3rd byte (C)
+    ld c, 0                     ; C will hold the "spillover" bits
 
-    ld a, (shift_amt)
+    ld a, (render_sprite_shift_amt)
     or a                        ; check if shift is 0
     jr z, shift_done            ; skip if no shift needed (fast path)
  
-    ld b, a                     ; b = shift counter
+    ld b, a                     ; B = shift counter
 shift_bits:
     srl d                       ; shift left byte, bit 0 goes to carry
     rr e                        ; rotate right byte, carry goes into bit 7
@@ -170,48 +196,49 @@ shift_bits:
     djnz shift_bits
 
 shift_done:
-    ; we now have 3 bytes to draw: d, e, c
-    ; d = left, e = middle, c = right (spill)
+    ; we now have 3 bytes to draw: D, E, C
+    ; D = left, E = middle, C = right (spill)
 
-    ; --- step 5: draw to screen (or logic) ---
+    ; draw to screen and detect collision 
     ; byte 1
-    ld a, (hl)                  ; get current screen
+    ld a, (hl)                  ; load current screen pixels
     and d                       ; check collision
     ld b, a                     ;
-    ld a, (sprite_collision)    ;
+    ld a, (render_sprite_collision)
     or b                        ;
-    ld (sprite_collision), a    ;
+    ld (render_sprite_collision), a
     ld a, (hl)                  ; reload screen pixels
     or d                        ; or with sprite left
     ld (hl), a                  ; write back
     inc hl
 
     ; byte 2
-    ld a, (hl)
+    ld a, (hl)                  ; load current screen pixels
     and e                       ; check collision
     ld b, a                     ;
-    ld a, (sprite_collision)    ;
+    ld a, (render_sprite_collision)
     or b                        ;
-    ld (sprite_collision), a    ;
+    ld (render_sprite_collision), a
     ld a, (hl)                  ; reload screen pixels
     or e                        ; or with sprite middle
-    ld (hl), a
+    ld (hl), a                  ; write back
     inc hl
 
     ; byte 3 (spillover)
-    ld a, (hl)
-    and c
-    ld b, a
-    ld a, (sprite_collision)
-    or b
-    ld (sprite_collision), a
+    ld a, (hl)                  ; load current screen pixels
+    and c                       ; check collision
+    ld b, a                     ;
+    ld a, (render_sprite_collision)
+    or b                        ;
+    ld (render_sprite_collision), a
     ld a, (hl)                  ; reload screen pixels
     or c                        ; or with sprite spill
-    ld (hl), a
+    ld (hl), a                  ; write back
 
-    ; --- step 6: advance pointers ---
+    ; advance pointers
     pop hl                      ; restore start of line address
-    call move_down_scanline     ; helper to move hl down 1 pixel row
+
+    call move_down_scanline     ; helper to move HL down 1 pixel row
 
     inc ix                      ; move sprite pointer +2
     inc ix
@@ -225,25 +252,19 @@ move_down_scanline:
     inc h                       ; increment high byte (pixel row)
     ld a, h
     and $07                     ; check if we crossed 8-line char boundary
-    ret nz                      ; if not 0, we are safe
+    ret nz                      ; if not 0 then return 
 
-    ; if we wrapped 0-7, we need to fix the address
+    ; if wrapped 0-7 then fix the address
     ld a, l
     add a, 32                   ; move to next character row
     ld l, a
-    ret c                       ; if carry, we moved to next third, standard handling is ok
-
-    ld a, h                     ; otherwise, subtract 8 from h to stay in correct third
+    ; if carry then moved to next third, standard handling is ok
+    ret c
+    ; otherwise, subtract 8 from H to stay in correct third
+    ld a, h
     sub 8
     ld h, a
     ret
-
-; variable storage
-shift_amt: db 0
-;-------------------------------------------------------------------------------
-; variables
-;-------------------------------------------------------------------------------
-camera_x: defb 0
 
 ;-------------------------------------------------------------------------------
 ; charset: 256 * 8 = 2048 B
