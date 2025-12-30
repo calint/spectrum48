@@ -74,7 +74,8 @@ render_sprites:
     xor a
     ld (sprites_collision_bits), a
 
-    ; wipe hero from old position before move
+    ; render hero
+    ; restore dirty tiles
     ld a, (hero_x_prv)
     ld b, a                     ; B is old x
     ld a, (hero_y_prv)
@@ -87,13 +88,14 @@ render_sprites:
     ld a, (hero_y)
     ld (hero_y_prv), a          ; save hero_y to previous
 
-    ; render hero
+    ; render sprite
     ld a, (hero_x)
     ld b, a
     ld a, (hero_y)
     ld c, a
     ld ix, sprites_data_8
     call render_sprite
+    ; update sprites collision bits
     ld a, (render_sprite_collision)
     or a
     jr z, .no_collision
@@ -103,7 +105,7 @@ render_sprites:
 .no_collision:
     ; done render hero
 
-
+    ; debugging on screen
     ld a, (sprites_collision_bits)
     ld hl, $401f
     ld (hl), a
@@ -115,9 +117,8 @@ input:
     out ($fe), a
 
 .check_camera:
-    ; check 'A' (left) and 'D' (right)
     ld bc, $fdfe        ; row A, S, D, F, G
-    in a, (c)           ; read port
+    in a, (c)           ; read row (0 = pressed)
 
 .check_a:
     bit 0, a
@@ -169,10 +170,11 @@ input:
 
 ; ------------------------------------------------------------------------------
 ; renders a sprite
-; inputs:  B = x coordinate (0-255 pixels)
-;          C = y coordinate (0-191 pixels)
-;          IX = pointer to sprite data
-; outputs: render_sprite_collision = non-zero if rendered over content
+;
+; inputs:   B = x coordinate (0-255 pixels)
+;           C = y coordinate (0-191 pixels)
+;           IX = pointer to sprite data
+; outputs:  render_sprite_collision = non-zero if rendered over content
 ; clobbers: A, B, C, D, E, H, L, IX
 ; ------------------------------------------------------------------------------
 render_sprite:
@@ -310,7 +312,10 @@ render_sprite:
 
 ; ------------------------------------------------------------------------------
 ; draws a 8x8 tile to the screen
-; inputs IXH=screen_x A=screen_y
+;
+; inputs:   IXH=screen_x A=screen_y
+; outputs:  -
+; clobbers: A, B, D, E, H, L
 ; ------------------------------------------------------------------------------
 draw_single_tile
     push af                     ; save screen row in A
@@ -363,7 +368,10 @@ draw_single_tile
 
 ; ------------------------------------------------------------------------------
 ; restores tiles from tile_map for a 16x16 sprite area
-; inputs  b = x pixel c = y pixel
+;
+; inputs:   b = x pixel c = y pixel
+; outputs:  -
+; clobbers: 
 ; ------------------------------------------------------------------------------
 restore_sprite_background
     ; calculate starting tile column x / 8
@@ -400,7 +408,7 @@ restore_sprite_background
     cp 24               ; check vertical boundary
     jr nc, .next_row
 
-    ; draw_single_tile handles camera_x automatically
+    ; `draw_single_tile` handles `camera_x` automatically
     ld ixh, d           ; IXH is screen column
     ld a, e             ; A is screen row
     call draw_single_tile
