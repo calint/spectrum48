@@ -127,12 +127,18 @@ input:
     jr nz, .check_d
     ld hl, camera_x
     dec (hl)
+    ld a, (hero_x)
+    add a, 8
+    ld (hero_x), a
 
 .check_d:
     bit 2, a
     jr nz, .check_camera_done
     ld hl, camera_x
     inc (hl)
+    ld a, (hero_x)
+    sub 8
+    ld (hero_x), a
 
 .check_camera_done:
 
