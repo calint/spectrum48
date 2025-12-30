@@ -202,38 +202,38 @@ shift_done:
     ; draw to screen and detect collision 
     ; byte 1
     ld a, (hl)                  ; load current screen pixels
+    ld b, a                     ; save screen pixels
     and d                       ; check collision
-    ld b, a                     ;
-    ld a, (render_sprite_collision)
-    or b                        ;
-    ld (render_sprite_collision), a
-    ld a, (hl)                  ; reload screen pixels
+    jr z, .no_collision_1       ; skip if no collision
+    ld (render_sprite_collision), a  ; store any non-zero = collision
+.no_collision_1:
+    ld a, b                     ; reload screen pixels
     or d                        ; or with sprite left
     ld (hl), a                  ; write back
     inc hl
 
     ; byte 2
-    ld a, (hl)                  ; load current screen pixels
-    and e                       ; check collision
-    ld b, a                     ;
-    ld a, (render_sprite_collision)
-    or b                        ;
+    ld a, (hl)
+    ld b, a
+    and e
+    jr z, .no_collision_2
     ld (render_sprite_collision), a
-    ld a, (hl)                  ; reload screen pixels
-    or e                        ; or with sprite middle
-    ld (hl), a                  ; write back
+.no_collision_2:
+    ld a, b
+    or e
+    ld (hl), a
     inc hl
 
     ; byte 3 (spillover)
-    ld a, (hl)                  ; load current screen pixels
-    and c                       ; check collision
-    ld b, a                     ;
-    ld a, (render_sprite_collision)
-    or b                        ;
+    ld a, (hl)
+    ld b, a
+    and c
+    jr z, .no_collision_3
     ld (render_sprite_collision), a
-    ld a, (hl)                  ; reload screen pixels
-    or c                        ; or with sprite spill
-    ld (hl), a                  ; write back
+.no_collision_3:
+    ld a, b
+    or c
+    ld (hl), a
 
     ; advance pointers
     pop hl                      ; restore start of line address
