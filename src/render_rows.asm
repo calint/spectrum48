@@ -6,6 +6,13 @@
     ;    input: IXL = tile map column offset, IXH = screen column number
     ; clobbers: A, B, C, D, E, H, L
 
+    ; note: since `charset` is aligned on 2048 the lowest 11 bits in
+    ;       the pointer are 0's which opens for optimization using bit
+    ;       operations such as roll 3 top bits in lower byte into the
+    ;       high byte of the pointer (bit 10, 9, 8 with base 0 in the
+    ;       16-bit pointer) then left shift lower byte by 3 (8 bytes 
+    ;       per character bitmap) then compose the pointer with HL
+
     ld a, ixl
     add a, ixh
     ld c, a          ; C = constant tile map column
@@ -17,13 +24,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -68,13 +75,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -119,13 +126,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -170,13 +177,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -221,13 +228,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -272,13 +279,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -323,13 +330,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -374,13 +381,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -423,13 +430,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -474,13 +481,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -525,13 +532,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -576,13 +583,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -627,13 +634,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -678,13 +685,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -729,13 +736,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -780,13 +787,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -829,13 +836,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -880,13 +887,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -931,13 +938,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -982,13 +989,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -1033,13 +1040,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -1084,13 +1091,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -1135,13 +1142,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
@@ -1186,13 +1193,13 @@
     ld l, c
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup index
-    and %11100000    ; get top 3 bits for high byte
+    and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff
+    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
     ld h, a          ; H = charset page
-    ld a, l
+    ld a, l          ; shift tile index by 3
     add a, a         ; x2
     add a, a         ; x4
     add a, a         ; x8
