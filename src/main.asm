@@ -14,6 +14,8 @@ HERO_SPRITE_BIT: equ 1
 sprites_collision_bit: db 0   ; 8 bits for sprite collisions
 
 camera_x: db 0
+camera_x_prv: db $ff
+
 hero_x: db 100
 hero_y: db 100
 
@@ -34,15 +36,23 @@ start:
 main_loop:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_VBLANK
-    out ($fe), a        ; set border
+    out ($fe), a
+
     halt                ; sleep until the start of the next frame
  
-    ld a, BORDER_RENDER_TILE_MAP
-    out ($fe), a
+    ; check if camera position changed triggering a re-draw of tile map
+    ; ld hl, camera_x_prv
+    ; ld a, (camera_x)
+    ; cp (hl)
+    ; jp z, render_sprites
+    ; ld (hl), a
 
 ;-------------------------------------------------------------------------------
 render_tile_map:
 ;-------------------------------------------------------------------------------
+    ld a, BORDER_RENDER_TILE_MAP
+    out ($fe), a
+
     ld a, (camera_x)
     ld ixl, a
     ld a, 0             ; current loop column (0-31)
