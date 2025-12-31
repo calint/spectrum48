@@ -183,7 +183,7 @@ input:
 ;           C = y coordinate (0-191 pixels)
 ;           IX = pointer to sprite data
 ; outputs:  render_sprite_collision = non-zero if rendered over content
-; clobbers: A, B, C, D, E, H, L, IX
+; clobbers: AF, BC, DE, HL, IX
 ; ------------------------------------------------------------------------------
 render_sprite:
     ; clear collision byte (0 = no collision)
@@ -326,13 +326,14 @@ render_sprite:
     ; temporaries for this subroutine
     .shift_amt: db 0
 
-; ------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 ; draws a 8x8 tile to the screen
 ;
-; inputs:   IXH=screen_x A=screen_y
+; inputs:   IXH = screen_x
+;           A = screen_y
 ; outputs:  -
-; clobbers: A, B, D, E, H, L
-; ------------------------------------------------------------------------------
+; clobbers: AF, B, DE, HL
+;-------------------------------------------------------------------------------
 draw_single_tile
     push af                     ; save screen row in A
  
@@ -363,39 +364,81 @@ draw_single_tile
     or $40                      ; screen base 4000
     ld h, a                     ; screen high byte in H
 
-    ld a, b
+    ld a, b                     ; screen row to A
     and %00000111               ; isolate row bits 0 to 2
-    rrca
+    rrca                        ; rotate lower bits to high bits
     rrca
     rrca                        ; move bits to 5 6 7
     or ixh                      ; add screen column IXH
     ld l, a                     ; screen low byte in L
 
     ; copy 8 bytes
-    ld b, 8                     ; 8 scanlines in B
-.char_loop
+
+    ; scanline 0
     ld a, (de)                  ; fetch byte from DE
     ld (hl), a                  ; write to HL screen
     inc de                      ; next source in DE
     inc h                       ; next screen line in H
-    djnz .char_loop
+
+    ; scanline 1
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+
+    ; scanline 2
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+
+    ; scanline 3
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+
+    ; scanline 4
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+
+    ; scanline 5
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+
+    ; scanline 6
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
+
+    ; scanline 7
+    ld a, (de)                  ; fetch byte from DE
+    ld (hl), a                  ; write to HL screen
+    inc de                      ; next source in DE
+    inc h                       ; next screen line in H
  
     ret
 
-; ------------------------------------------------------------------------------
-; restores tiles from tile_map for a 16x16 sprite area
+;-------------------------------------------------------------------------------
+; restores tiles from tile_map for a 16 x 16 sprite area
 ;
-; inputs:   b = x pixel c = y pixel
+; inputs:   B = x pixel
+;           C = y pixel
 ; outputs:  -
-; clobbers: 
-; ------------------------------------------------------------------------------
+; clobbers: AF, BC, DE, IX
+;-------------------------------------------------------------------------------
 restore_sprite_background
     ; calculate starting tile column x / 8
     ld a, b
     rrca
     rrca
     rrca
-    and $1f
+    and %00011111
     ld d, a             ; D is screen column 0 to 31
 
     ; calculate starting tile row y / 8
@@ -403,7 +446,7 @@ restore_sprite_background
     rrca
     rrca
     rrca
-    and $1f
+    and %00011111
     ld e, a             ; E is screen row 0 to 23
 
     ld b, 3             ; loop 3 columns
@@ -411,20 +454,21 @@ restore_sprite_background
     push bc
     push de             ; save current screen D and E
 
-    ld a, d
+    ld a, d             ; screen column to A
     cp 32               ; check screen boundary
-    jr nc, .next_col
+    jr nc, .next_col    ; if A >= 32
 
     ld b, 3             ; loop 3 rows
 .row_loop
     push bc
     push de
 
-    ld a, e
+    ld a, e             ; screen row to A
     cp 24               ; check vertical boundary
-    jr nc, .next_row
+    jr nc, .next_row    ; if A >= 24
 
-    ; `draw_single_tile` handles `camera_x` automatically
+    ; call `draw_single_tile`
+    ; note: handles `camera_x` offset
     ld ixh, d           ; IXH is screen column
     ld a, e             ; A is screen row
     call draw_single_tile
