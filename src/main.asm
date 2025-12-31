@@ -29,19 +29,21 @@ HERO_FLAG_JUMPING:    equ 4
 ;-------------------------------------------------------------------------------
 sprites_collision_bits: db 0   ; 8 bits for sprite collisions
 
-camera_x:     db -16
-camera_x_prv: db $ff
+camera_x      db -16
+camera_x_prv  db $ff
 
-hero_frame_counter: db 0
+hero_frame_counter  db 0
 
-hero_x:     dw 132 << SUBPIXELS 
-hero_y:     dw   0 << SUBPIXELS
+hero_x      dw 132 << SUBPIXELS 
+hero_y      dw 0
 hero_dx     dw 0
 hero_dy     dw 0
-hero_x_prv: dw 132 << SUBPIXELS
-hero_y_prv: dw   0 << SUBPIXELS
+hero_x_prv  dw 132 << SUBPIXELS
+hero_y_prv  dw 0
 hero_dx_prv dw 0
 hero_dy_prv dw 0
+hero_x_drw  db 132 ; previous render sprite x
+hero_y_drw  db 0   ; previous render sprite y
 hero_flags  db 0
 
 
@@ -104,19 +106,11 @@ render_sprites:
 
     ; call restore_sprite_background
     ; B = hero_x_prv >> SUBPIXELS
-    ld hl, (hero_x_prv)
-    rept SUBPIXELS
-        srl h
-        rr  l
-    endm
-    ld b, l
+    ld a, (hero_x_drw)
+    ld b, a
     ; C = hero_y_prv >> SUBPIXELS
-    ld hl, (hero_y_prv)
-    rept SUBPIXELS
-        srl h
-        rr  l
-    endm
-    ld c, l
+    ld a, (hero_y_drw)
+    ld c, a
     call restore_sprite_background
 
     ; call render_sprite
@@ -126,6 +120,8 @@ render_sprites:
         rr  l
     endm
     ld b, l
+    ld a, b
+    ld (hero_x_drw), a
     ; C = hero_y_prv >> SUBPIXELS
     ld hl, (hero_y)
     rept SUBPIXELS
@@ -133,6 +129,8 @@ render_sprites:
         rr  l
     endm
     ld c, l
+    ld a, c
+    ld (hero_y_drw), a
     ld ix, sprites_data_8
     call render_sprite
 
