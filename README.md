@@ -1,8 +1,8 @@
-# spectrum 48
+# spectrum 48k
 
 ## intention
 
-* learn cpu z80 by writing assembler for spectrum 48
+* learn cpu z80 by writing assembler for spectrum 48k
 * render a tile map
 * sprite implementation
 * read keyboard
