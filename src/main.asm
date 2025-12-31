@@ -2,24 +2,48 @@ org $8000
 ;-------------------------------------------------------------------------------
 ; constants
 ;-------------------------------------------------------------------------------
-BORDER_VBLANK: equ 1
+BORDER_VBLANK:          equ 1
 BORDER_RENDER_TILE_MAP: equ 14
-BORDER_RENDER_SPRITES: equ 4
-BORDER_INPUT: equ 9
-HERO_SPRITE_BIT: equ 1
+BORDER_RENDER_SPRITES:  equ 4
+BORDER_INPUT:           equ 9
+
+; tunable constants
+SUBPIXELS: equ 4
+
+GRAVITY:          equ 3
+GRAVITY_INTERVAL: equ %1111
+
+HERO_SPRITE_BIT:      equ 1
+HERO_MOVE_DX:         equ 8
+HERO_JUMP_VELOCITY:   equ 33
+HERO_SKIP_VELOCITY:   equ 20
+HERO_SKIP_INTERVAL:   equ %1111
+
+; hard constants
+HERO_FLAG_RESTARTING: equ 1
+HERO_FLAG_MOVING:     equ 2
+HERO_FLAG_JUMPING:    equ 4
 
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
 sprites_collision_bits: db 0   ; 8 bits for sprite collisions
 
-camera_x: db 0
+camera_x:     db -16
 camera_x_prv: db $ff
 
-hero_x: db 100
-hero_y: db 100
-hero_x_prv: db 100
-hero_y_prv: db 100
+hero_frame_counter: db 0
+
+hero_x:     dw 100 << SUBPIXELS 
+hero_y:     dw 100 << SUBPIXELS
+hero_dx     dw 0
+hero_dy     dw 0
+hero_x_prv: dw 100 << SUBPIXELS
+hero_y_prv: dw 100 << SUBPIXELS
+hero_dx_prv dw 0
+hero_dy_prv dw 0
+hero_flags  db 0
+
 
 ; used by `render_sprite`
 render_sprite_collision: db 0 ; if non-zero sprite collided with drawn content
@@ -79,23 +103,36 @@ render_sprites:
     ; restore dirty tiles
 
     ; call restore_sprite_background
-    ld a, (hero_x_prv)
-    ld b, a                     ; B is old x
-    ld a, (hero_y_prv)
-    ld c, a                     ; C is old y
+    ; B = hero_x_prv >> SUBPIXELS
+    ld hl, (hero_x_prv)
+    rept SUBPIXELS
+        srl h
+        rr  l
+    endm
+    ld b, l
+    ; C = hero_y_prv >> SUBPIXELS
+    ld hl, (hero_y_prv)
+    rept SUBPIXELS
+        srl h
+        rr  l
+    endm
+    ld c, l
     call restore_sprite_background
 
-    ; save current position to previous
-    ld a, (hero_x)
-    ld (hero_x_prv), a          ; save hero_x to previous
-    ld a, (hero_y)
-    ld (hero_y_prv), a          ; save hero_y to previous
-
     ; call render_sprite
-    ld a, (hero_x)
-    ld b, a
-    ld a, (hero_y)
-    ld c, a
+    ld hl, (hero_x)
+    rept SUBPIXELS
+        srl h
+        rr  l
+    endm
+    ld b, l
+    ; C = hero_y_prv >> SUBPIXELS
+    ld hl, (hero_y)
+    rept SUBPIXELS
+        srl h
+        rr  l
+    endm
+    ld c, l
     ld ix, sprites_data_8
     call render_sprite
 
@@ -107,18 +144,46 @@ render_sprites:
     or HERO_SPRITE_BIT
     ld (sprites_collision_bits), a
 _no_collision:
-    ; done render hero
 
+    ; done render hero
     ; debugging on screen
     ld a, (sprites_collision_bits)
     ld hl, $401f
     ld (hl), a
 
 ;-------------------------------------------------------------------------------
+check_collision:
+;-------------------------------------------------------------------------------
+    ; check collision
+    ld a, (sprites_collision_bits)
+    and HERO_SPRITE_BIT
+    jr z, _no_collision
+
+    ; restore previous position and set dx, dy to 0
+    ld hl, (hero_x_prv)
+    ld (hero_x), hl
+    ld hl, (hero_y_prv)
+    ld (hero_y), hl
+    ld hl, 0
+    ld (hero_dx), hl
+    ld (hero_dy), hl
+
+    ; clear flags
+    ld a, (hero_flags)
+    and ~HERO_FLAG_JUMPING & ~HERO_FLAG_RESTARTING
+    ld (hero_flags), a
+
+_no_collision:
+
+;-------------------------------------------------------------------------------
 input:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_INPUT
     out ($fe), a
+
+    ; set horizontal velocity to 0
+    ld hl, 0
+    ld (hero_dx), hl
 
 _check_camera:
     ld bc, $fdfe        ; row A, S, D, F, G
@@ -127,52 +192,178 @@ _check_camera:
 _check_a:
     bit 0, a
     jr nz, _check_d
+
+    ; adjust camera x
     ld hl, camera_x
     dec (hl)
-    ld a, (hero_x)
-    add a, 8
-    ld (hero_x), a
+
+    ; adjust hero x
+    ld hl, (hero_x)
+    ld de, 8 << SUBPIXELS
+    add hl, de
+    ld (hero_x), hl
 
 _check_d:
     bit 2, a
     jr nz, _check_camera_done
+
+    ; adjust camera x
     ld hl, camera_x
     inc (hl)
-    ld a, (hero_x)
-    sub 8
-    ld (hero_x), a
+
+    ; adjust hero x
+    ld hl, (hero_x)
+    ld de, 8 << SUBPIXELS
+    or a                ; clear carry
+    sbc hl, de
+    ld (hero_x), hl
 
 _check_camera_done:
 
 _check_hero:
     ld bc, $fefe        ; row for Z, X, C, V
-    in a, (c)           ; read row (0 = pressed)
+    in b, (c)           ; read row (0 = pressed)
+
+    ld hl, $4010
+    ld (hl), a
 
 _check_z:
-    bit 1, a
+    bit 1, b
     jr nz, _check_x
-    ld hl, hero_x
-    dec (hl)
+
+    ld a, (hero_flags)
+    or HERO_FLAG_MOVING
+    ld (hero_flags), a
+
+    ld hl, -HERO_MOVE_DX
+    ld (hero_dx), hl
+
+    ; if not at skip (small jump) interval then continue to next step
+    ld a, (hero_frame_counter)
+    and HERO_SKIP_INTERVAL
+    jr nz, _check_z_done
+
+    ; if there is vertical movement then don't skip (small jump)
+    ld hl, (hero_dy)
+    ld a, h
+    or l
+    jr nz, _check_z_done
+
+    ; set skip (small jump) `dy`
+    ld hl, -HERO_SKIP_VELOCITY 
+    ld (hero_dy), hl
+
+_check_z_done:
 
 _check_x:
-    bit 2, a
+    bit 2, b
     jr nz, _check_c
-    ld hl, hero_y
-    inc (hl)
+
+    ld hl, -HERO_MOVE_DX
+    ld (hero_dy), hl
 
 _check_c:
-    bit 3, a
+    bit 3, b
     jr nz, _check_v
-    ld hl, hero_y
-    dec (hl)
+
+    ld hl, HERO_MOVE_DX
+    ld (hero_dy), hl
 
 _check_v:
-    bit 4, a
+    bit 4, b
+    jr nz, _check_shift
+
+    ld a, (hero_flags)
+    or HERO_FLAG_MOVING
+    ld (hero_flags), a
+
+    ld hl, HERO_MOVE_DX
+    ld (hero_dx), hl
+
+    ; if not at skip (small jump) interval then continue to next step
+    ld a, (hero_frame_counter)
+    and HERO_SKIP_INTERVAL
+    jr nz, _check_v_done
+
+    ; if there is vertical movement then don't skip (small jump)
+    ld hl, (hero_dy)
+    ld a, h
+    or l
+    jr nz, _check_v_done
+
+    ; set skip (small jump) `dy`
+    ld hl, -HERO_SKIP_VELOCITY 
+    ld (hero_dy), hl
+    ld hl, HERO_MOVE_DX
+    ld (hero_dx), hl
+
+_check_v_done:
+
+_check_shift:
+    bit 0, b
     jr nz, _check_hero_done
-    ld hl, hero_x
-    inc (hl)
+
+    ld a, (hero_flags)
+    and HERO_FLAG_JUMPING
+    jr nz, _check_shift_done
+
+    ld hl, -HERO_JUMP_VELOCITY
+    ld (hero_dy), hl
+
+    ld a, HERO_FLAG_MOVING | HERO_FLAG_JUMPING
+    ld (hero_flags), a
+
+_check_shift_done:
 
 _check_hero_done:
+
+;-------------------------------------------------------------------------------
+physics:
+;-------------------------------------------------------------------------------
+    ; save state to prv
+    ld hl, (hero_x)
+    ld (hero_x_prv), hl
+    ld hl, (hero_y)
+    ld (hero_y_prv), hl
+    ld hl, (hero_dx)
+    ld (hero_dx_prv), hl
+    ld hl, (hero_dy)
+    ld (hero_dy_prv), hl
+
+    ; add velocity to position
+    ld hl, (hero_x)
+    ld de, (hero_dx)
+    add hl, de
+    ld (hero_x), hl
+    ld hl, (hero_y)
+    ld de, (hero_dy)
+    add hl, de
+    ld (hero_y), hl
+
+    ; if hero is jumping then jump to gravity
+    ld a, (hero_flags)
+    and HERO_FLAG_JUMPING
+    jr nz, _gravity
+
+    ld a, (hero_frame_counter)
+    inc a
+    ld (hero_frame_counter), a
+    and GRAVITY_INTERVAL
+    jr z, _gravity
+
+    ld hl, (hero_dy)
+    ld a, h
+    or l
+    jr z, _gravity_done
+
+_gravity:
+    ld hl, (hero_dy)
+    ld de, GRAVITY
+    add hl, de
+    ld (hero_dy), hl
+
+_gravity_done:
+
 
 ;-------------------------------------------------------------------------------
     jp main_loop
