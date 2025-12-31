@@ -75,28 +75,30 @@ render_sprites:
     ld (sprites_collision_bits), a
 
     ; render hero
+
     ; restore dirty tiles
+
+    ; call restore_sprite_background
     ld a, (hero_x_prv)
     ld b, a                     ; B is old x
     ld a, (hero_y_prv)
     ld c, a                     ; C is old y
-
     call restore_sprite_background
 
+    ; save current position to previous
     ld a, (hero_x)
     ld (hero_x_prv), a          ; save hero_x to previous
     ld a, (hero_y)
     ld (hero_y_prv), a          ; save hero_y to previous
 
-    ; render sprite
+    ; call render_sprite
     ld a, (hero_x)
     ld b, a
     ld a, (hero_y)
     ld c, a
     ld ix, sprites_data_8
-
     call render_sprite
-    
+
     ; update sprites collision bits
     ld a, (render_sprite_collision)
     or a
