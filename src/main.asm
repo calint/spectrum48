@@ -329,7 +329,69 @@ render_sprite:
     .shift_amt: db 0
 
 ;-------------------------------------------------------------------------------
-; draws a 8x8 tile to the screen
+; restores tiles from tile_map for a 16 x 16 sprite area
+;
+; inputs:   B = x pixel
+;           C = y pixel
+; outputs:  -
+; clobbers: AF, BC, DE, IX
+;-------------------------------------------------------------------------------
+restore_sprite_background
+    ; calculate starting tile column x / 8
+    ld a, b
+    rrca
+    rrca
+    rrca
+    and %00011111
+    ld d, a             ; D is screen column 0 to 31
+
+    ; calculate starting tile row y / 8
+    ld a, c
+    rrca
+    rrca
+    rrca
+    and %00011111
+    ld e, a             ; E is screen row 0 to 23
+
+    ld b, 3             ; loop 3 columns
+.col_loop
+    push bc
+    push de             ; save current screen D and E
+
+    ld a, d             ; screen column to A
+    cp 32               ; check screen boundary
+    jr nc, .next_col    ; if A >= 32
+
+    ld b, 3             ; loop 3 rows
+.row_loop
+    push bc
+    push de
+
+    ld a, e             ; screen row to A
+    cp 24               ; check vertical boundary
+    jr nc, .next_row    ; if A >= 24
+
+    ; call `draw_single_tile`
+    ; note: handles `camera_x` offset
+    ld ixh, d           ; IXH is screen column
+    ld a, e             ; A is screen row
+    call draw_single_tile
+
+.next_row
+    pop de
+    inc e               ; next row down in E
+    pop bc
+    djnz .row_loop
+
+.next_col
+    pop de
+    inc d               ; next column right in D
+    pop bc
+    djnz .col_loop
+    ret
+
+;-------------------------------------------------------------------------------
+; draws a 8 x 8 tile to the screen
 ;
 ; inputs:   IXH = screen_x
 ;           A = screen_y
@@ -424,68 +486,6 @@ draw_single_tile
     inc de                      ; next source in DE
     inc h                       ; next screen line in H
  
-    ret
-
-;-------------------------------------------------------------------------------
-; restores tiles from tile_map for a 16 x 16 sprite area
-;
-; inputs:   B = x pixel
-;           C = y pixel
-; outputs:  -
-; clobbers: AF, BC, DE, IX
-;-------------------------------------------------------------------------------
-restore_sprite_background
-    ; calculate starting tile column x / 8
-    ld a, b
-    rrca
-    rrca
-    rrca
-    and %00011111
-    ld d, a             ; D is screen column 0 to 31
-
-    ; calculate starting tile row y / 8
-    ld a, c
-    rrca
-    rrca
-    rrca
-    and %00011111
-    ld e, a             ; E is screen row 0 to 23
-
-    ld b, 3             ; loop 3 columns
-.col_loop
-    push bc
-    push de             ; save current screen D and E
-
-    ld a, d             ; screen column to A
-    cp 32               ; check screen boundary
-    jr nc, .next_col    ; if A >= 32
-
-    ld b, 3             ; loop 3 rows
-.row_loop
-    push bc
-    push de
-
-    ld a, e             ; screen row to A
-    cp 24               ; check vertical boundary
-    jr nc, .next_row    ; if A >= 24
-
-    ; call `draw_single_tile`
-    ; note: handles `camera_x` offset
-    ld ixh, d           ; IXH is screen column
-    ld a, e             ; A is screen row
-    call draw_single_tile
-
-.next_row
-    pop de
-    inc e               ; next row down in E
-    pop bc
-    djnz .row_loop
-
-.next_col
-    pop de
-    inc d               ; next column right in D
-    pop bc
-    djnz .col_loop
     ret
 
 ;-------------------------------------------------------------------------------
