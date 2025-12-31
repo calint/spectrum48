@@ -190,10 +190,11 @@ render_sprite:
     xor a
     ld (render_sprite_collision), a
 
+    ; calculate screen address
+
     ; H:   0  1  0 y7 y6 y2 y1 y0
     ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
-    ; calculate screen address
     ld a, c                     ; y to A
     and $07                     ; mask 00000111 (y bits 0-2)
     or $40                      ; add base address
@@ -220,6 +221,8 @@ render_sprite:
     and %00011111               ; isolate the column bits (0-31)
     or l                        ; combine with L
     ld l, a                     ; HL now points to screen byte
+
+    ; render the characters that enclose the sprite
 
     ; prepare shift counter
     ld a, b
@@ -256,6 +259,7 @@ render_sprite:
     ; D = left, E = middle, C = right (spill)
 
     ; draw to screen and detect collision 
+
     ; byte 1
     ld a, (hl)                  ; load current screen pixels
     ld b, a                     ; save screen pixels
