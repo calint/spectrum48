@@ -34,12 +34,12 @@ camera_x_prv: db $ff
 
 hero_frame_counter: db 0
 
-hero_x:     dw 100 << SUBPIXELS 
-hero_y:     dw 100 << SUBPIXELS
+hero_x:     dw 132 << SUBPIXELS 
+hero_y:     dw   0 << SUBPIXELS
 hero_dx     dw 0
 hero_dy     dw 0
-hero_x_prv: dw 100 << SUBPIXELS
-hero_y_prv: dw 100 << SUBPIXELS
+hero_x_prv: dw 132 << SUBPIXELS
+hero_y_prv: dw   0 << SUBPIXELS
 hero_dx_prv dw 0
 hero_dy_prv dw 0
 hero_flags  db 0
@@ -175,6 +175,16 @@ check_collision:
 
 _no_collision:
 
+    ; save state to prv
+    ld hl, (hero_x)
+    ld (hero_x_prv), hl
+    ld hl, (hero_y)
+    ld (hero_y_prv), hl
+    ld hl, (hero_dx)
+    ld (hero_dx_prv), hl
+    ld hl, (hero_dy)
+    ld (hero_dy_prv), hl
+
 ;-------------------------------------------------------------------------------
 input:
 ;-------------------------------------------------------------------------------
@@ -202,6 +212,10 @@ _check_a:
     ld de, 8 << SUBPIXELS
     add hl, de
     ld (hero_x), hl
+    ld hl, (hero_x_prv)
+    ld de, $0080
+    add hl, de
+    ld (hero_x_prv), hl
 
 _check_d:
     bit 2, a
@@ -213,10 +227,13 @@ _check_d:
 
     ; adjust hero x
     ld hl, (hero_x)
-    ld de, 8 << SUBPIXELS
-    or a                ; clear carry
-    sbc hl, de
+    ld de, -(8 << SUBPIXELS)
+    add hl, de
     ld (hero_x), hl
+    ld hl, (hero_x_prv)
+    ld de, $ff80
+    add hl, de
+    ld (hero_x_prv), hl
 
 _check_camera_done:
 
@@ -320,16 +337,6 @@ _check_hero_done:
 ;-------------------------------------------------------------------------------
 physics:
 ;-------------------------------------------------------------------------------
-    ; save state to prv
-    ld hl, (hero_x)
-    ld (hero_x_prv), hl
-    ld hl, (hero_y)
-    ld (hero_y_prv), hl
-    ld hl, (hero_dx)
-    ld (hero_dx_prv), hl
-    ld hl, (hero_dy)
-    ld (hero_dy_prv), hl
-
     ; add velocity to position
     ld hl, (hero_x)
     ld de, (hero_dx)
