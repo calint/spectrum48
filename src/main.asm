@@ -57,13 +57,13 @@ render_tile_map:
     ld a, (camera_x)
     ld ixl, a
     ld a, 0             ; current loop column (0-31)
-.loop:
+_loop:
     ld ixh, a           ; save A
     include "render_rows.asm"
     ld a, ixh           ; restore A
     inc a
     cp 32
-    jp nz, .loop
+    jp nz, _loop
 
 ;-------------------------------------------------------------------------------
 render_sprites:
@@ -102,11 +102,11 @@ render_sprites:
     ; update sprites collision bits
     ld a, (render_sprite_collision)
     or a
-    jr z, .no_collision
+    jr z, _no_collision
     ld a, (sprites_collision_bits)
     or HERO_SPRITE_BIT
     ld (sprites_collision_bits), a
-.no_collision:
+_no_collision:
     ; done render hero
 
     ; debugging on screen
@@ -120,59 +120,59 @@ input:
     ld a, BORDER_INPUT
     out ($fe), a
 
-.check_camera:
+_check_camera:
     ld bc, $fdfe        ; row A, S, D, F, G
     in a, (c)           ; read row (0 = pressed)
 
-.check_a:
+_check_a:
     bit 0, a
-    jr nz, .check_d
+    jr nz, _check_d
     ld hl, camera_x
     dec (hl)
     ld a, (hero_x)
     add a, 8
     ld (hero_x), a
 
-.check_d:
+_check_d:
     bit 2, a
-    jr nz, .check_camera_done
+    jr nz, _check_camera_done
     ld hl, camera_x
     inc (hl)
     ld a, (hero_x)
     sub 8
     ld (hero_x), a
 
-.check_camera_done:
+_check_camera_done:
 
-.check_hero:
+_check_hero:
     ld bc, $fefe        ; row for Z, X, C, V
     in a, (c)           ; read row (0 = pressed)
 
-.check_z:
+_check_z:
     bit 1, a
-    jr nz, .check_x
+    jr nz, _check_x
     ld hl, hero_x
     dec (hl)
 
-.check_x:
+_check_x:
     bit 2, a
-    jr nz, .check_c
+    jr nz, _check_c
     ld hl, hero_y
     inc (hl)
 
-.check_c:
+_check_c:
     bit 3, a
-    jr nz, .check_v
+    jr nz, _check_v
     ld hl, hero_y
     dec (hl)
 
-.check_v:
+_check_v:
     bit 4, a
-    jr nz, .check_hero_done
+    jr nz, _check_hero_done
     ld hl, hero_x
     inc (hl)
 
-.check_hero_done:
+_check_hero_done:
 
 ;-------------------------------------------------------------------------------
     jp main_loop
@@ -229,11 +229,11 @@ render_sprite:
     ; prepare shift counter
     ld a, b
     and %111                    ; x % 8 (shift amount)
-    ld (.shift_amt), a          ; save for later loop
+    ld (_shift_amt), a          ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
 
-.draw_loop:
+_draw_loop:
     push bc                     ; save loop counter
     push hl                     ; save screen address start of line
 
@@ -245,18 +245,18 @@ render_sprite:
     ; we need to shift DE into a 3rd byte (C)
     ld c, 0                     ; C will hold the "spillover" bits
 
-    ld a, (.shift_amt)
+    ld a, (_shift_amt)
     or a                        ; check if shift is 0
-    jr z, .shift_done           ; skip if no shift needed (fast path)
+    jr z, _shift_done           ; skip if no shift needed (fast path)
  
     ld b, a                     ; B = shift counter
-.shift_bits:
+_shift_bits:
     srl d                       ; shift left byte, bit 0 goes to carry
     rr e                        ; rotate right byte, carry goes into bit 7
     rr c                        ; rotate spill byte, carry goes into bit 7
-    djnz .shift_bits
+    djnz _shift_bits
 
-.shift_done:
+_shift_done:
     ; 3 bytes to draw: D, E, C
     ; D = left, E = middle, C = right (spill)
 
@@ -266,9 +266,9 @@ render_sprite:
     ld a, (hl)                  ; load current screen pixels
     ld b, a                     ; save screen pixels
     and d                       ; check collision
-    jr z, .no_collision_1       ; skip if no collision
+    jr z, _no_collision_1       ; skip if no collision
     ld (render_sprite_collision), a  ; store any non-zero = collision
-.no_collision_1:
+_no_collision_1:
     ld a, b                     ; reload screen pixels
     or d                        ; or with sprite left
     ld (hl), a                  ; write back
@@ -278,9 +278,9 @@ render_sprite:
     ld a, (hl)
     ld b, a
     and e
-    jr z, .no_collision_2
+    jr z, _no_collision_2
     ld (render_sprite_collision), a
-.no_collision_2:
+_no_collision_2:
     ld a, b
     or e
     ld (hl), a
@@ -290,9 +290,9 @@ render_sprite:
     ld a, (hl)
     ld b, a
     and c
-    jr z, .no_collision_3
+    jr z, _no_collision_3
     ld (render_sprite_collision), a
-.no_collision_3:
+_no_collision_3:
     ld a, b
     or c
     ld (hl), a
@@ -304,29 +304,29 @@ render_sprite:
     inc h                       ; increment high byte (pixel row)
     ld a, h
     and $07                     ; check if we crossed 8-line char boundary
-    jr nz, .move_down_scanline_done ; if not 0 then continue
+    jr nz, _move_down_scanline_done ; if not 0 then continue
 
     ; if wrapped 0-7 then fix the lower byte of the address
     ld a, l
     add a, 32                   ; move to next character row
     ld l, a
     ; if carry then 256 and moved to next third, continue
-    jr c, .move_down_scanline_done
+    jr c, _move_down_scanline_done
     ; otherwise, subtract 8 from H to stay in correct third and continue
     ld a, h
     sub 8
     ld h, a
-.move_down_scanline_done:
+_move_down_scanline_done:
 
     inc ix                      ; move sprite pointer +2
     inc ix
  
     pop bc                      ; restore loop counter
-    djnz .draw_loop
+    djnz _draw_loop
     ret
 
     ; temporaries for this subroutine
-    .shift_amt: db 0
+    _shift_amt: db 0
 
 ;-------------------------------------------------------------------------------
 ; restores tiles from tile_map for a 16 x 16 sprite area
@@ -354,22 +354,22 @@ restore_sprite_background
     ld e, a             ; E is screen row 0 to 23
 
     ld b, 3             ; loop 3 columns
-.col_loop
+_col_loop
     push bc
     push de             ; save current screen D and E
 
     ld a, d             ; screen column to A
     cp 32               ; check screen boundary
-    jr nc, .next_col    ; if A >= 32
+    jr nc, _next_col    ; if A >= 32
 
     ld b, 3             ; loop 3 rows
-.row_loop
+_row_loop
     push bc
     push de
 
     ld a, e             ; screen row to A
     cp 24               ; check vertical boundary
-    jr nc, .next_row    ; if A >= 24
+    jr nc, _next_row    ; if A >= 24
 
     ; call `draw_single_tile`
     ; note: handles `camera_x` offset
@@ -377,17 +377,17 @@ restore_sprite_background
     ld a, e             ; A is screen row
     call draw_single_tile
 
-.next_row
+_next_row
     pop de
     inc e               ; next row down in E
     pop bc
-    djnz .row_loop
+    djnz _row_loop
 
-.next_col
+_next_col
     pop de
     inc d               ; next column right in D
     pop bc
-    djnz .col_loop
+    djnz _col_loop
     ret
 
 ;-------------------------------------------------------------------------------
