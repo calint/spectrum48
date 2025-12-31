@@ -186,8 +186,12 @@ input:
 ; clobbers: A, B, C, D, E, H, L, IX
 ; ------------------------------------------------------------------------------
 render_sprite:
+    ; clear collision byte (0 = no collision)
     xor a
     ld (render_sprite_collision), a
+
+    ; H:   0  1  0 y7 y6 y2 y1 y0
+    ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ; calculate screen address
     ld a, c                     ; y to A
@@ -195,31 +199,31 @@ render_sprite:
     or $40                      ; add base address
     ld h, a                     ; store in H
 
-    ld a, c
+    ld a, c                     ; y to A
     rra                         ; rotate y bits to position
     rra
     rra
-    and $18                     ; isolate y bits 3-4 (sector offset)
+    and %00011000               ; isolate y bits 3-4 (sector offset)
     or h
     ld h, a                     ; H is now correct
 
-    ld a, c
+    ld a, c                     ; y to A
     rla                         ; rotate y bits 5-7 to position
     rla
     and $e0                     ; isolate them
     ld l, a                     ; start L
 
     ld a, b                     ; x to A
+    rra                         ; shift out the pixel fractions in a character
     rra
     rra
-    rra
-    and $1f                     ; x / 8 (column 0-31)
+    and %00011111               ; isolate the column bits (0-31)
     or l                        ; combine with L
     ld l, a                     ; HL now points to screen byte
 
     ; prepare shift counter
     ld a, b
-    and $07                     ; x % 8 (shift amount)
+    and %111                    ; x % 8 (shift amount)
     ld (.shift_amt), a          ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
@@ -232,13 +236,13 @@ render_sprite:
     ld d, (ix + 0)               ; load left sprite byte
     ld e, (ix + 1)               ; load right sprite byte
 
-    ; shift 16-bit row right by (render_sprite_shift_amt)
+    ; shift 16-bit row right by (.shift_amt)
     ; we need to shift DE into a 3rd byte (C)
     ld c, 0                     ; C will hold the "spillover" bits
 
     ld a, (.shift_amt)
     or a                        ; check if shift is 0
-    jr z, .shift_done            ; skip if no shift needed (fast path)
+    jr z, .shift_done           ; skip if no shift needed (fast path)
  
     ld b, a                     ; B = shift counter
 .shift_bits:
@@ -248,7 +252,7 @@ render_sprite:
     djnz .shift_bits
 
 .shift_done:
-    ; we now have 3 bytes to draw: D, E, C
+    ; 3 bytes to draw: D, E, C
     ; D = left, E = middle, C = right (spill)
 
     ; draw to screen and detect collision 
@@ -296,11 +300,11 @@ render_sprite:
     and $07                     ; check if we crossed 8-line char boundary
     jr nz, .move_down_scanline_done ; if not 0 then continue
 
-    ; if wrapped 0-7 then fix the address
+    ; if wrapped 0-7 then fix the lower byte of the address
     ld a, l
     add a, 32                   ; move to next character row
     ld l, a
-    ; if carry then moved to next third, standard handling is ok, continue
+    ; if carry then 256 and moved to next third, continue
     jr c, .move_down_scanline_done
     ; otherwise, subtract 8 from H to stay in correct third and continue
     ld a, h
@@ -315,7 +319,7 @@ render_sprite:
     djnz .draw_loop
     ret
 
-    ; temporaries for this subrouting
+    ; temporaries for this subroutine
     .shift_amt: db 0
 
 ; ------------------------------------------------------------------------------
