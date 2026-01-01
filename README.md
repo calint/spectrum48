@@ -7,7 +7,7 @@
 * sprites with collision detection
 * read keyboard
 * miniature game
-  - keys: `a`,`d`: left, right; `g`: jump; `j`, `l` camera left, right
+  * keys: `a`,`d`: left, right; `g`: jump; `j`, `l` camera left, right
 
 ## tools
 
@@ -19,3 +19,7 @@
 * releases are considered finished
 * tagged versions have been played to completion
 * latest commit is under development
+
+## screenshots
+
+![u r in roome](screenshots/1.png)
