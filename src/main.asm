@@ -15,7 +15,7 @@ HERO_SPRITE_BIT       equ 1
 HERO_MOVE_DX          equ 8
 HERO_JUMP_DY          equ 33
 HERO_SKIP_DY          equ 20
-HERO_SKIP_RATE    equ %1111
+HERO_SKIP_RATE        equ %1111
 
 HERO_ANIM_ID_IDLE     equ 1
 HERO_ANIM_RATE_IDLE   equ %11111
