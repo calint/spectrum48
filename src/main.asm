@@ -19,17 +19,17 @@ HERO_JUMP_VELOCITY    equ 33
 HERO_SKIP_VELOCITY    equ 20
 HERO_SKIP_INTERVAL    equ %1111
 
-; hard constants
-HERO_FLAG_RESTARTING  equ 1
-HERO_FLAG_MOVING      equ 2
-HERO_FLAG_JUMPING     equ 4
-
 HERO_ANIM_ID_IDLE     equ 1
 HERO_ANIM_RATE_IDLE   equ %11111
 HERO_ANIM_ID_LEFT     equ 2
 HERO_ANIM_RATE_LEFT   equ %111
 HERO_ANIM_ID_RIGHT    equ 3
 HERO_ANIM_RATE_RIGHT  equ %111
+
+; hard constants
+HERO_FLAG_RESTARTING  equ 1
+HERO_FLAG_MOVING      equ 2
+HERO_FLAG_JUMPING     equ 4
 
 ;-------------------------------------------------------------------------------
 ; variables
