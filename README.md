@@ -12,3 +12,9 @@
 
 * `pasmo 0.5.5`: assembler
 * `fuse 1.6.0`: spectrum 48 emulator
+
+## notes
+
+* releases are considered finished
+* tagged versions have been played to completion
+* latest commit is under development
