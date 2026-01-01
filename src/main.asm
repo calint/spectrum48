@@ -8,16 +8,14 @@ BORDER_RENDER_SPRITES   equ 4
 BORDER_INPUT            equ 9
 
 ; tunable constants
-SUBPIXELS  equ 4
-
 GRAVITY           equ 3
 GRAVITY_INTERVAL  equ %1111
 
 HERO_SPRITE_BIT       equ 1
 HERO_MOVE_DX          equ 8
-HERO_JUMP_VELOCITY    equ 33
-HERO_SKIP_VELOCITY    equ 20
-HERO_SKIP_INTERVAL    equ %1111
+HERO_JUMP_DY          equ 33
+HERO_SKIP_DY          equ 20
+HERO_SKIP_RATE    equ %1111
 
 HERO_ANIM_ID_IDLE     equ 1
 HERO_ANIM_RATE_IDLE   equ %11111
@@ -26,10 +24,17 @@ HERO_ANIM_RATE_LEFT   equ %111
 HERO_ANIM_ID_RIGHT    equ 3
 HERO_ANIM_RATE_RIGHT  equ %111
 
+TILE_ID_PICKABLE      equ 33
+TILE_ID_PICKED        equ 32
+
+SUBPIXELS             equ 4
+
 ; hard constants
 HERO_FLAG_RESTARTING  equ 1
 HERO_FLAG_MOVING      equ 2
 HERO_FLAG_JUMPING     equ 4
+TILE_WIDTH            equ 8
+TILE_SHIFT            equ 3
 
 ;-------------------------------------------------------------------------------
 ; variables
@@ -161,10 +166,10 @@ _no_collision:
 ;-------------------------------------------------------------------------------
 collisions:
 ;-------------------------------------------------------------------------------
-    ; check collision
+_check_sprites:
     ld a, (sprites_collision_bits)
     and HERO_SPRITE_BIT
-    jr z, _done
+    jr z, _check_sprites_done
 
     ; restore previous position and set dx, dy to 0
     ld hl, (hero_x_prv)
@@ -180,7 +185,98 @@ collisions:
     and ~HERO_FLAG_JUMPING & ~HERO_FLAG_RESTARTING
     ld (hero_flags), a
 
-_done:
+_check_sprites_done:
+
+_check_tiles:
+    ld hl, (hero_x)
+    rept SUBPIXELS
+        srl h
+        rr l
+    endm
+    ld de, TILE_WIDTH / 2
+    add hl, de
+    rept TILE_SHIFT
+        srl h
+        rr l
+    endm
+    ld a, (camera_x)
+    add a, l
+    ld b, a                 ; B = top left tile x
+
+    ld hl, (hero_y)
+    rept SUBPIXELS
+        srl h
+        rr l
+    endm
+    ld de, TILE_WIDTH / 2
+    add hl, de
+    rept TILE_SHIFT
+        srl h
+        rr l
+    endm
+    ld c, l                 ; C = top left tile y
+
+    ld h, c
+    ld l, b
+    ld de, tile_map
+    add hl, de
+
+_check_top_left:
+    ld a, (hl)              ; A = tile id
+    cp TILE_ID_PICKABLE
+    jr nz, _check_top_right
+
+    ld (hl), TILE_ID_PICKED
+
+    push af
+    ld ixh, b
+    ld a, c
+    call draw_single_tile
+    pop af
+
+_check_top_right:
+    inc l
+    ld a, (hl)              ; A = tile id
+    cp TILE_ID_PICKABLE
+    jr nz, _check_bottom_right
+
+    ld (hl), TILE_ID_PICKED
+
+    push af
+    ld ixh, b
+    ld a, c
+    call draw_single_tile
+    pop af
+
+_check_bottom_right:
+    inc h
+    ld a, (hl)              ; A = tile id
+    cp TILE_ID_PICKABLE
+    jr nz, _check_bottom_left
+
+    ld (hl), TILE_ID_PICKED
+
+    push af
+    ld ixh, b
+    ld a, c
+    call draw_single_tile
+    pop af
+
+_check_bottom_left:
+    dec l
+    ld a, (hl)              ; A = tile id
+    cp TILE_ID_PICKABLE
+    jr nz, _check_tiles_done
+
+    ld (hl), TILE_ID_PICKED
+
+    push af
+    ld ixh, b
+    ld a, c
+    call draw_single_tile
+    pop af
+
+_check_tiles_done:
 
 ;-------------------------------------------------------------------------------
 state:
@@ -340,7 +436,7 @@ _anim_left_done:
 
     ; if not at skip (small jump) interval then continue to next step
     ld a, (hero_frame_counter)
-    and HERO_SKIP_INTERVAL
+    and HERO_SKIP_RATE
     jr nz, _check_hero_left_done
 
     ; if there is vertical movement then don't skip (small jump)
@@ -350,7 +446,7 @@ _anim_left_done:
     jr nz, _check_hero_left_done
 
     ; set skip (small jump) `dy`
-    ld hl, -HERO_SKIP_VELOCITY 
+    ld hl, -HERO_SKIP_DY 
     ld (hero_dy), hl
 
 _check_hero_left_done:
@@ -398,7 +494,7 @@ _anim_right_done:
 
     ; if not at skip (small jump) interval then continue to next step
     ld a, (hero_frame_counter)
-    and HERO_SKIP_INTERVAL
+    and HERO_SKIP_RATE
     jr nz, _check_hero_right_done
 
     ; if there is vertical movement then don't skip (small jump)
@@ -408,7 +504,7 @@ _anim_right_done:
     jr nz, _check_hero_right_done
 
     ; set skip (small jump) `dy`
-    ld hl, -HERO_SKIP_VELOCITY 
+    ld hl, -HERO_SKIP_DY 
     ld (hero_dy), hl
     ld hl, HERO_MOVE_DX
     ld (hero_dx), hl
@@ -425,7 +521,7 @@ _check_hero_jump:
     jr nz, _check_hero_jump_done
 
     ; set jump velocity
-    ld hl, -HERO_JUMP_VELOCITY
+    ld hl, -HERO_JUMP_DY
     ld (hero_dy), hl
 
     ; flag hero with moving and jumping
