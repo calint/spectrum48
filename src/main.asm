@@ -3,8 +3,8 @@ org $8000
 ; constants
 ;-------------------------------------------------------------------------------
 BORDER_VBLANK           equ 1
-BORDER_RENDER_TILE_MAP  equ 0
-BORDER_RENDER_SPRITES   equ 4
+BORDER_RENDER_TILE_MAP  equ 1
+BORDER_RENDER_SPRITES   equ 6
 BORDER_INPUT            equ 9
 
 ; tunable constants
