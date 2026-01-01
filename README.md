@@ -7,6 +7,7 @@
 * sprites with collision detection
 * read keyboard
 * miniature game
+  - keys: `a`,`d`: left, right; `g`: jump; `j`, `l` camera left, right
 
 ## tools
 
