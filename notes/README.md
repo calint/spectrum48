@@ -55,3 +55,7 @@ $EFFE       0       9       8       7       6
 $DFFE       P       O       I       U       Y
 $BFFE       ENTER   L       K       J       H
 $7FFE       SPACE   SYM     M       N       B
+
+## instruction set
+
+* Only A can be stored directly to an 8-bit memory location.

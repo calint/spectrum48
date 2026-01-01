@@ -228,11 +228,10 @@ _check_top_left:
 
     ld (hl), TILE_ID_PICKED
 
-    push af
+    ; call draw_single_tile
     ld ixh, b
     ld a, c
     call draw_single_tile
-    pop af
 
 _check_top_right:
     inc l
@@ -242,11 +241,10 @@ _check_top_right:
 
     ld (hl), TILE_ID_PICKED
 
-    push af
+    ; call draw_single_tile
     ld ixh, b
     ld a, c
     call draw_single_tile
-    pop af
 
 _check_bottom_right:
     inc h
@@ -256,11 +254,10 @@ _check_bottom_right:
 
     ld (hl), TILE_ID_PICKED
 
-    push af
+    ; call draw_single_tile
     ld ixh, b
     ld a, c
     call draw_single_tile
-    pop af
 
 _check_bottom_left:
     dec l
@@ -270,11 +267,10 @@ _check_bottom_left:
 
     ld (hl), TILE_ID_PICKED
 
-    push af
+    ; call draw_single_tile
     ld ixh, b
     ld a, c
     call draw_single_tile
-    pop af
 
 _check_tiles_done:
 
