@@ -24,6 +24,13 @@ HERO_FLAG_RESTARTING  equ 1
 HERO_FLAG_MOVING      equ 2
 HERO_FLAG_JUMPING     equ 4
 
+HERO_ANIM_ID_IDLE     equ 1
+HERO_ANIM_RATE_IDLE   equ %11111
+HERO_ANIM_ID_LEFT     equ 2
+HERO_ANIM_RATE_LEFT   equ %111
+HERO_ANIM_ID_RIGHT    equ 3
+HERO_ANIM_RATE_RIGHT  equ %111
+
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
@@ -34,16 +41,20 @@ camera_x_prv  db $ff
 
 hero_frame_counter  db 0
 
-hero_x      dw 132 << SUBPIXELS 
-hero_y      dw 0
-hero_dx     dw 0 ; horizontal velocity
-hero_dy     dw 0 ; vertical velocity
-hero_x_prv  dw 132 << SUBPIXELS ; previous frame state
-hero_y_prv  dw 0                ; previous framet state
-hero_x_drw  db 132 ; previous x for render sprite
-hero_y_drw  db 0   ; previous y render sprite
-hero_flags  db 0
-
+hero_x           dw 132 << SUBPIXELS 
+hero_y           dw 0
+hero_dx          dw 0 ; horizontal velocity
+hero_dy          dw 0 ; vertical velocity
+hero_x_prv       dw 132 << SUBPIXELS ; previous frame state
+hero_y_prv       dw 0                ; previous framet state
+hero_x_drw       db 132 ; previous x for render sprite
+hero_y_drw       db 0   ; previous y render sprite
+hero_flags       db 0
+hero_sprite      dw sprites_data_8
+hero_anim_id     db HERO_ANIM_ID_IDLE
+hero_anim_frame  db 0
+hero_anim_rate   db %111
+hero_anim_ptr    dw hero_animation_idle
 
 ; used by `render_sprite`
 render_sprite_collision  db 0 ; if non-zero sprite collided with drawn content
@@ -129,7 +140,7 @@ render_sprites:
     ld c, l
     ld a, c
     ld (hero_y_drw), a
-    ld ix, sprites_data_8
+    ld ix, (hero_sprite)
     call render_sprite
 
     ; update sprites collision bits
@@ -181,6 +192,56 @@ state:
     ld (hero_y_prv), hl
 
 ;-------------------------------------------------------------------------------
+animation:
+;-------------------------------------------------------------------------------
+    ld a, (hero_anim_rate)
+    ld b, a
+    ld a, (hero_frame_counter)
+    and b
+    jr nz, _done
+
+    ; HL = base animation table
+    ld hl, (hero_anim_ptr)
+
+    ; DE = frame index * 2
+    ld a, (hero_anim_frame)
+    add a, a              ; *2
+    ld e, a
+    ld d, 0
+    add hl, de            ; HL = entry address
+
+    ; load word -> DE
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+    ; terminator?
+    ld a, d
+    or e
+    jr nz, _use_frame
+
+_restart:
+    xor a
+    ld (hero_anim_frame), a
+
+    ; load first frame (table[0])
+    ld hl, (hero_anim_ptr)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+_use_frame:
+    ; update current sprite
+    ld (hero_sprite), de
+
+    ; advance frame index
+    ld a, (hero_anim_frame)
+    inc a
+    ld (hero_anim_frame), a
+
+_done:
+
+;-------------------------------------------------------------------------------
 input:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_INPUT
@@ -189,6 +250,10 @@ input:
     ; set horizontal velocity to 0
     ld hl, 0
     ld (hero_dx), hl
+
+    ld a, (hero_flags)
+    and ~HERO_FLAG_MOVING
+    ld (hero_flags), a
 
 _check_camera:
     ld bc, $bffe        ; row: enter, l, k, j, h
@@ -241,6 +306,34 @@ _check_hero_left:
     or HERO_FLAG_MOVING
     ld (hero_flags), a
 
+    ; initiate animation
+    ld a, (hero_anim_id)
+    cp HERO_ANIM_ID_LEFT
+    jr z, _anim_left_done            ; already active, skip
+
+    ; set new animation id
+    ld a, HERO_ANIM_ID_LEFT
+    ld (hero_anim_id), a
+
+    ld a, HERO_ANIM_RATE_LEFT
+    ld (hero_anim_rate), a
+
+    ; reset animation frame
+    xor a
+    ld (hero_anim_frame), a
+
+    ; set animation table
+    ld hl, hero_animation_left
+    ld (hero_anim_ptr), hl
+
+    ; load first frame from table[0]
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    ld (hero_sprite), de
+
+_anim_left_done:
+
     ; set dx
     ld hl, -HERO_MOVE_DX
     ld (hero_dx), hl
@@ -270,6 +363,34 @@ _check_hero_right:
     ld a, (hero_flags)
     or HERO_FLAG_MOVING
     ld (hero_flags), a
+
+    ; initiate animation
+    ld a, (hero_anim_id)
+    cp HERO_ANIM_ID_RIGHT
+    jr z, _anim_right_done            ; already active, skip
+
+    ; set new animation id
+    ld a, HERO_ANIM_ID_RIGHT
+    ld (hero_anim_id), a
+
+    ld a, HERO_ANIM_RATE_RIGHT
+    ld (hero_anim_rate), a
+
+    ; reset animation frame
+    xor a
+    ld (hero_anim_frame), a
+
+    ; set animation table
+    ld hl, hero_animation_right
+    ld (hero_anim_ptr), hl
+
+    ; load first frame from table[0]
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    ld (hero_sprite), de
+
+_anim_right_done:
 
     ; set dx
     ld hl, HERO_MOVE_DX
@@ -312,6 +433,40 @@ _check_hero_jump:
     ld (hero_flags), a
 
 _check_hero_jump_done:
+
+    ld a, (hero_flags)
+    and HERO_FLAG_MOVING
+    jr nz, _done
+
+    ; initiate animation
+    ld a, (hero_anim_id)
+    cp HERO_ANIM_ID_IDLE
+    jr z, _anim_idle_done            ; already active, skip
+
+    ; set new animation id
+    ld a, HERO_ANIM_ID_IDLE
+    ld (hero_anim_id), a
+
+    ld a, HERO_ANIM_RATE_IDLE
+    ld (hero_anim_rate), a
+
+    ; reset animation frame
+    xor a
+    ld (hero_anim_frame), a
+
+    ; set animation table
+    ld hl, hero_animation_idle
+    ld (hero_anim_ptr), hl
+
+    ; load first frame from table[0]
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    ld (hero_sprite), de
+
+_anim_idle_done:
+
+_done:
 
 ;-------------------------------------------------------------------------------
 physics:
@@ -689,5 +844,25 @@ sprites_data:
     include "sprites.asm"
 
 ;-------------------------------------------------------------------------------
+; animations
+;-------------------------------------------------------------------------------
+org ($ + 255) & $ff00
+hero_animation_idle:
+    dw sprites_data_8
+    dw sprites_data_9
+    dw sprites_data_10
+    dw sprites_data_9
+    dw 0
 
+hero_animation_right:
+    dw sprites_data_0
+    dw sprites_data_1
+    dw 0
+
+hero_animation_left:
+    dw sprites_data_2
+    dw sprites_data_3
+    dw 0
+
+;-------------------------------------------------------------------------------
 end start
