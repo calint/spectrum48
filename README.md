@@ -11,8 +11,11 @@
 
 ## tools
 
-* `pasmo 0.5.5`: assembler
 * `fuse 1.6.0`: spectrum 48 emulator
+* `pasmo 0.5.5`: assembler
+* `tiled 1.11.2`: tile map editor
+* `gimp 3.0.6`: image manipulator
+* `python 3.13.11`: automation
 
 ## notes
 
