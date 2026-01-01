@@ -36,14 +36,12 @@ hero_frame_counter  db 0
 
 hero_x      dw 132 << SUBPIXELS 
 hero_y      dw 0
-hero_dx     dw 0
-hero_dy     dw 0
-hero_x_prv  dw 132 << SUBPIXELS
-hero_y_prv  dw 0
-hero_dx_prv dw 0
-hero_dy_prv dw 0
-hero_x_drw  db 132 ; previous render sprite x
-hero_y_drw  db 0   ; previous render sprite y
+hero_dx     dw 0 ; horizontal velocity
+hero_dy     dw 0 ; vertical velocity
+hero_x_prv  dw 132 << SUBPIXELS ; previous frame state
+hero_y_prv  dw 0                ; previous framet state
+hero_x_drw  db 132 ; previous x for render sprite
+hero_y_drw  db 0   ; previous y render sprite
 hero_flags  db 0
 
 
@@ -181,10 +179,6 @@ state:
     ld (hero_x_prv), hl
     ld hl, (hero_y)
     ld (hero_y_prv), hl
-    ld hl, (hero_dx)
-    ld (hero_dx_prv), hl
-    ld hl, (hero_dy)
-    ld (hero_dy_prv), hl
 
 ;-------------------------------------------------------------------------------
 input:
