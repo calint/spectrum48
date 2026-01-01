@@ -52,8 +52,8 @@ hero_dx          dw 0 ; horizontal velocity
 hero_dy          dw 0 ; vertical velocity
 hero_x_prv       dw 132 << SUBPIXELS ; previous frame state
 hero_y_prv       dw 0                ; previous framet state
-hero_x_drw       db 132 ; previous x for render sprite
-hero_y_drw       db 0   ; previous y render sprite
+hero_x_drw       db 132 ; previous render sprite x
+hero_y_drw       db 0   ; and y
 hero_flags       db 0
 hero_sprite      dw sprites_data_8
 hero_anim_id     db HERO_ANIM_ID_IDLE
