@@ -3,7 +3,7 @@
 ## intention
 
 * learn cpu z80 by writing assembler for spectrum 48k
-* render a tile map
+* render tile map
 * sprites with collision detection
 * read keyboard
 * miniature game
