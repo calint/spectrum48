@@ -2,14 +2,16 @@ org $8000
 ;-------------------------------------------------------------------------------
 ; constants
 ;-------------------------------------------------------------------------------
+
+; tunable constants
+
 BORDER_VBLANK           equ 1
 BORDER_RENDER_TILE_MAP  equ 1
 BORDER_RENDER_SPRITES   equ 6
 BORDER_INPUT            equ 9
 
-; tunable constants
-GRAVITY           equ 3
-GRAVITY_INTERVAL  equ %1111
+GRAVITY               equ 3
+GRAVITY_RATE          equ %1111
 
 HERO_SPRITE_BIT       equ 1
 HERO_MOVE_DX          equ 8
@@ -31,9 +33,11 @@ TILE_ID_PICKED        equ 32
 SUBPIXELS             equ 4
 
 ; hard constants
+
 HERO_FLAG_RESTARTING  equ 1
 HERO_FLAG_MOVING      equ 2
 HERO_FLAG_JUMPING     equ 4
+
 TILE_WIDTH            equ 8
 TILE_SHIFT            equ 3
 
@@ -42,35 +46,33 @@ TILE_SHIFT            equ 3
 ;-------------------------------------------------------------------------------
 sprites_collision_bits: db 0   ; 8 bits for sprite collisions
 
-camera_x      db -16
-camera_x_prv  db $ff
-
-hero_frame_counter  db 0
-
+camera_x         db -16
+camera_x_prv     db $ff
+hero_frame       db 0
 hero_x           dw 132 << SUBPIXELS 
 hero_y           dw 0
-hero_dx          dw 0 ; horizontal velocity
-hero_dy          dw 0 ; vertical velocity
-hero_x_prv       dw 132 << SUBPIXELS ; previous frame state
-hero_y_prv       dw 0                ; previous framet state
-hero_x_drw       db 132 ; previous render sprite x
-hero_y_drw       db 0   ; and y
+hero_dx          dw 0
+hero_dy          dw 0
+hero_x_prv       dw 132 << SUBPIXELS
+hero_y_prv       dw 0
+hero_x_drw       db 132
+hero_y_drw       db 0
 hero_flags       db 0
 hero_sprite      dw sprites_data_8
 hero_anim_id     db HERO_ANIM_ID_IDLE
 hero_anim_frame  db 0
-hero_anim_rate   db %11111
+hero_anim_rate   db HERO_ANIM_RATE_IDLE
 hero_anim_ptr    dw hero_animation_idle
 
-; used by `render_sprite`
-render_sprite_collision  db 0 ; if non-zero sprite collided with drawn content
+; set in `render_sprite` when any sprite pixel wrote over curren screen content
+sprite_collided  db 0   ; 0 = no collisions
 
 ;-------------------------------------------------------------------------------
 start:
 ;-------------------------------------------------------------------------------
-    ld hl, $5800        ; attribute start
+    ld hl, $5800        ; color attribute start, 768 bytes
     ld (hl), 7          ; white on black
-    ld de, $5801        ; destination is one byte ahead
+    ld de, $5801        ; destination one byte ahead to copy previous byte
     ld bc, 767          ; remaining bytes to fill
     ldir                ; fastest hardware copy loop
 
@@ -82,7 +84,7 @@ main_loop:
 
     halt                ; sleep until the start of the next frame
  
-    ; check if camera position changed triggering a re-draw of tile map
+    ; check if camera position changed triggering tile map re-draw
     ld hl, camera_x_prv
     ld a, (camera_x)
     cp (hl)
@@ -120,10 +122,10 @@ render_sprites:
     ; restore dirty tiles
 
     ; call restore_sprite_background
-    ; B = hero_x_prv >> SUBPIXELS
+    ; B = previous render x 
     ld a, (hero_x_drw)
     ld b, a
-    ; C = hero_y_prv >> SUBPIXELS
+    ; C = previous render y 
     ld a, (hero_y_drw)
     ld c, a
     call restore_sprite_background
@@ -135,28 +137,28 @@ render_sprites:
         rr  l
     endm
     ld b, l
-    ld a, b
+    ld a, b             ; save x where sprite was rendered
     ld (hero_x_drw), a
-    ; C = hero_y_prv >> SUBPIXELS
+    ; C = hero_x >> SUBPIXELS
     ld hl, (hero_y)
     rept SUBPIXELS
         srl h
         rr  l
     endm
     ld c, l
-    ld a, c
+    ld a, c             ; save y where sprite was rendered
     ld (hero_y_drw), a
     ld ix, (hero_sprite)
     call render_sprite
 
     ; update sprites collision bits
-    ld a, (render_sprite_collision)
+    ld a, (sprite_collided)
     or a
-    jr z, _no_collision
+    jr z, _done
     ld a, (sprites_collision_bits)
     or HERO_SPRITE_BIT
     ld (sprites_collision_bits), a
-_no_collision:
+_done:
 
     ; done render hero
     ; debugging on screen
@@ -181,20 +183,21 @@ _check_sprites:
     ld (hero_dx), hl
     ld (hero_dy), hl
 
-    ; clear flags
+    ; clear hero flags
     ld a, (hero_flags)
-    and ~HERO_FLAG_JUMPING & ~HERO_FLAG_RESTARTING
+    and ~(HERO_FLAG_JUMPING | HERO_FLAG_RESTARTING)
     ld (hero_flags), a
 
 _check_sprites_done:
 
 _check_tiles:
+    ; calculate tile x
     ld hl, (hero_x)
     rept SUBPIXELS
         srl h
         rr l
     endm
-    ld de, TILE_WIDTH / 2
+    ld de, TILE_WIDTH / 2  ; bias to get an estimated rounding
     add hl, de
     rept TILE_SHIFT
         srl h
@@ -204,12 +207,13 @@ _check_tiles:
     add a, l
     ld b, a                 ; B = top left tile x
 
+    ; calculate tile y
     ld hl, (hero_y)
     rept SUBPIXELS
         srl h
         rr l
     endm
-    ld de, TILE_WIDTH / 2
+    ld de, TILE_WIDTH / 2   ; bias to get an estimated rounding
     add hl, de
     rept TILE_SHIFT
         srl h
@@ -217,6 +221,7 @@ _check_tiles:
     endm
     ld c, l                 ; C = top left tile y
 
+    ; point HL to top left tile
     ld h, c
     ld l, b
     ld de, tile_map
@@ -227,6 +232,7 @@ _check_top_left:
     cp TILE_ID_PICKABLE
     jr nz, _check_top_right
 
+    ; overwrite the picked tile
     ld (hl), TILE_ID_PICKED
 
     ; call draw_single_tile
@@ -289,7 +295,7 @@ animation:
 ;-------------------------------------------------------------------------------
     ld a, (hero_anim_rate)
     ld b, a
-    ld a, (hero_frame_counter)
+    ld a, (hero_frame)
     and b
     jr nz, _done
 
@@ -344,6 +350,7 @@ input:
     ld hl, 0
     ld (hero_dx), hl
 
+    ; clear hero is moving flag
     ld a, (hero_flags)
     and ~HERO_FLAG_MOVING
     ld (hero_flags), a
@@ -400,27 +407,24 @@ _check_hero_left:
     ld (hero_flags), a
 
     ; initiate animation
-    ld a, (hero_anim_id)
     ; if animation already active, skip
+    ld a, (hero_anim_id)
     cp HERO_ANIM_ID_LEFT
     jr z, _anim_left_done
 
-    ; set new animation id
     ld a, HERO_ANIM_ID_LEFT
     ld (hero_anim_id), a
 
     ld a, HERO_ANIM_RATE_LEFT
     ld (hero_anim_rate), a
 
-    ; reset animation frame
     xor a
     ld (hero_anim_frame), a
 
-    ; set animation table
     ld hl, hero_animation_left
     ld (hero_anim_ptr), hl
 
-    ; load first frame from table[0]
+    ; load first frame from table
     ld e, (hl)
     inc hl
     ld d, (hl)
@@ -432,21 +436,20 @@ _anim_left_done:
     ;       collision, thus if in collision give a boost to escape collision
     ;       when hanging on horizontal background
     ;       boost constant is tuned depending on the animation frames for
-    ;       left and right where left needs to move 2 pixels to escape
+    ;       left and right where left, in this case, needs to move 2 pixels
+    ;       to escape
 
+    ; choose dx boost if in collision
+    ld hl, -HERO_MOVE_DX
     ld a, (sprites_collision_bits)
     and HERO_SPRITE_BIT
-    jr z, _no_boost_left
+    jr z, _set_left_dx
     ld hl, -HERO_MOVE_BOOST_DX
-    jr _set_left_dx
-_no_boost_left:
-    ; set dx
-    ld hl, -HERO_MOVE_DX
 _set_left_dx:
     ld (hero_dx), hl
 
     ; if not at skip (small jump) interval then continue to next step
-    ld a, (hero_frame_counter)
+    ld a, (hero_frame)
     and HERO_SKIP_RATE
     jr nz, _check_hero_left_done
 
@@ -477,22 +480,19 @@ _check_hero_right:
     cp HERO_ANIM_ID_RIGHT
     jr z, _anim_right_done
 
-    ; set new animation id
     ld a, HERO_ANIM_ID_RIGHT
     ld (hero_anim_id), a
 
     ld a, HERO_ANIM_RATE_RIGHT
     ld (hero_anim_rate), a
 
-    ; reset animation frame
     xor a
     ld (hero_anim_frame), a
 
-    ; set animation table
     ld hl, hero_animation_right
     ld (hero_anim_ptr), hl
 
-    ; load first frame from table[0]
+    ; load first frame from table
     ld e, (hl)
     inc hl
     ld d, (hl)
@@ -500,20 +500,17 @@ _check_hero_right:
 
 _anim_right_done:
 
-    ; set dx
+    ; choose dx boost if in collision
+    ld hl, HERO_MOVE_DX
     ld a, (sprites_collision_bits)
     and HERO_SPRITE_BIT
-    jr z, _no_boost_right
+    jr z, _set_right_dx
     ld hl, HERO_MOVE_BOOST_DX
-    jr _set_right_dx
-_no_boost_right:
-    ; set dx
-    ld hl, HERO_MOVE_DX
 _set_right_dx:
     ld (hero_dx), hl
 
     ; if not at skip (small jump) interval then continue to next step
-    ld a, (hero_frame_counter)
+    ld a, (hero_frame)
     and HERO_SKIP_RATE
     jr nz, _check_hero_right_done
 
@@ -535,7 +532,7 @@ _check_hero_jump:
     bit 4, b
     jr nz, _check_hero_jump_done
 
-    ; if hero is jumping jump to don
+    ; if hero is jumping then done
     ld a, (hero_flags)
     and HERO_FLAG_JUMPING
     jr nz, _check_hero_jump_done
@@ -549,32 +546,29 @@ _check_hero_jump:
     ld (hero_flags), a
 
 _check_hero_jump_done:
-
+    ; if hero is moving continue
     ld a, (hero_flags)
     and HERO_FLAG_MOVING
     jr nz, _done
 
-    ; initiate animation
+    ; initiate idle animation
     ld a, (hero_anim_id)
     cp HERO_ANIM_ID_IDLE
-    jr z, _anim_idle_done            ; already active, skip
+    jr z, _anim_idle_done   ; already active, skip
 
-    ; set new animation id
     ld a, HERO_ANIM_ID_IDLE
     ld (hero_anim_id), a
 
     ld a, HERO_ANIM_RATE_IDLE
     ld (hero_anim_rate), a
 
-    ; reset animation frame
     xor a
     ld (hero_anim_frame), a
 
-    ; set animation table
     ld hl, hero_animation_idle
     ld (hero_anim_ptr), hl
 
-    ; load first frame from table[0]
+    ; load first frame from table
     ld e, (hl)
     inc hl
     ld d, (hl)
@@ -603,13 +597,14 @@ physics:
     jr nz, _gravity
 
     ; apply gravity in intervals
-    ld a, (hero_frame_counter)
+    ; increment frame counter used in timing masks (wrap is ok)
+    ld a, (hero_frame)
     inc a
-    ld (hero_frame_counter), a
-    and GRAVITY_INTERVAL
+    ld (hero_frame), a
+    and GRAVITY_RATE
     jr z, _gravity
 
-    ; if no vertical movement jump over gravity
+    ; if no vertical movement then done
     ld hl, (hero_dy)
     ld a, h
     or l
@@ -640,7 +635,7 @@ _gravity_done:
 render_sprite:
     ; clear collision byte (0 = no collision)
     xor a
-    ld (render_sprite_collision), a
+    ld (sprite_collided), a
 
     ; calculate screen address
 
@@ -717,7 +712,7 @@ _shift_done:
     ld b, a                     ; save screen pixels
     and d                       ; check collision
     jr z, _no_collision_1       ; skip if no collision
-    ld (render_sprite_collision), a  ; store any non-zero = collision
+    ld (sprite_collided), a  ; store any non-zero = collision
 _no_collision_1:
     ld a, b                     ; reload screen pixels
     or d                        ; or with sprite left
@@ -729,7 +724,7 @@ _no_collision_1:
     ld b, a
     and e
     jr z, _no_collision_2
-    ld (render_sprite_collision), a
+    ld (sprite_collided), a
 _no_collision_2:
     ld a, b
     or e
@@ -741,7 +736,7 @@ _no_collision_2:
     ld b, a
     and c
     jr z, _no_collision_3
-    ld (render_sprite_collision), a
+    ld (sprite_collided), a
 _no_collision_3:
     ld a, b
     or c
@@ -840,8 +835,8 @@ _next_col
 ;-------------------------------------------------------------------------------
 ; draws a 8 x 8 tile to the screen
 ;
-; inputs:   IXH = screen_x
-;           A = screen_y
+; inputs:   IXH = screen character x
+;           A = screen character y
 ; outputs:  -
 ; clobbers: AF, BC, DE, HL
 ;-------------------------------------------------------------------------------
