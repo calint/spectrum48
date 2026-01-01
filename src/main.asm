@@ -331,25 +331,27 @@ physics:
     and HERO_FLAG_JUMPING
     jr nz, _gravity
 
+    ; apply gravity in intervals
     ld a, (hero_frame_counter)
     inc a
     ld (hero_frame_counter), a
     and GRAVITY_INTERVAL
     jr z, _gravity
 
+    ; if no vertical movement jump over gravity
     ld hl, (hero_dy)
     ld a, h
     or l
     jr z, _gravity_done
 
 _gravity:
+    ; apply gravity on velocity
     ld hl, (hero_dy)
     ld de, GRAVITY
     add hl, de
     ld (hero_dy), hl
 
 _gravity_done:
-
 
 ;-------------------------------------------------------------------------------
     jp main_loop
