@@ -41,7 +41,8 @@ TILE_SHIFT            equ 3
 ;-------------------------------------------------------------------------------
 sprites_collision_bits: db 0   ; 8 bits for sprite collisions
 
-camera_x      db -16
+;camera_x      db -16
+camera_x      db 39
 camera_x_prv  db $ff
 
 hero_frame_counter  db 0
@@ -944,9 +945,9 @@ sprites_data:
 ;-------------------------------------------------------------------------------
 org ($ + 255) & $ff00
 hero_animation_idle:
-    dw sprites_data_8
-    dw sprites_data_9
     dw sprites_data_10
+    dw sprites_data_9
+    dw sprites_data_8
     dw sprites_data_9
     dw 0
 
