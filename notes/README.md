@@ -43,3 +43,15 @@ L = |char_row||column|
 
 After +32:
 L = |char_row+1||column|
+
+## keyboard
+
+Port (BC)   Bit 0   Bit 1   Bit 2   Bit 3   Bit 4
+$FEFE       SHIFT   Z       X       C       V
+$FDFE       A       S       D       F       G
+$FBFE       Q       W       E       R       T
+$F7FE       1       2       3       4       5
+$EFFE       0       9       8       7       6
+$DFFE       P       O       I       U       Y
+$BFFE       ENTER   L       K       J       H
+$7FFE       SPACE   SYM     M       N       B

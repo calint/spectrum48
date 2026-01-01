@@ -150,12 +150,12 @@ _no_collision:
     ld (hl), a
 
 ;-------------------------------------------------------------------------------
-check_collision:
+collisions:
 ;-------------------------------------------------------------------------------
     ; check collision
     ld a, (sprites_collision_bits)
     and HERO_SPRITE_BIT
-    jr z, _no_collision
+    jr z, _done
 
     ; restore previous position and set dx, dy to 0
     ld hl, (hero_x_prv)
@@ -171,8 +171,11 @@ check_collision:
     and ~HERO_FLAG_JUMPING & ~HERO_FLAG_RESTARTING
     ld (hero_flags), a
 
-_no_collision:
+_done:
 
+;-------------------------------------------------------------------------------
+state:
+;-------------------------------------------------------------------------------
     ; save state to prv
     ld hl, (hero_x)
     ld (hero_x_prv), hl
@@ -194,12 +197,12 @@ input:
     ld (hero_dx), hl
 
 _check_camera:
-    ld bc, $fdfe        ; row A, S, D, F, G
+    ld bc, $bffe        ; row: enter, l, k, j, h
     in a, (c)           ; read row (0 = pressed)
 
-_check_a:
-    bit 0, a
-    jr nz, _check_d
+_check_camera_left:
+    bit 3, a
+    jr nz, _check_camera_left_done
 
     ; adjust camera x
     ld hl, camera_x
@@ -210,14 +213,13 @@ _check_a:
     ld de, 8 << SUBPIXELS
     add hl, de
     ld (hero_x), hl
-    ld hl, (hero_x_prv)
-    ld de, $0080
-    add hl, de
     ld (hero_x_prv), hl
 
-_check_d:
-    bit 2, a
-    jr nz, _check_camera_done
+_check_camera_left_done:
+
+_check_camera_right:
+    bit 1, a
+    jr nz, _check_camera_right_done
 
     ; adjust camera x
     ld hl, camera_x
@@ -228,109 +230,94 @@ _check_d:
     ld de, -(8 << SUBPIXELS)
     add hl, de
     ld (hero_x), hl
-    ld hl, (hero_x_prv)
-    ld de, $ff80
-    add hl, de
     ld (hero_x_prv), hl
 
-_check_camera_done:
+_check_camera_right_done:
 
 _check_hero:
-    ld bc, $fefe        ; row for Z, X, C, V
+    ld bc, $fdfe        ; row for a, s, d, f, g
     in b, (c)           ; read row (0 = pressed)
 
-    ld hl, $4010
-    ld (hl), a
-
-_check_z:
-    bit 1, b
-    jr nz, _check_x
-
-    ld a, (hero_flags)
-    or HERO_FLAG_MOVING
-    ld (hero_flags), a
-
-    ld hl, -HERO_MOVE_DX
-    ld (hero_dx), hl
-
-    ; if not at skip (small jump) interval then continue to next step
-    ld a, (hero_frame_counter)
-    and HERO_SKIP_INTERVAL
-    jr nz, _check_z_done
-
-    ; if there is vertical movement then don't skip (small jump)
-    ld hl, (hero_dy)
-    ld a, h
-    or l
-    jr nz, _check_z_done
-
-    ; set skip (small jump) `dy`
-    ld hl, -HERO_SKIP_VELOCITY 
-    ld (hero_dy), hl
-
-_check_z_done:
-
-_check_x:
-    bit 2, b
-    jr nz, _check_c
-
-    ld hl, -HERO_MOVE_DX
-    ld (hero_dy), hl
-
-_check_c:
-    bit 3, b
-    jr nz, _check_v
-
-    ld hl, HERO_MOVE_DX
-    ld (hero_dy), hl
-
-_check_v:
-    bit 4, b
-    jr nz, _check_shift
-
-    ld a, (hero_flags)
-    or HERO_FLAG_MOVING
-    ld (hero_flags), a
-
-    ld hl, HERO_MOVE_DX
-    ld (hero_dx), hl
-
-    ; if not at skip (small jump) interval then continue to next step
-    ld a, (hero_frame_counter)
-    and HERO_SKIP_INTERVAL
-    jr nz, _check_v_done
-
-    ; if there is vertical movement then don't skip (small jump)
-    ld hl, (hero_dy)
-    ld a, h
-    or l
-    jr nz, _check_v_done
-
-    ; set skip (small jump) `dy`
-    ld hl, -HERO_SKIP_VELOCITY 
-    ld (hero_dy), hl
-    ld hl, HERO_MOVE_DX
-    ld (hero_dx), hl
-
-_check_v_done:
-
-_check_shift:
+_check_hero_left:
     bit 0, b
-    jr nz, _check_hero_done
+    jr nz, _check_hero_left_done
 
+    ; flag hero is moving
+    ld a, (hero_flags)
+    or HERO_FLAG_MOVING
+    ld (hero_flags), a
+
+    ; set dx
+    ld hl, -HERO_MOVE_DX
+    ld (hero_dx), hl
+
+    ; if not at skip (small jump) interval then continue to next step
+    ld a, (hero_frame_counter)
+    and HERO_SKIP_INTERVAL
+    jr nz, _check_hero_left_done
+
+    ; if there is vertical movement then don't skip (small jump)
+    ld hl, (hero_dy)
+    ld a, h
+    or l
+    jr nz, _check_hero_left_done
+
+    ; set skip (small jump) `dy`
+    ld hl, -HERO_SKIP_VELOCITY 
+    ld (hero_dy), hl
+
+_check_hero_left_done:
+
+_check_hero_right:
+    bit 2, b
+    jr nz, _check_hero_right_done
+
+    ; flag hero moving
+    ld a, (hero_flags)
+    or HERO_FLAG_MOVING
+    ld (hero_flags), a
+
+    ; set dx
+    ld hl, HERO_MOVE_DX
+    ld (hero_dx), hl
+
+    ; if not at skip (small jump) interval then continue to next step
+    ld a, (hero_frame_counter)
+    and HERO_SKIP_INTERVAL
+    jr nz, _check_hero_right_done
+
+    ; if there is vertical movement then don't skip (small jump)
+    ld hl, (hero_dy)
+    ld a, h
+    or l
+    jr nz, _check_hero_right_done
+
+    ; set skip (small jump) `dy`
+    ld hl, -HERO_SKIP_VELOCITY 
+    ld (hero_dy), hl
+    ld hl, HERO_MOVE_DX
+    ld (hero_dx), hl
+
+_check_hero_right_done:
+
+_check_hero_jump:
+    bit 4, b
+    jr nz, _check_hero_jump_done
+
+    ; if hero is jumping jump to don
     ld a, (hero_flags)
     and HERO_FLAG_JUMPING
-    jr nz, _check_shift_done
+    jr nz, _check_hero_jump_done
 
+    ; set jump velocity
     ld hl, -HERO_JUMP_VELOCITY
     ld (hero_dy), hl
 
+    ; flag hero with moving and jumping
     ld a, HERO_FLAG_MOVING | HERO_FLAG_JUMPING
     ld (hero_flags), a
 
-_check_shift_done:
-
-_check_hero_done:
+_check_hero_jump_done:
 
 ;-------------------------------------------------------------------------------
 physics:
