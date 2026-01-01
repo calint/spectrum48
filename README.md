@@ -4,9 +4,9 @@
 
 * learn cpu z80 by writing assembler for spectrum 48k
 * render a tile map
-* sprite implementation
+* sprites with collision detection
 * read keyboard
-* control sprite drawn over tile map
+* miniature game
 
 ## tools
 
