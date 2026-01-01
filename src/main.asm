@@ -3,7 +3,7 @@ org $8000
 ; constants
 ;-------------------------------------------------------------------------------
 BORDER_VBLANK           equ 1
-BORDER_RENDER_TILE_MAP  equ 14
+BORDER_RENDER_TILE_MAP  equ 0
 BORDER_RENDER_SPRITES   equ 4
 BORDER_INPUT            equ 9
 
@@ -326,7 +326,7 @@ physics:
     add hl, de
     ld (hero_y), hl
 
-    ; if hero is jumping then jump to gravity
+    ; if hero is jumping then apply gravity
     ld a, (hero_flags)
     and HERO_FLAG_JUMPING
     jr nz, _gravity
