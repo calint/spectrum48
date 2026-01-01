@@ -2,27 +2,27 @@ org $8000
 ;-------------------------------------------------------------------------------
 ; constants
 ;-------------------------------------------------------------------------------
-BORDER_VBLANK:          equ 1
-BORDER_RENDER_TILE_MAP: equ 14
-BORDER_RENDER_SPRITES:  equ 4
-BORDER_INPUT:           equ 9
+BORDER_VBLANK           equ 1
+BORDER_RENDER_TILE_MAP  equ 14
+BORDER_RENDER_SPRITES   equ 4
+BORDER_INPUT            equ 9
 
 ; tunable constants
-SUBPIXELS: equ 4
+SUBPIXELS  equ 4
 
-GRAVITY:          equ 3
-GRAVITY_INTERVAL: equ %1111
+GRAVITY           equ 3
+GRAVITY_INTERVAL  equ %1111
 
-HERO_SPRITE_BIT:      equ 1
-HERO_MOVE_DX:         equ 8
-HERO_JUMP_VELOCITY:   equ 33
-HERO_SKIP_VELOCITY:   equ 20
-HERO_SKIP_INTERVAL:   equ %1111
+HERO_SPRITE_BIT       equ 1
+HERO_MOVE_DX          equ 8
+HERO_JUMP_VELOCITY    equ 33
+HERO_SKIP_VELOCITY    equ 20
+HERO_SKIP_INTERVAL    equ %1111
 
 ; hard constants
-HERO_FLAG_RESTARTING: equ 1
-HERO_FLAG_MOVING:     equ 2
-HERO_FLAG_JUMPING:    equ 4
+HERO_FLAG_RESTARTING  equ 1
+HERO_FLAG_MOVING      equ 2
+HERO_FLAG_JUMPING     equ 4
 
 ;-------------------------------------------------------------------------------
 ; variables
@@ -46,7 +46,7 @@ hero_flags  db 0
 
 
 ; used by `render_sprite`
-render_sprite_collision: db 0 ; if non-zero sprite collided with drawn content
+render_sprite_collision  db 0 ; if non-zero sprite collided with drawn content
 
 ;-------------------------------------------------------------------------------
 start:
