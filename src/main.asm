@@ -13,6 +13,7 @@ GRAVITY_INTERVAL  equ %1111
 
 HERO_SPRITE_BIT       equ 1
 HERO_MOVE_DX          equ 8
+HERO_MOVE_BOOST_DX    equ 16
 HERO_JUMP_DY          equ 33
 HERO_SKIP_DY          equ 20
 HERO_SKIP_RATE        equ %1111
@@ -58,7 +59,7 @@ hero_flags       db 0
 hero_sprite      dw sprites_data_8
 hero_anim_id     db HERO_ANIM_ID_IDLE
 hero_anim_frame  db 0
-hero_anim_rate   db %111
+hero_anim_rate   db %11111
 hero_anim_ptr    dw hero_animation_idle
 
 ; used by `render_sprite`
@@ -400,8 +401,9 @@ _check_hero_left:
 
     ; initiate animation
     ld a, (hero_anim_id)
+    ; if animation already active, skip
     cp HERO_ANIM_ID_LEFT
-    jr z, _anim_left_done            ; already active, skip
+    jr z, _anim_left_done
 
     ; set new animation id
     ld a, HERO_ANIM_ID_LEFT
@@ -426,8 +428,21 @@ _check_hero_left:
 
 _anim_left_done:
 
+    ; note: hero can get stuck due to animation frames not allowing to exit
+    ;       collision, thus if in collision give a boost to escape collision
+    ;       when hanging on horizontal background
+    ;       boost constant is tuned depending on the animation frames for
+    ;       left and right where left needs to move 2 pixels to escape
+
+    ld a, (sprites_collision_bits)
+    and HERO_SPRITE_BIT
+    jr z, _no_boost_left
+    ld hl, -HERO_MOVE_BOOST_DX
+    jr _set_left_dx
+_no_boost_left:
     ; set dx
     ld hl, -HERO_MOVE_DX
+_set_left_dx:
     ld (hero_dx), hl
 
     ; if not at skip (small jump) interval then continue to next step
@@ -457,9 +472,10 @@ _check_hero_right:
     ld (hero_flags), a
 
     ; initiate animation
+    ; if animation already active, skip
     ld a, (hero_anim_id)
     cp HERO_ANIM_ID_RIGHT
-    jr z, _anim_right_done            ; already active, skip
+    jr z, _anim_right_done
 
     ; set new animation id
     ld a, HERO_ANIM_ID_RIGHT
@@ -485,7 +501,15 @@ _check_hero_right:
 _anim_right_done:
 
     ; set dx
+    ld a, (sprites_collision_bits)
+    and HERO_SPRITE_BIT
+    jr z, _no_boost_right
+    ld hl, HERO_MOVE_BOOST_DX
+    jr _set_right_dx
+_no_boost_right:
+    ; set dx
     ld hl, HERO_MOVE_DX
+_set_right_dx:
     ld (hero_dx), hl
 
     ; if not at skip (small jump) interval then continue to next step
@@ -937,9 +961,9 @@ sprites_data:
 ;-------------------------------------------------------------------------------
 org ($ + 255) & $ff00
 hero_animation_idle:
-    dw sprites_data_10
-    dw sprites_data_9
     dw sprites_data_8
+    dw sprites_data_9
+    dw sprites_data_10
     dw sprites_data_9
     dw 0
 
