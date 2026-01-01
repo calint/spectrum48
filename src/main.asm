@@ -611,7 +611,7 @@ _gravity_done:
 ;           C = y coordinate (0-191 pixels)
 ;           IX = pointer to sprite data
 ; outputs:  render_sprite_collision = non-zero if rendered over content
-; clobbers: AF, BC, DE, HL, IX
+; clobbers: AF, BC, DE, HL, IX, IYL
 ;-------------------------------------------------------------------------------
 render_sprite:
     ; clear collision byte (0 = no collision)
@@ -655,7 +655,7 @@ render_sprite:
     ; prepare shift counter
     ld a, b
     and %111                    ; x % 8 (shift amount)
-    ld (_shift_amt), a          ; save for later loop
+    ld IYL, a          ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
 
@@ -671,7 +671,7 @@ _draw_loop:
     ; we need to shift DE into a 3rd byte (C)
     ld c, 0                     ; C will hold the "spillover" bits
 
-    ld a, (_shift_amt)
+    ld a, IYL
     or a                        ; check if shift is 0
     jr z, _shift_done           ; skip if no shift needed (fast path)
  
@@ -751,9 +751,6 @@ _move_down_scanline_done:
     djnz _draw_loop
     ret
 
-    ; temporaries for this subroutine
-    _shift_amt: db 0
-
 ;-------------------------------------------------------------------------------
 ; restores tiles from tile_map for a 16 x 16 sprite area
 ;
@@ -822,10 +819,10 @@ _next_col
 ; inputs:   IXH = screen_x
 ;           A = screen_y
 ; outputs:  -
-; clobbers: AF, B, DE, HL
+; clobbers: AF, BC, DE, HL
 ;-------------------------------------------------------------------------------
 draw_single_tile
-    push af                     ; save screen row in A
+    ld c, a                     ; save screen row in A
  
     ; get tile id from map
     ld h, high tile_map         ; tile_map base in H
@@ -848,7 +845,7 @@ draw_single_tile
     ex de, hl                   ; DE is source
 
     ; calculate screen address
-    pop af                      ; A is screen row
+    ld a, c                     ; A is screen row
     ld b, a                     ; save row in B
     and %00011000               ; isolate row bits 3 4
     or $40                      ; screen base 4000
