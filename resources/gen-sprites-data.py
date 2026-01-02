@@ -45,5 +45,5 @@ with Image.open(filename) as img:
 
                     bytes_out.append(f"%{byte_val:08b}")
 
-                print(f"defb {', '.join(bytes_out)} ; {y - row}")
+                print(f"db {', '.join(bytes_out)} ; {y - row}")
             print()

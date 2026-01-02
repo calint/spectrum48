@@ -26,7 +26,7 @@ for row in range(height):
     for col in range(width):
         tile_id = data[row * width + col]
         row_data.append((int(tile_id) - 1) & bit_mask)
-    row_str = "defb " + ",".join(map(str, row_data))
+    row_str = "db " + ",".join(map(str, row_data))
     print(row_str)
     if newline_sep_every_nth_line and (row + 1) % newline_sep_every_nth_line == 0:
         print("")

@@ -36,6 +36,6 @@ with Image.open(filename) as img:
                         pixel = img.getpixel((x, y))
                         bit = 1 if pixel != BACKGROUND_PALETTE_INDEX else 0
                         byte_value = (byte_value << 1) | bit
-                    print(f"defb %{byte_value:08b}", end="")
+                    print(f"db %{byte_value:08b}", end="")
                 print()
             print()
