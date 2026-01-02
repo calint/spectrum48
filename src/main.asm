@@ -235,10 +235,10 @@ _check_top_left:
     ; overwrite the picked tile
     ld (hl), TILE_ID_PICKED
 
-    ; call draw_single_tile
+    ; call render_single_tile
     ld ixh, b
     ld a, c
-    call draw_single_tile
+    call render_single_tile
 
 _check_top_right:
     inc l
@@ -248,10 +248,10 @@ _check_top_right:
 
     ld (hl), TILE_ID_PICKED
 
-    ; call draw_single_tile
+    ; call render_single_tile
     ld ixh, b
     ld a, c
-    call draw_single_tile
+    call render_single_tile
 
 _check_bottom_right:
     inc h
@@ -261,10 +261,10 @@ _check_bottom_right:
 
     ld (hl), TILE_ID_PICKED
 
-    ; call draw_single_tile
+    ; call render_single_tile
     ld ixh, b
     ld a, c
-    call draw_single_tile
+    call render_single_tile
 
 _check_bottom_left:
     dec l
@@ -274,10 +274,10 @@ _check_bottom_left:
 
     ld (hl), TILE_ID_PICKED
 
-    ; call draw_single_tile
+    ; call render_single_tile
     ld ixh, b
     ld a, c
-    call draw_single_tile
+    call render_single_tile
 
 _check_tiles_done:
 
@@ -817,7 +817,7 @@ _row_loop
     ; note: handles `camera_x` offset
     ld ixh, d           ; IXH is screen column
     ld a, e             ; A is screen row
-    call draw_single_tile
+    call render_single_tile
 
 _next_row
     pop de
@@ -833,14 +833,14 @@ _next_col
     ret
 
 ;-------------------------------------------------------------------------------
-; draws a 8 x 8 tile to the screen
+; renders a 8 x 8 tile to the screen
 ;
 ; inputs:   IXH = screen character x
 ;           A = screen character y
 ; outputs:  -
 ; clobbers: AF, BC, DE, HL
 ;-------------------------------------------------------------------------------
-draw_single_tile
+render_single_tile
     ld c, a                     ; save screen row in A
  
     ; get tile id from map
