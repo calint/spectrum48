@@ -18,7 +18,7 @@ HERO_MOVE_DX          equ 8
 HERO_MOVE_BOOST_DX    equ 16
 HERO_JUMP_DY          equ 33
 HERO_SKIP_DY          equ 20
-HERO_SKIP_RATE        equ %1111
+HERO_SKIP_RATE        equ %11111
 
 HERO_ANIM_ID_IDLE     equ 1
 HERO_ANIM_RATE_IDLE   equ %11111
@@ -169,6 +169,8 @@ _done:
 ;-------------------------------------------------------------------------------
 collisions:
 ;-------------------------------------------------------------------------------
+; note: after this phase x and y must be out of collision since next phase will
+;       save current x and y into previous for next frame
 _check_sprites:
     ld a, (sprites_collision_bits)
     and HERO_SPRITE_BIT
@@ -284,6 +286,11 @@ _check_tiles_done:
 ;-------------------------------------------------------------------------------
 state:
 ;-------------------------------------------------------------------------------
+    ; increment frame counter used in timing masks (wrap is ok)
+    ld a, (hero_frame)
+    inc a
+    ld (hero_frame), a
+
     ; save state to prv
     ld hl, (hero_x)
     ld (hero_x_prv), hl
@@ -523,8 +530,6 @@ _set_right_dx:
     ; set skip (small jump) `dy`
     ld hl, -HERO_SKIP_DY 
     ld (hero_dy), hl
-    ld hl, HERO_MOVE_DX
-    ld (hero_dx), hl
 
 _check_hero_right_done:
 
@@ -597,10 +602,7 @@ physics:
     jr nz, _gravity
 
     ; apply gravity in intervals
-    ; increment frame counter used in timing masks (wrap is ok)
     ld a, (hero_frame)
-    inc a
-    ld (hero_frame), a
     and GRAVITY_RATE
     jr z, _gravity
 
