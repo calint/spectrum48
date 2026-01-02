@@ -465,6 +465,9 @@ _set_left_dx:
     ld a, h
     or l
     jr nz, _check_hero_left_done
+    ; note: this logic works with tuned constants, however, is hero is skipping
+    ;       and frame coincides with skip rate and dy is 0 then hero skips again
+    ;       giving the effect of hero floating upwards
 
     ; set skip (small jump) `dy`
     ld hl, -HERO_SKIP_DY 
@@ -526,6 +529,9 @@ _set_right_dx:
     ld a, h
     or l
     jr nz, _check_hero_right_done
+    ; note: this logic works with tuned constants, however, is hero is skipping
+    ;       and frame coincides with skip rate and dy is 0 then hero skips again
+    ;       giving the effect of hero floating upwards
 
     ; set skip (small jump) `dy`
     ld hl, -HERO_SKIP_DY 
