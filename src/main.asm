@@ -604,6 +604,8 @@ physics:
     ld a, h
     or l
     jr z, _gravity_done
+    ; note: if gravity and skip cancel each other so that dy is 0 then hero
+    ;       floats, adjust constants to avoid that
 
 _gravity:
     ; apply gravity on velocity
