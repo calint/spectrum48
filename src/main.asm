@@ -18,7 +18,7 @@ HERO_MOVE_DX          equ 8
 HERO_MOVE_BOOST_DX    equ 16
 HERO_JUMP_DY          equ 33
 HERO_SKIP_DY          equ 20
-HERO_SKIP_RATE        equ %11111
+HERO_SKIP_RATE        equ %1111
 
 HERO_ANIM_ID_IDLE     equ 1
 HERO_ANIM_RATE_IDLE   equ %11111
@@ -593,6 +593,9 @@ physics:
 
     ; apply gravity in intervals
     ld a, (hero_frame)
+    inc a
+    ; note: add 1 so that gravity is not applied same frame as "skip" for better
+    ;       gameplay
     and GRAVITY_RATE
     jr z, _gravity
 
