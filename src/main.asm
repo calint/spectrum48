@@ -298,56 +298,6 @@ state:
     ld (hero_y_prv), hl
 
 ;-------------------------------------------------------------------------------
-animation:
-;-------------------------------------------------------------------------------
-    ld a, (hero_anim_rate)
-    ld b, a
-    ld a, (hero_frame)
-    and b
-    jr nz, _done
-
-    ; HL = base animation table
-    ld hl, (hero_anim_ptr)
-
-    ; DE = frame index * 2
-    ld a, (hero_anim_frame)
-    add a, a              ; *2
-    ld e, a
-    ld d, 0
-    add hl, de            ; HL = entry address
-
-    ; load word -> DE
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-
-    ; terminator?
-    ld a, d
-    or e
-    jr nz, _use_frame
-
-_restart:
-    xor a
-    ld (hero_anim_frame), a
-
-    ; load first frame (table[0])
-    ld hl, (hero_anim_ptr)
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-
-_use_frame:
-    ; update current sprite
-    ld (hero_sprite), de
-
-    ; advance frame index
-    ld a, (hero_anim_frame)
-    inc a
-    ld (hero_anim_frame), a
-
-_done:
-
-;-------------------------------------------------------------------------------
 input:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_INPUT
@@ -631,6 +581,56 @@ _gravity_done:
     ld de, (hero_dy)
     add hl, de
     ld (hero_y), hl
+
+;-------------------------------------------------------------------------------
+animation:
+;-------------------------------------------------------------------------------
+    ld a, (hero_anim_rate)
+    ld b, a
+    ld a, (hero_frame)
+    and b
+    jr nz, _done
+
+    ; HL = base animation table
+    ld hl, (hero_anim_ptr)
+
+    ; DE = frame index * 2
+    ld a, (hero_anim_frame)
+    add a, a              ; *2
+    ld e, a
+    ld d, 0
+    add hl, de            ; HL = entry address
+
+    ; load word -> DE
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+    ; terminator?
+    ld a, d
+    or e
+    jr nz, _use_frame
+
+_restart:
+    xor a
+    ld (hero_anim_frame), a
+
+    ; load first frame (table[0])
+    ld hl, (hero_anim_ptr)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+_use_frame:
+    ; update current sprite
+    ld (hero_sprite), de
+
+    ; advance frame index
+    ld a, (hero_anim_frame)
+    inc a
+    ld (hero_anim_frame), a
+
+_done:
 
 ;-------------------------------------------------------------------------------
     jp main_loop
