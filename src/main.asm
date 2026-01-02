@@ -586,16 +586,6 @@ _done:
 ;-------------------------------------------------------------------------------
 physics:
 ;-------------------------------------------------------------------------------
-    ; add velocity to position
-    ld hl, (hero_x)
-    ld de, (hero_dx)
-    add hl, de
-    ld (hero_x), hl
-    ld hl, (hero_y)
-    ld de, (hero_dy)
-    add hl, de
-    ld (hero_y), hl
-
     ; if hero is jumping then apply gravity
     ld a, (hero_flags)
     and HERO_FLAG_JUMPING
@@ -620,6 +610,16 @@ _gravity:
     ld (hero_dy), hl
 
 _gravity_done:
+
+    ; add velocity to position
+    ld hl, (hero_x)
+    ld de, (hero_dx)
+    add hl, de
+    ld (hero_x), hl
+    ld hl, (hero_y)
+    ld de, (hero_dy)
+    add hl, de
+    ld (hero_y), hl
 
 ;-------------------------------------------------------------------------------
     jp main_loop
