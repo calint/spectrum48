@@ -629,7 +629,7 @@ _gravity_done:
 ; inputs:   B = x coordinate (0-255 pixels)
 ;           C = y coordinate (0-191 pixels)
 ;           IX = pointer to sprite data
-; outputs:  render_sprite_collision = non-zero if rendered over content
+; outputs:  sprite_collided = non-zero if rendered over content
 ; clobbers: AF, BC, DE, HL, IX, IYL
 ;-------------------------------------------------------------------------------
 render_sprite:
@@ -658,7 +658,7 @@ render_sprite:
     ld a, c                     ; y to A
     rla                         ; rotate y bits 5-7 to position
     rla
-    and $e0                     ; isolate them
+    and %11100000               ; isolate them
     ld l, a                     ; start L
 
     ld a, b                     ; x to A
