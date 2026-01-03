@@ -197,34 +197,23 @@ _check_sprites_done:
 
 _check_tiles:
     ; calculate tile x
-    ld hl, (hero_x)
-    rept SUBPIXELS
-        srl h
-        rr l
-    endm
-    ld de, TILE_WIDTH / 2  ; bias to get an estimated rounding
-    add hl, de
+    ld a, (hero_x_screen)
+    add a, TILE_WIDTH / 2   ; bias toward tile center (rounded tile coordinate)
     rept TILE_SHIFT
-        srl h
-        rr l
+        srl a
     endm
+    ld b, a
     ld a, (camera_x)
-    add a, l
+    add a, b
     ld b, a                 ; B = top left tile x
 
     ; calculate tile y
-    ld hl, (hero_y)
-    rept SUBPIXELS
-        srl h
-        rr l
-    endm
-    ld de, TILE_WIDTH / 2   ; bias to get an estimated rounding
-    add hl, de
+    ld a, (hero_y_screen)
+    add a, TILE_WIDTH / 2   ; bias toward tile center (rounded tile coordinate)
     rept TILE_SHIFT
-        srl h
-        rr l
+        srl a
     endm
-    ld c, l                 ; C = top left tile y
+    ld c, a                 ; C = top left tile y
 
     ; point HL to top left tile
     ld h, c
@@ -289,11 +278,6 @@ _check_tiles_done:
 ;-------------------------------------------------------------------------------
 state:
 ;-------------------------------------------------------------------------------
-    ; increment frame counter used in timing masks (wrap is ok)
-    ld a, (hero_frame)
-    inc a
-    ld (hero_frame), a
-
     ; save state to prv
     ld hl, (hero_x)
     ld (hero_x_prv), hl
@@ -636,6 +620,10 @@ _use_frame:
 _done:
 
 ;-------------------------------------------------------------------------------
+    ; increment frame counter used in timing masks (wrap is ok)
+    ld hl, hero_frame
+    inc (hl)
+
     jp main_loop
 ;-------------------------------------------------------------------------------
 
@@ -728,7 +716,7 @@ _shift_done:
     ld b, a                     ; save screen pixels
     and d                       ; check collision
     jr z, _no_collision_1       ; skip if no collision
-    ld (sprite_collided), a  ; store any non-zero = collision
+    ld (sprite_collided), a     ; store any non-zero = collision
 _no_collision_1:
     ld a, b                     ; reload screen pixels
     or d                        ; or with sprite left
