@@ -27,9 +27,9 @@ HERO_ANIM_RATE_LEFT   equ %111
 HERO_ANIM_ID_RIGHT    equ 3
 HERO_ANIM_RATE_RIGHT  equ %111
 
-HERO_CAMERA_LFT_EDGE  equ 3
-HERO_CAMERA_RHT_EDGE  equ 28
-HERO_CAMERA_MOVE      equ 24
+HERO_CAMERA_LFT_EDGE  equ 7
+HERO_CAMERA_RHT_EDGE  equ 25
+HERO_CAMERA_MOVE      equ 18
 
 TILE_ID_PICKABLE      equ 33
 TILE_ID_PICKED        equ 32
@@ -203,22 +203,34 @@ _camera_reposition:
     cp CAMERA_STATE_IDLE
     jr z, _camera_reposition_done
 
+    ld hl, camera_x
     cp CAMERA_STATE_LEFT
-    jr nz, _camera_reposition_right
+    jr nz, _prep_right
+
+_prep_left:
+    ld bc, 8 << SUBPIXELS   ; hero moves right relative to screen
+    ld d, -1                ; camera moves left
+    jr _apply
+
+_prep_right:
+    ld bc, -(8 << SUBPIXELS)
+    ld d, 1
+
+_apply:
+    ; update camera x
+    ld a, (hl)
+    add a, d
+    ld (hl), a
 
     ; adjust hero x
     ld hl, (hero_x)
-    ld de, 8 << SUBPIXELS
-    add hl, de
+    add hl, bc
     ld (hero_x), hl
     ld hl, (hero_x_prv)
-    add hl, de
+    add hl, bc
     ld (hero_x_prv), hl
 
-    ; adjust camera x
-    ld a, (camera_x)
-    dec a
-    ld (camera_x), a
+    ; check if destination reached
     ld hl, camera_dest_x
     cp (hl)
     jr nz, _camera_reposition_done
@@ -227,28 +239,6 @@ _camera_reposition:
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
     jr _camera_reposition_done
-
-_camera_reposition_right:
-    ; adjust hero x
-    ld hl, (hero_x)
-    ld de, -(8 << SUBPIXELS)
-    add hl, de
-    ld (hero_x), hl
-    ld hl, (hero_x_prv)
-    add hl, de
-    ld (hero_x_prv), hl
-
-    ; adjust camera x
-    ld a, (camera_x)
-    inc a
-    ld (camera_x), a
-    ld hl, camera_dest_x
-    cp (hl)
-    jr nz, _camera_reposition_done
-
-    ; done
-    ld a, CAMERA_STATE_IDLE
-    ld (camera_state), a
 
 _camera_reposition_done:
 
@@ -337,33 +327,33 @@ _done:
 ;-------------------------------------------------------------------------------
 camera_adjust_focus:
 ;-------------------------------------------------------------------------------
-    ; if hero is to much to the left or right of the screen camera will
-    ; reposition
-
     ld a, (hero_x_screen)
     rept TILE_SHIFT
-        srl a
+        srl a                ; convert to tile x
     endm
 
-    cp HERO_CAMERA_LFT_EDGE
-    jr nc, _check_right_edge
+    ld hl, camera_x          ; hl points to current camera
+    cp HERO_CAMERA_LFT_EDGE  ; check left boundary
+    jr c, _set_left          ; jump if hero < left edge
 
-    ld a, (camera_x)
-    add a, -HERO_CAMERA_MOVE
-    ld (camera_dest_x), a
-    ld a, CAMERA_STATE_LEFT
-    ld (camera_state), a
-    jr _done
+    cp HERO_CAMERA_RHT_EDGE  ; check right boundary
+    jr c, _done              ; if hero < right edge we are in deadzone
 
- _check_right_edge:
-    cp HERO_CAMERA_RHT_EDGE
-    jr c, _done
+_set_right:
+    ld b, CAMERA_STATE_RIGHT ; prepare state for right move
+    ld a, (hl)               ; get current camera_x
+    add a, HERO_CAMERA_MOVE  ; calculate destination
+    jr _store_camera         ; jump to shared store
 
-    ld a, (camera_x)
-    add a, HERO_CAMERA_MOVE
-    ld (camera_dest_x), a
-    ld a, CAMERA_STATE_RIGHT
-    ld (camera_state), a
+_set_left:
+    ld b, CAMERA_STATE_LEFT  ; prepare state for left move
+    ld a, (hl)               ; get current camera_x
+    sub HERO_CAMERA_MOVE     ; calculate destination
+
+_store_camera:
+    ld (camera_dest_x), a    ; store new destination
+    ld a, b                  ; move state to accumulator
+    ld (camera_state), a     ; update camera state
 
 _done:
 
