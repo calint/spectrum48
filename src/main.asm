@@ -58,8 +58,8 @@ hero_dx          dw 0
 hero_dy          dw 0
 hero_x_prv       dw 132 << SUBPIXELS
 hero_y_prv       dw 0
-hero_x_drw       db 132
-hero_y_drw       db 0
+hero_x_screen    db 132
+hero_y_screen    db 0
 hero_flags       db 0
 hero_sprite      dw sprites_data_8
 hero_anim_id     db HERO_ANIM_ID_IDLE
@@ -126,10 +126,10 @@ render_sprites:
 
     ; call restore_sprite_background
     ; B = previous render x 
-    ld a, (hero_x_drw)
+    ld a, (hero_x_screen)
     ld b, a
     ; C = previous render y 
-    ld a, (hero_y_drw)
+    ld a, (hero_y_screen)
     ld c, a
     call restore_sprite_background
 
@@ -141,7 +141,7 @@ render_sprites:
     endm
     ld b, l
     ld a, b             ; save x where sprite was rendered
-    ld (hero_x_drw), a
+    ld (hero_x_screen), a
     ; C = hero_x >> SUBPIXELS
     ld hl, (hero_y)
     rept SUBPIXELS
@@ -150,7 +150,7 @@ render_sprites:
     endm
     ld c, l
     ld a, c             ; save y where sprite was rendered
-    ld (hero_y_drw), a
+    ld (hero_y_screen), a
     ld ix, (hero_sprite)
     call render_sprite
 
