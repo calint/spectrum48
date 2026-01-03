@@ -78,7 +78,7 @@ sprite_collided  db 0   ; 0 = no collisions
 ;           table = address of animation table
 ;           id = address of animation id field
 ;           rate = address of animation rate field
-;           ptr = address of current frame pointer field
+;           ptr = address of current pointer field into the animation table
 ;           sprite = address of sprite field
 ; output:   initiates addresses with animation
 ; clobbers: A, DE, HL
