@@ -78,12 +78,12 @@ sprite_collided  db 0   ; 0 = no collisions
 ;           table = address of animation table
 ;           id = address of animation id field
 ;           rate = address of animation rate field
-;           ptr = address of current pointer field into the animation table
+;           ptr = address of current pointer field to the animation table
 ;           sprite = address of sprite field
 ; output:   initiates addresses with animation
 ; clobbers: A, DE, HL
 ;-------------------------------------------------------------------------------
-SET_ANIMATION MACRO ID, RATE, table, id, rate, frame, ptr, sprite
+ANIMATION_SET MACRO ID, RATE, table, id, rate, frame, ptr, sprite
     ; check if same animation and if so then done
     ld a, (id)
     cp ID
@@ -110,6 +110,65 @@ SET_ANIMATION MACRO ID, RATE, table, id, rate, frame, ptr, sprite
 _done:
 ENDM
 
+;-------------------------------------------------------------------------------
+; advances a frame in animation if `hero_frame` bitwise and `(rate)` is zero
+; if end is reached then restart at first frame
+;
+; input:    id = address of animation id field
+;           rate = address of animation rate field
+;           ptr = address of current pointer field into the animation table
+;           sprite = address of sprite field
+; output:   adjusts `(ptr)` and `(sprite)`
+; clobbers: A, B, DE, HL
+;-------------------------------------------------------------------------------
+ANIMATION_DO MACRO id, rate, frame, ptr, sprite
+    ld a, (rate)
+    ld b, a
+    ld a, (hero_frame)
+    and b
+    jr nz, _done
+
+    ; HL = base animation table
+    ld hl, (ptr)
+
+    ; DE = frame index * 2
+    ld a, (frame)
+    add a, a              ; *2
+    ld e, a
+    ld d, 0
+    add hl, de            ; HL = entry address
+
+    ; load word -> DE
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+    ; terminator?
+    ld a, d
+    or e
+    jr nz, _use_frame
+
+_restart:
+    xor a
+    ld (frame), a
+
+    ; load first frame (table[0])
+    ld hl, (ptr)
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+
+_use_frame:
+    ; update current sprite
+    ld (sprite), de
+
+    ; advance frame index
+    ld a, (frame)
+    inc a
+    ld (frame), a
+
+_done:
+ENDM
 ;-------------------------------------------------------------------------------
 start:
 ;-------------------------------------------------------------------------------
@@ -391,7 +450,7 @@ _check_hero_left:
     ld (hero_flags), a
 
     ; initiate animation
-    SET_ANIMATION HERO_ANIM_ID_LEFT, HERO_ANIM_RATE_LEFT, hero_animation_left, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
+    ANIMATION_SET HERO_ANIM_ID_LEFT, HERO_ANIM_RATE_LEFT, hero_animation_left, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
     ; note: hero can get stuck due to animation frames not allowing to exit
     ;       collision, thus if in collision give a boost to escape collision
@@ -438,7 +497,7 @@ _check_hero_right:
     or HERO_FLAG_MOVING
     ld (hero_flags), a
 
-    SET_ANIMATION HERO_ANIM_ID_RIGHT, HERO_ANIM_RATE_RIGHT, hero_animation_right, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
+    ANIMATION_SET HERO_ANIM_ID_RIGHT, HERO_ANIM_RATE_RIGHT, hero_animation_right, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
     ; choose dx boost if in collision
     ld hl, HERO_MOVE_DX
@@ -492,7 +551,7 @@ _check_hero_jump_done:
     and HERO_FLAG_MOVING
     jr nz, _done
 
-    SET_ANIMATION HERO_ANIM_ID_IDLE, HERO_ANIM_RATE_IDLE, hero_animation_idle, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
+    ANIMATION_SET HERO_ANIM_ID_IDLE, HERO_ANIM_RATE_IDLE, hero_animation_idle, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
 _done:
 
@@ -547,50 +606,7 @@ animation:
     and HERO_FLAG_JUMPING
     jr nz, _done
 
-    ld a, (hero_anim_rate)
-    ld b, a
-    ld a, (hero_frame)
-    and b
-    jr nz, _done
-
-    ; HL = base animation table
-    ld hl, (hero_anim_ptr)
-
-    ; DE = frame index * 2
-    ld a, (hero_anim_frame)
-    add a, a              ; *2
-    ld e, a
-    ld d, 0
-    add hl, de            ; HL = entry address
-
-    ; load word -> DE
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-
-    ; terminator?
-    ld a, d
-    or e
-    jr nz, _use_frame
-
-_restart:
-    xor a
-    ld (hero_anim_frame), a
-
-    ; load first frame (table[0])
-    ld hl, (hero_anim_ptr)
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-
-_use_frame:
-    ; update current sprite
-    ld (hero_sprite), de
-
-    ; advance frame index
-    ld a, (hero_anim_frame)
-    inc a
-    ld (hero_anim_frame), a
+    ANIMATION_DO hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
 _done:
 
