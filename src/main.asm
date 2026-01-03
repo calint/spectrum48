@@ -41,6 +41,9 @@ HERO_FLAG_JUMPING     equ 4
 TILE_WIDTH            equ 8
 TILE_SHIFT            equ 3
 
+SCREEN_WIDTH          equ 32
+SCREEN_HEIGHT         equ 24
+
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
@@ -105,7 +108,7 @@ _loop:
     include "render_rows.asm"
     ld a, ixh           ; restore A
     inc a
-    cp 32
+    cp SCREEN_WIDTH
     jp nz, _loop
 
 ;-------------------------------------------------------------------------------
@@ -766,7 +769,7 @@ _no_collision_3:
 
     ; if wrapped 0-7 then fix the lower byte of the address
     ld a, l
-    add a, 32                   ; move to next character row
+    add a, SCREEN_WIDTH         ; move to next character row
     ld l, a
     ; if carry then 256 and moved to next third, continue
     jr c, _move_down_scanline_done
@@ -814,8 +817,8 @@ _col_loop
     push de             ; save current screen D and E
 
     ld a, d             ; screen column to A
-    cp 32               ; check screen boundary
-    jr nc, _next_col    ; if A >= 32
+    cp SCREEN_WIDTH     ; check screen boundary
+    jr nc, _next_col    ; if A >= SCREEN_WIDTH
 
     ld b, 3             ; loop 3 rows
 _row_loop
@@ -823,7 +826,7 @@ _row_loop
     push de
 
     ld a, e             ; screen row to A
-    cp 24               ; check vertical boundary
+    cp SCREEN_HEIGHT    ; check vertical boundary
     jr nc, _next_row    ; if A >= 24
 
     ; call `draw_single_tile`
