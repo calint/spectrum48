@@ -27,6 +27,10 @@ HERO_ANIM_RATE_LEFT   equ %111
 HERO_ANIM_ID_RIGHT    equ 3
 HERO_ANIM_RATE_RIGHT  equ %111
 
+HERO_CAMERA_LFT_EDGE  equ 5
+HERO_CAMERA_RHT_EDGE  equ 26
+HERO_CAMERA_MOVE      equ 20
+
 TILE_ID_PICKABLE      equ 33
 TILE_ID_PICKED        equ 32
 
@@ -37,6 +41,10 @@ SUBPIXELS             equ 4
 HERO_FLAG_RESTARTING  equ 1
 HERO_FLAG_MOVING      equ 2
 HERO_FLAG_JUMPING     equ 4
+
+CAMERA_STATE_IDLE     equ 0
+CAMERA_STATE_LEFT     equ 1
+CAMERA_STATE_RIGHT    equ 2
 
 TILE_WIDTH            equ 8
 TILE_SHIFT            equ 3
@@ -51,6 +59,9 @@ sprites_collision_bits: db 0   ; 8 bits for sprite collisions
 
 camera_x         db -16
 camera_x_prv     db $ff
+camera_state     db CAMERA_STATE_IDLE
+camera_dest_x    db -16
+
 hero_frame       db 0
 hero_x           dw 132 << SUBPIXELS 
 hero_y           dw 0
@@ -185,7 +196,53 @@ main_loop:
     out ($fe), a
 
     halt                ; sleep until the start of the next frame
- 
+
+_camera_reposition:
+    ld a, (camera_state)
+    cp CAMERA_STATE_IDLE
+    jr z, _camera_reposition_done
+
+    cp CAMERA_STATE_LEFT
+    jr nz, _camera_reposition_right
+
+    ; adjust hero x
+    ld hl, (hero_x)
+    ld de, 8 << SUBPIXELS
+    add hl, de
+    ld (hero_x), hl
+    ld (hero_x_prv), hl
+
+    ld a, (camera_x)
+    dec a
+    ld (camera_x), a
+    ld hl, camera_dest_x
+    cp (hl)
+    jr nz, _camera_reposition_done
+
+    ld a, CAMERA_STATE_IDLE
+    ld (camera_state), a
+    jr _camera_reposition_done
+
+_camera_reposition_right:
+    ; adjust hero x
+    ld hl, (hero_x)
+    ld de, -(8 << SUBPIXELS)
+    add hl, de
+    ld (hero_x), hl
+    ld (hero_x_prv), hl
+
+    ld a, (camera_x)
+    inc a
+    ld (camera_x), a
+    ld hl, camera_dest_x
+    cp (hl)
+    jr nz, _camera_reposition_done
+
+    ld a, CAMERA_STATE_IDLE
+    ld (camera_state), a
+
+_camera_reposition_done:
+
     ; check if camera position changed triggering tile map re-draw
     ld hl, camera_x_prv
     ld a, (camera_x)
@@ -267,6 +324,40 @@ _done:
     ld a, (sprites_collision_bits)
     ld hl, $401f
     ld (hl), a
+
+;-------------------------------------------------------------------------------
+camera_adjust_focus:
+;-------------------------------------------------------------------------------
+    ld a, (hero_x_screen)
+    rept TILE_SHIFT
+        srl a
+    endm
+
+    cp HERO_CAMERA_LFT_EDGE
+    jr nc, _check_right_edge
+
+    ld a, (camera_x)
+    add a, -HERO_CAMERA_MOVE
+    ld (camera_dest_x), a
+    ld a, CAMERA_STATE_LEFT
+    ld (camera_state), a
+    jr _done
+
+ _check_right_edge:
+    ld a, (hero_x_screen)
+    rept TILE_SHIFT
+        srl a
+    endm
+    cp HERO_CAMERA_RHT_EDGE
+    jr c, _done
+
+    ld a, (camera_x)
+    add a, HERO_CAMERA_MOVE
+    ld (camera_dest_x), a
+    ld a, CAMERA_STATE_RIGHT
+    ld (camera_state), a
+
+_done:
 
 ;-------------------------------------------------------------------------------
 collisions:
@@ -397,44 +488,6 @@ input:
     ld a, (hero_flags)
     and ~HERO_FLAG_MOVING
     ld (hero_flags), a
-
-_check_camera:
-    ld bc, $bffe        ; row: enter, l, k, j, h
-    in a, (c)           ; read row (0 = pressed)
-
-_check_camera_left:
-    bit 3, a
-    jr nz, _check_camera_left_done
-
-    ; adjust camera x
-    ld hl, camera_x
-    dec (hl)
-
-    ; adjust hero x
-    ld hl, (hero_x)
-    ld de, 8 << SUBPIXELS
-    add hl, de
-    ld (hero_x), hl
-    ld (hero_x_prv), hl
-
-_check_camera_left_done:
-
-_check_camera_right:
-    bit 1, a
-    jr nz, _check_camera_right_done
-
-    ; adjust camera x
-    ld hl, camera_x
-    inc (hl)
-
-    ; adjust hero x
-    ld hl, (hero_x)
-    ld de, -(8 << SUBPIXELS)
-    add hl, de
-    ld (hero_x), hl
-    ld (hero_x_prv), hl
-
-_check_camera_right_done:
 
 _check_hero:
     ld bc, $fdfe        ; row for a, s, d, f, g
