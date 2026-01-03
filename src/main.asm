@@ -211,8 +211,10 @@ _camera_reposition:
     ld de, 8 << SUBPIXELS
     add hl, de
     ld (hero_x), hl
+    ld hl, (hero_x_prv)
+    add hl, de
     ld (hero_x_prv), hl
-    
+
     ; adjust camera x
     ld a, (camera_x)
     dec a
@@ -232,6 +234,8 @@ _camera_reposition_right:
     ld de, -(8 << SUBPIXELS)
     add hl, de
     ld (hero_x), hl
+    ld hl, (hero_x_prv)
+    add hl, de
     ld (hero_x_prv), hl
 
     ; adjust camera x
@@ -329,11 +333,6 @@ _done:
     ld a, (sprites_collision_bits)
     ld hl, $401f
     ld (hl), a
-
-    ; if camera is repositioning then redraw
-    ld a, (camera_state)
-    cp CAMERA_STATE_IDLE
-    jp nz, main_loop
 
 ;-------------------------------------------------------------------------------
 camera_adjust_focus:
