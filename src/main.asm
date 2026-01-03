@@ -197,6 +197,7 @@ main_loop:
 
     halt                ; sleep until the start of the next frame
 
+; if camera is repositioning
 _camera_reposition:
     ld a, (camera_state)
     cp CAMERA_STATE_IDLE
@@ -211,7 +212,8 @@ _camera_reposition:
     add hl, de
     ld (hero_x), hl
     ld (hero_x_prv), hl
-
+    
+    ; adjust camera x
     ld a, (camera_x)
     dec a
     ld (camera_x), a
@@ -219,6 +221,7 @@ _camera_reposition:
     cp (hl)
     jr nz, _camera_reposition_done
 
+    ; done
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
     jr _camera_reposition_done
@@ -231,6 +234,7 @@ _camera_reposition_right:
     ld (hero_x), hl
     ld (hero_x_prv), hl
 
+    ; adjust camera x
     ld a, (camera_x)
     inc a
     ld (camera_x), a
@@ -238,6 +242,7 @@ _camera_reposition_right:
     cp (hl)
     jr nz, _camera_reposition_done
 
+    ; done
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
 
@@ -325,9 +330,17 @@ _done:
     ld hl, $401f
     ld (hl), a
 
+    ; if camera is repositioning then redraw
+    ld a, (camera_state)
+    cp CAMERA_STATE_IDLE
+    jp nz, main_loop
+
 ;-------------------------------------------------------------------------------
 camera_adjust_focus:
 ;-------------------------------------------------------------------------------
+    ; if hero is to much to the left or right of the screen camera will
+    ; reposition
+
     ld a, (hero_x_screen)
     rept TILE_SHIFT
         srl a
