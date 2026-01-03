@@ -344,10 +344,6 @@ camera_adjust_focus:
     jr _done
 
  _check_right_edge:
-    ld a, (hero_x_screen)
-    rept TILE_SHIFT
-        srl a
-    endm
     cp HERO_CAMERA_RHT_EDGE
     jr c, _done
 
