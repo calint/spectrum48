@@ -71,6 +71,46 @@ hero_anim_ptr    dw hero_animation_idle
 sprite_collided  db 0   ; 0 = no collisions
 
 ;-------------------------------------------------------------------------------
+; initiates animation if not same
+;
+; input:    ID = animation id constant
+;           RATE = animation rate constant
+;           table = address of animation table
+;           id = address of animation id field
+;           rate = address of animation rate field
+;           ptr = address of current frame pointer field
+;           sprite = address of sprite field
+; output:   initiates addresses with animation
+; clobbers: A, DE, HL
+;-------------------------------------------------------------------------------
+SET_ANIMATION MACRO ID, RATE, table, id, rate, frame, ptr, sprite
+    ; check if same animation and if so then done
+    ld a, (id)
+    cp ID
+    jr z, _done
+
+    ld a, ID
+    ld (id), a
+
+    ld a, RATE
+    ld (rate), a
+
+    xor a
+    ld (frame), a
+
+    ld hl, table
+    ld (ptr), hl
+
+    ; load first frame from table
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    ld (sprite), de
+
+_done:
+ENDM
+
+;-------------------------------------------------------------------------------
 start:
 ;-------------------------------------------------------------------------------
     ld hl, $5800        ; color attribute start, 768 bytes
@@ -351,30 +391,7 @@ _check_hero_left:
     ld (hero_flags), a
 
     ; initiate animation
-    ; if animation already active, skip
-    ld a, (hero_anim_id)
-    cp HERO_ANIM_ID_LEFT
-    jr z, _anim_left_done
-
-    ld a, HERO_ANIM_ID_LEFT
-    ld (hero_anim_id), a
-
-    ld a, HERO_ANIM_RATE_LEFT
-    ld (hero_anim_rate), a
-
-    xor a
-    ld (hero_anim_frame), a
-
-    ld hl, hero_animation_left
-    ld (hero_anim_ptr), hl
-
-    ; load first frame from table
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    ld (hero_sprite), de
-
-_anim_left_done:
+    SET_ANIMATION HERO_ANIM_ID_LEFT, HERO_ANIM_RATE_LEFT, hero_animation_left, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
     ; note: hero can get stuck due to animation frames not allowing to exit
     ;       collision, thus if in collision give a boost to escape collision
@@ -421,31 +438,7 @@ _check_hero_right:
     or HERO_FLAG_MOVING
     ld (hero_flags), a
 
-    ; initiate animation
-    ; if animation already active, skip
-    ld a, (hero_anim_id)
-    cp HERO_ANIM_ID_RIGHT
-    jr z, _anim_right_done
-
-    ld a, HERO_ANIM_ID_RIGHT
-    ld (hero_anim_id), a
-
-    ld a, HERO_ANIM_RATE_RIGHT
-    ld (hero_anim_rate), a
-
-    xor a
-    ld (hero_anim_frame), a
-
-    ld hl, hero_animation_right
-    ld (hero_anim_ptr), hl
-
-    ; load first frame from table
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    ld (hero_sprite), de
-
-_anim_right_done:
+    SET_ANIMATION HERO_ANIM_ID_RIGHT, HERO_ANIM_RATE_RIGHT, hero_animation_right, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
     ; choose dx boost if in collision
     ld hl, HERO_MOVE_DX
@@ -499,30 +492,7 @@ _check_hero_jump_done:
     and HERO_FLAG_MOVING
     jr nz, _done
 
-    ; initiate idle animation
-    ld a, (hero_anim_id)
-    cp HERO_ANIM_ID_IDLE
-    jr z, _anim_idle_done   ; already active, skip
-
-    ld a, HERO_ANIM_ID_IDLE
-    ld (hero_anim_id), a
-
-    ld a, HERO_ANIM_RATE_IDLE
-    ld (hero_anim_rate), a
-
-    xor a
-    ld (hero_anim_frame), a
-
-    ld hl, hero_animation_idle
-    ld (hero_anim_ptr), hl
-
-    ; load first frame from table
-    ld e, (hl)
-    inc hl
-    ld d, (hl)
-    ld (hero_sprite), de
-
-_anim_idle_done:
+    SET_ANIMATION HERO_ANIM_ID_IDLE, HERO_ANIM_RATE_IDLE, hero_animation_idle, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
 _done:
 
@@ -572,6 +542,11 @@ _gravity_done:
 ;-------------------------------------------------------------------------------
 animation:
 ;-------------------------------------------------------------------------------
+    ; don't animate if jumping for funny gameplay effect
+    ld a, (hero_flags)
+    and HERO_FLAG_JUMPING
+    jr nz, _done
+
     ld a, (hero_anim_rate)
     ld b, a
     ld a, (hero_frame)
