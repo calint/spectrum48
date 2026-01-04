@@ -429,16 +429,16 @@ _check_sprites:
 _check_sprites_done:
 
 _check_tiles:
-    ; calculate tile x
+    ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
     add a, TILE_WIDTH / 2   ; bias toward tile center (rounded tile coordinate)
     rept TILE_SHIFT
         srl a
     endm
-    ld b, a
+    ld b, a                 ; B = column
     ld a, (camera_x)
     add a, b
-    ld b, a                 ; B = top left tile x
+    ld l, a                 ; L = top left tile x
 
     ; calculate tile y
     ld a, (hero_y_screen)
@@ -446,11 +446,10 @@ _check_tiles:
     rept TILE_SHIFT
         srl a
     endm
-    ld c, a                 ; C = top left tile y
+    ld c, a                 ; C = row
+    ld h, a                 ; H = top left tile y
 
     ; point HL to top left tile
-    ld h, c
-    ld l, b
     ld de, tile_map
     add hl, de
 
@@ -462,48 +461,39 @@ _check_top_left:
     ; overwrite the picked tile
     ld (hl), TILE_ID_PICKED
 
-    ; call render_single_tile
-    ld ixh, b
-    ld a, c
     call render_single_tile
 
 _check_top_right:
     inc l
+    inc b
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
     jr nz, _check_bottom_right
 
     ld (hl), TILE_ID_PICKED
 
-    ; call render_single_tile
-    ld ixh, b
-    ld a, c
     call render_single_tile
 
 _check_bottom_right:
     inc h
+    inc c
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
     jr nz, _check_bottom_left
 
     ld (hl), TILE_ID_PICKED
 
-    ; call render_single_tile
-    ld ixh, b
-    ld a, c
     call render_single_tile
 
 _check_bottom_left:
     dec l
+    dec b
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
     jr nz, _check_tiles_done
 
     ld (hl), TILE_ID_PICKED
 
-    ; call render_single_tile
-    ld ixh, b
-    ld a, c
     call render_single_tile
 
 _check_tiles_done:
@@ -864,10 +854,16 @@ _move_down_scanline_done:
 ;-------------------------------------------------------------------------------
 ; restores tiles from tile_map for a 16 x 16 sprite area
 ;
-; inputs:   B = x pixel
-;           C = y pixel
-; outputs:  -
-; clobbers: AF, BC, DE, IX
+; input:
+;   B = x pixel
+;   C = y pixel
+;
+; output:
+;   B = column
+;   C = row
+;
+; clobbers:
+;   AF, BC, DE, IX
 ;-------------------------------------------------------------------------------
 restore_sprite_background
     ; calculate starting tile column x / 8
@@ -876,7 +872,7 @@ restore_sprite_background
     rrca
     rrca
     and %00011111
-    ld d, a             ; D is screen column 0 to 31
+    ld b, a             ; B is screen column 0 to 31
 
     ; calculate starting tile row y / 8
     ld a, c
@@ -884,64 +880,52 @@ restore_sprite_background
     rrca
     rrca
     and %00011111
-    ld e, a             ; E is screen row 0 to 23
+    ld c, a             ; C is screen row 0 to 23
 
-    ld b, 3             ; loop 3 columns
-_col_loop
-    push bc
-    push de             ; save current screen D and E
-
-    ld a, d             ; screen column to A
-    cp SCREEN_WIDTH     ; check screen boundary
-    jr nc, _next_col    ; if A >= SCREEN_WIDTH
-
-    ld b, 3             ; loop 3 rows
-_row_loop
-    push bc
-    push de
-
-    ld a, e             ; screen row to A
-    cp SCREEN_HEIGHT    ; check vertical boundary
-    jr nc, _next_row    ; if A >= 24
-
-    ; call `draw_single_tile`
-    ; note: handles `camera_x` offset
-    ld ixh, d           ; IXH is screen column
-    ld a, e             ; A is screen row
+    call render_single_tile
+    inc b
+    call render_single_tile
+    inc b
+    call render_single_tile
+    inc c
+    call render_single_tile
+    dec b
+    call render_single_tile
+    dec b
+    call render_single_tile
+    inc c
+    call render_single_tile
+    inc b
+    call render_single_tile
+    inc b
     call render_single_tile
 
-_next_row
-    pop de
-    inc e               ; next row down in E
-    pop bc
-    djnz _row_loop
-
-_next_col
-    pop de
-    inc d               ; next column right in D
-    pop bc
-    djnz _col_loop
     ret
 
 ;-------------------------------------------------------------------------------
 ; renders a 8 x 8 tile to the screen
 ;
-; inputs:   IXH = screen character x
-;           A = screen character y
-; outputs:  -
-; clobbers: AF, BC, DE, HL
+; input:
+;   B = column
+;   C = row
+;
+; output: -
+;
+; clobbers:
+;   AF, DE, HL
 ;-------------------------------------------------------------------------------
-render_single_tile
-    ld c, a                     ; save screen row in A
- 
+render_single_tile:
     ; get tile id from map
     ld h, high tile_map         ; tile_map base in H
+    ld a, c
     add a, h                    ; A is base high byte plus row
     ld h, a                     ; H is now the correct high byte
  
     ld a, (camera_x)            ; get current camera offset in A
-    add a, ixh                  ; add screen x in IXH
+    add a, b                    ; add screen x in IXH
     ld l, a                     ; L is final map column
+    ; HL = pointer to tile
+
     ld a, (hl)                  ; A is tile id from HL
  
     ; get charset address
@@ -952,21 +936,20 @@ render_single_tile
     add hl, hl
     ld de, charset
     add hl, de                  ; HL is bitmap source
-    ex de, hl                   ; DE is source
+    ex de, hl                   ; DE is now bitmap source
 
     ; calculate screen address
     ld a, c                     ; A is screen row
-    ld b, a                     ; save row in B
     and %00011000               ; isolate row bits 3 4
-    or $40                      ; screen base 4000
+    or %01000000                ; screen base 4000
     ld h, a                     ; screen high byte in H
 
-    ld a, b                     ; screen row to A
+    ld a, c                     ; screen row to A
     and %00000111               ; isolate row bits 0 to 2
     rrca                        ; rotate lower bits to high bits
     rrca
-    rrca                        ; move bits to 5 6 7
-    or ixh                      ; add screen column IXH
+    rrca                        ; moved low bits to 5 6 7
+    or b                        ; add column B
     ld l, a                     ; screen low byte in L
 
     ; copy 8 bytes
@@ -1020,7 +1003,6 @@ render_single_tile
     inc h                       ; next screen line in H
  
     ret
-
 ;-------------------------------------------------------------------------------
 ; charset: 256 * 8 = 2048 B
 ;-------------------------------------------------------------------------------
