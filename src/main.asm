@@ -27,9 +27,9 @@ HERO_ANIM_RATE_LEFT   equ %111
 HERO_ANIM_ID_RIGHT    equ 3
 HERO_ANIM_RATE_RIGHT  equ %111
 
-HERO_CAMERA_LFT_EDGE  equ 7
-HERO_CAMERA_RHT_EDGE  equ 25
-HERO_CAMERA_MOVE      equ 18
+HERO_CAMERA_LFT_EDGE  equ 4
+HERO_CAMERA_RHT_EDGE  equ 27
+HERO_CAMERA_PANE      equ 21
 
 TILE_ID_PICKABLE      equ 33
 TILE_ID_PICKED        equ 32
@@ -197,22 +197,28 @@ main_loop:
 
     halt                ; sleep until the start of the next frame
 
-; if camera is repositioning
-_camera_reposition:
+;-------------------------------------------------------------------------------
+camera_pane:
+;-------------------------------------------------------------------------------
+    ; handle panning camera to new position
+
+    ; if idle then skip step
     ld a, (camera_state)
     cp CAMERA_STATE_IDLE
-    jr z, _camera_reposition_done
+    jr z, _done
 
+    ; check if panning left
     ld hl, camera_x
+    ; A = camera_state
     cp CAMERA_STATE_LEFT
-    jr nz, _prep_right
+    jr nz, _right
 
-_prep_left:
+_left:
     ld bc, 8 << SUBPIXELS   ; hero moves right relative to screen
     ld d, -1                ; camera moves left
     jr _apply
 
-_prep_right:
+_right:
     ld bc, -(8 << SUBPIXELS)
     ld d, 1
 
@@ -222,7 +228,7 @@ _apply:
     add a, d
     ld (hl), a
 
-    ; adjust hero x
+    ; adjust hero x and x_prv
     ld hl, (hero_x)
     add hl, bc
     ld (hero_x), hl
@@ -232,17 +238,21 @@ _apply:
 
     ; check if destination reached
     ld hl, camera_dest_x
+    ; A = camera_x
     cp (hl)
-    jr nz, _camera_reposition_done
+    jr nz, _done
 
     ; done
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
-    jr _camera_reposition_done
 
-_camera_reposition_done:
+_done:
 
-    ; check if camera position changed triggering tile map re-draw
+;-------------------------------------------------------------------------------
+render:
+;-------------------------------------------------------------------------------
+    ; check if camera position changed since last frame and if so trigger
+    ; `render_tile_map`, otherwise jump past that to `render_sprites`
     ld hl, camera_x_prv
     ld a, (camera_x)
     cp (hl)
@@ -325,8 +335,11 @@ _done:
     ld (hl), a
 
 ;-------------------------------------------------------------------------------
-camera_adjust_focus:
+camera_adjust:
 ;-------------------------------------------------------------------------------
+    ; if hero is to far to the left or right start camera panning
+
+    ; get hero tile x
     ld a, (hero_x_screen)
     rept TILE_SHIFT
         srl a                ; convert to tile x
@@ -334,23 +347,23 @@ camera_adjust_focus:
 
     ld hl, camera_x          ; hl points to current camera
     cp HERO_CAMERA_LFT_EDGE  ; check left boundary
-    jr c, _set_left          ; jump if hero < left edge
+    jr c, _left              ; jump if hero < left edge
 
     cp HERO_CAMERA_RHT_EDGE  ; check right boundary
     jr c, _done              ; if hero < right edge we are in deadzone
 
-_set_right:
+_right:
     ld b, CAMERA_STATE_RIGHT ; prepare state for right move
     ld a, (hl)               ; get current camera_x
-    add a, HERO_CAMERA_MOVE  ; calculate destination
-    jr _store_camera         ; jump to shared store
+    add a, HERO_CAMERA_PANE  ; calculate destination
+    jr _apply                ; jump to shared store
 
-_set_left:
+_left:
     ld b, CAMERA_STATE_LEFT  ; prepare state for left move
     ld a, (hl)               ; get current camera_x
-    sub HERO_CAMERA_MOVE     ; calculate destination
+    sub HERO_CAMERA_PANE     ; calculate destination
 
-_store_camera:
+_apply:
     ld (camera_dest_x), a    ; store new destination
     ld a, b                  ; move state to accumulator
     ld (camera_state), a     ; update camera state
