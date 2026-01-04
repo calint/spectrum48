@@ -174,9 +174,8 @@ _use_frame:
     ld (sprite), de
 
     ; advance frame index
-    ld a, (frame)
-    inc a
-    ld (frame), a
+    ld hl, frame
+    inc (hl)
 
 _done:
 ENDM
