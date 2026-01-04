@@ -84,15 +84,20 @@ sprite_collided  db 0   ; 0 = no collisions
 ;-------------------------------------------------------------------------------
 ; initiates animation if not same
 ;
-; input:    ID = animation id constant
-;           RATE = animation rate constant
-;           table = address of animation table
-;           id = address of animation id field
-;           rate = address of animation rate field
-;           ptr = address of animation table pointer
-;           sprite = address of sprite field
-; output:   initiates addresses with animation
-; clobbers: A, DE, HL
+; input:
+;   ID = animation id constant
+;   RATE = animation rate constant
+;   table = address of animation table
+;   id = address of animation id field
+;   rate = address of animation rate field
+;   ptr = address of animation table pointer
+;   sprite = address of sprite field
+;
+; output:
+;   initiates addresses with animation
+;
+; clobbers:
+;   A, DE, HL
 ;-------------------------------------------------------------------------------
 ANIMATION_SET MACRO ID, RATE, table, id, rate, frame, ptr, sprite
     ; check if same animation and if so then done
@@ -125,12 +130,17 @@ ENDM
 ; advances a frame in animation if `hero_frame` bitwise and `(rate)` is zero and
 ; if end is reached then restart at first frame
 ;
-; input:    id = address of animation id field
-;           rate = address of animation rate field
-;           ptr = address of current pointer field into the animation table
-;           sprite = address of sprite field
-; output:   adjusts `(ptr)` and `(sprite)`
-; clobbers: A, B, DE, HL
+; input:
+;   id = address of animation id field
+;   rate = address of animation rate field
+;   ptr = address of current pointer field into the animation table
+;   sprite = address of sprite field
+; 
+; output:
+;   adjusts `(ptr)` and `(sprite)`
+;
+; clobbers:
+;   A, B, DE, HL
 ;-------------------------------------------------------------------------------
 ANIMATION_DO MACRO id, rate, frame, ptr, sprite
     ld a, (rate)
