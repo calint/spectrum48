@@ -38,9 +38,8 @@ SUBPIXELS             equ 4
 
 ; hard constants
 
-HERO_FLAG_RESTARTING  equ 1
-HERO_FLAG_MOVING      equ 2
-HERO_FLAG_JUMPING     equ 4
+HERO_FLAG_MOVING      equ 1
+HERO_FLAG_JUMPING     equ 2
 
 CAMERA_STATE_IDLE     equ 0
 CAMERA_STATE_LEFT     equ 1
@@ -423,7 +422,7 @@ _check_sprites:
 
     ; clear hero flags
     ld a, (hero_flags)
-    and ~(HERO_FLAG_JUMPING | HERO_FLAG_RESTARTING)
+    and ~HERO_FLAG_JUMPING
     ld (hero_flags), a
 
 _check_sprites_done:
