@@ -852,10 +852,10 @@ _no_collision_3:
     ld h, a
 _move_down_scanline_done:
 
-    inc ix                      ; move sprite pointer +2
+    inc ix                     ; move sprite pointer +2
     inc ix
  
-    pop bc                      ; restore loop counter
+    pop bc                     ; restore loop counter
     djnz _draw_loop
 
     ret
@@ -1010,7 +1010,7 @@ render_single_tile:
     inc h                       ; next screen line in H
  
     ret
-    
+
 ;-------------------------------------------------------------------------------
 ; charset: 256 * 8 = 2048 B
 ;-------------------------------------------------------------------------------
