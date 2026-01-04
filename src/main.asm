@@ -191,6 +191,28 @@ start:
     ldir                ; fastest hardware copy loop
 
 ;-------------------------------------------------------------------------------
+; main loop:
+; 1. pane camera logic
+; 2. render
+; 2.1. render tile map if camera position has changed
+; 2.2. render sprite
+; 2.2.1. render dirty tiles from previous frame
+; 2.2.2. render sprite
+; 3. trigger camera pane if hero is at left or right edge of screen 
+; 4. check collision
+; 4.1. sprite vs background
+; 4.2. sprite vs tile
+; 5. save current hero state
+; 6. handle input
+; 6.1. left
+; 6.2. right
+; 6.3. jump
+; 7. apply game logic physics
+; 8. advance animation
+; 9. frame done, loop
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
 main_loop:
 ;-------------------------------------------------------------------------------
     ld a, BORDER_VBLANK
