@@ -180,6 +180,7 @@ _use_frame:
 
 _done:
 ENDM
+
 ;-------------------------------------------------------------------------------
 start:
 ;-------------------------------------------------------------------------------
@@ -202,10 +203,10 @@ camera_pane:
 ;-------------------------------------------------------------------------------
     ; handle panning camera to new position
 
-    ; if idle then skip step
+    ; if idle then continue
     ld a, (camera_state)
     cp CAMERA_STATE_IDLE
-    jr z, _done
+    jr z, _continue
 
     ; check if panning left
     ld hl, camera_x
@@ -224,7 +225,7 @@ _right:
 
 _apply:
     ; update camera x
-    ld a, (hl)
+    ld a, (hl)              ; HL = camera_x
     add a, d
     ld (hl), a
 
@@ -240,24 +241,24 @@ _apply:
     ld hl, camera_dest_x
     ; A = camera_x
     cp (hl)
-    jr nz, _done
+    jr nz, _continue
 
-    ; done
+    ; camera reached destination
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
 
-_done:
+_continue:
 
 ;-------------------------------------------------------------------------------
 render:
 ;-------------------------------------------------------------------------------
     ; check if camera position changed since last frame and if so trigger
-    ; `render_tile_map`, otherwise jump past that to `render_sprites`
+    ; `render_tile_map`, otherwise jump to `render_sprites`
     ld hl, camera_x_prv
     ld a, (camera_x)
     cp (hl)
     jp z, render_sprites
-    ld (hl), a
+    ld (hl), a          ; save current x to previous
 
 ;-------------------------------------------------------------------------------
 render_tile_map:
@@ -266,10 +267,10 @@ render_tile_map:
     out ($fe), a
 
     ld a, (camera_x)
-    ld ixl, a
+    ld ixl, a           ; tile map offset used in `render_rows.asm`
     ld a, 0             ; current loop column (0-31)
 _loop:
-    ld ixh, a           ; save A
+    ld ixh, a           ; screen column number
     include "render_rows.asm"
     ld a, ixh           ; restore A
     inc a
@@ -344,23 +345,24 @@ camera_adjust:
     rept TILE_SHIFT
         srl a                ; convert to tile x
     endm
+    ; A is now tile x
 
-    ld hl, camera_x          ; hl points to current camera
+    ld hl, camera_x
     cp HERO_CAMERA_LFT_EDGE  ; check left boundary
     jr c, _left              ; jump if hero < left edge
 
     cp HERO_CAMERA_RHT_EDGE  ; check right boundary
-    jr c, _done              ; if hero < right edge we are in deadzone
+    jr c, _continue          ; jump if hero < right edge
 
 _right:
-    ld b, CAMERA_STATE_RIGHT ; prepare state for right move
-    ld a, (hl)               ; get current camera_x
+    ld b, CAMERA_STATE_RIGHT ; prepare state for pane right
+    ld a, (hl)               ; get current `camera_x`
     add a, HERO_CAMERA_PANE  ; calculate destination
     jr _apply                ; jump to shared store
 
 _left:
-    ld b, CAMERA_STATE_LEFT  ; prepare state for left move
-    ld a, (hl)               ; get current camera_x
+    ld b, CAMERA_STATE_LEFT  ; prepare state for pane left
+    ld a, (hl)               ; get current `camera_x`
     sub HERO_CAMERA_PANE     ; calculate destination
 
 _apply:
@@ -368,7 +370,7 @@ _apply:
     ld a, b                  ; move state to accumulator
     ld (camera_state), a     ; update camera state
 
-_done:
+_continue:
 
 ;-------------------------------------------------------------------------------
 collisions:
@@ -542,7 +544,7 @@ _set_left_dx:
     ld a, h
     or l
     jr nz, _check_hero_left_done
-    ; note: this logic works with tuned constants, however, is hero is skipping
+    ; note: this logic works with tuned constants, however, if hero is skipping
     ;       and frame coincides with skip rate and dy is 0 then hero skips again
     ;       giving the effect of hero floating upwards
 
