@@ -1,9 +1,10 @@
-# about
+# about z80 and spectrum 48k
 
 ## screen memory layout
 
 The pixel data occupies 6,144 bytes, starting at memory address $4000
 (16,384 decimal) and extending to $57FF (22,527 decimal)
+
 ```text
 256 pixels wide
 ┌────────────────────────────────────────┐
@@ -47,6 +48,7 @@ L = |char_row+1||column|
 
 ## keyboard
 
+```text
 Port (BC)   Bit 0   Bit 1   Bit 2   Bit 3   Bit 4
 $FEFE       SHIFT   Z       X       C       V
 $FDFE       A       S       D       F       G
@@ -56,6 +58,7 @@ $EFFE       0       9       8       7       6
 $DFFE       P       O       I       U       Y
 $BFFE       ENTER   L       K       J       H
 $7FFE       SPACE   SYM     M       N       B
+```
 
 ## Z80 Register Usage & Idioms — Mental Cheat Sheet
 
