@@ -406,10 +406,10 @@ collisions:
 ;-------------------------------------------------------------------------------
 ; note: after this phase x and y must be out of collision since next phase will
 ;       save current x and y into previous for next frame
-_check_sprites:
+_check_sprite:
     ld a, (sprite_collided)
     or a
-    jr z, _check_sprites_done
+    jr z, _check_sprite_done
 
     ; restore previous position and set dx, dy to 0
     ld hl, (hero_x_prv)
@@ -420,15 +420,14 @@ _check_sprites:
     ld (hero_dx), de
     ld (hero_dy), de
 
-    ; clear hero flags
+    ; clear hero jumping flag
     ld a, (hero_flags)
     and ~HERO_FLAG_JUMPING
     ld (hero_flags), a
 
-_check_sprites_done:
+_check_sprite_done:
 
-    ; note: checking tile collisions is not fully correct but makes good
-    ;       gameplay
+    ; note: tiles collision check is not fully correct but makes good gameplay
 
 _check_tiles:
     ; calculate tile x = L and column = B
