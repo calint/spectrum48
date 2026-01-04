@@ -410,7 +410,7 @@ collisions:
 _check_sprite:
     ld a, (sprite_collided)
     or a
-    jr z, _check_sprite_done
+    jr z, _check_sprite_end
 
     ; restore previous position and set dx, dy to 0
     ld hl, (hero_x_prv)
@@ -426,7 +426,7 @@ _check_sprite:
     and ~HERO_FLAG_JUMPING
     ld (hero_flags), a
 
-_check_sprite_done:
+_check_sprite_end:
 
     ; note: tiles collision check is not fully correct but makes good gameplay
 
@@ -492,13 +492,13 @@ _check_bottom_left:
     dec b
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
-    jr nz, _check_tiles_done
+    jr nz, _check_tiles_end
 
     ld (hl), TILE_ID_PICKED
 
     call render_single_tile
 
-_check_tiles_done:
+_check_tiles_end:
 
 ;-------------------------------------------------------------------------------
 state:
@@ -530,7 +530,7 @@ _check_hero:
 
 _check_hero_left:
     bit 0, b
-    jr nz, _check_hero_left_done
+    jr nz, _check_hero_left_end
 
     ; flag hero is moving
     ld a, (hero_flags)
@@ -559,13 +559,13 @@ _set_left_dx:
     ; if not at skip (small jump) interval then continue to next step
     ld a, (hero_frame)
     and HERO_SKIP_RATE
-    jr nz, _check_hero_left_done
+    jr nz, _check_hero_left_end
 
     ; if there is vertical movement then don't skip (small jump)
     ld hl, (hero_dy)
     ld a, h
     or l
-    jr nz, _check_hero_left_done
+    jr nz, _check_hero_left_end
     ; note: this logic works with tuned constants, however, if hero is skipping
     ;       and frame coincides with skip rate and dy is 0 then hero skips again
     ;       giving the effect of hero floating upwards
@@ -574,11 +574,11 @@ _set_left_dx:
     ld hl, -HERO_SKIP_DY 
     ld (hero_dy), hl
 
-_check_hero_left_done:
+_check_hero_left_end:
 
 _check_hero_right:
     bit 2, b
-    jr nz, _check_hero_right_done
+    jr nz, _check_hero_right_end
 
     ; flag hero moving
     ld a, (hero_flags)
@@ -599,13 +599,13 @@ _set_right_dx:
     ; if not at skip (small jump) interval then continue to next step
     ld a, (hero_frame)
     and HERO_SKIP_RATE
-    jr nz, _check_hero_right_done
+    jr nz, _check_hero_right_end
 
     ; if there is vertical movement then don't skip (small jump)
     ld hl, (hero_dy)
     ld a, h
     or l
-    jr nz, _check_hero_right_done
+    jr nz, _check_hero_right_end
     ; note: this logic works with tuned constants, however, if hero is skipping
     ;       and frame coincides with skip rate and dy is 0 then hero skips again
     ;       giving the effect of hero floating upwards
@@ -614,16 +614,16 @@ _set_right_dx:
     ld hl, -HERO_SKIP_DY 
     ld (hero_dy), hl
 
-_check_hero_right_done:
+_check_hero_right_end:
 
 _check_hero_jump:
     bit 4, b
-    jr nz, _check_hero_jump_done
+    jr nz, _check_hero_jump_end
 
     ; if hero is jumping then done
     ld a, (hero_flags)
     and HERO_FLAG_JUMPING
-    jr nz, _check_hero_jump_done
+    jr nz, _check_hero_jump_end
 
     ; set jump velocity
     ld hl, -HERO_JUMP_DY
@@ -633,15 +633,16 @@ _check_hero_jump:
     ld a, HERO_FLAG_MOVING | HERO_FLAG_JUMPING
     ld (hero_flags), a
 
-_check_hero_jump_done:
+_check_hero_jump_end:
+
     ; if hero is moving continue
     ld a, (hero_flags)
     and HERO_FLAG_MOVING
-    jr nz, _done
+    jr nz, _end
 
     ANIMATION_SET HERO_ANIM_ID_IDLE, HERO_ANIM_RATE_IDLE, hero_animation_idle, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
-_done:
+_end:
 
 ;-------------------------------------------------------------------------------
 physics:
@@ -663,7 +664,7 @@ physics:
     ld hl, (hero_dy)
     ld a, h
     or l
-    jr z, _gravity_done
+    jr z, _gravity_end
     ; note: if gravity and skip cancel each other so that dy is 0 then hero
     ;       floats, adjust constants to avoid that
 
@@ -674,7 +675,7 @@ _gravity:
     add hl, de
     ld (hero_dy), hl
 
-_gravity_done:
+_gravity_end:
 
     ; add velocity to position
     ld hl, (hero_x)
@@ -692,11 +693,11 @@ animation:
     ; don't animate if jumping for funny gameplay effect
     ld a, (hero_flags)
     and HERO_FLAG_JUMPING
-    jr nz, _done
+    jr nz, _end
 
     ANIMATION_DO hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
-_done:
+_end:
 
 ;-------------------------------------------------------------------------------
     ; increment frame counter used in timing masks (wrap is ok)
