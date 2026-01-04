@@ -140,14 +140,14 @@ ENDM
 ;   adjusts `(ptr)` and `(sprite)`
 ;
 ; clobbers:
-;   A, B, DE, HL
+;   A, DE, HL
 ;-------------------------------------------------------------------------------
 ANIMATION_DO MACRO id, rate, frame, ptr, sprite
     ld a, (rate)
-    ld b, a
+    ld e, a
     ld a, (hero_frame)
-    and b
-    jr nz, _done
+    and e
+    jr nz, _end
 
     ; HL = base animation table
     ld hl, (ptr)
@@ -180,15 +180,14 @@ _restart:
     ld d, (hl)
 
 _use_frame:
-    ; update current sprite
+    ; update sprite pointer
     ld (sprite), de
 
     ; advance frame index
-    ld a, (frame)
-    inc a
-    ld (frame), a
+    ld hl, frame
+    inc (hl)
 
-_done:
+_end:
 ENDM
 
 ;-------------------------------------------------------------------------------
