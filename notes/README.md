@@ -99,9 +99,9 @@ $7FFE       SPACE   SYM     M       N       B
 #### Loop
 
     ld b,n
-.loop:
+    loop:
         ...
-    djnz .loop
+    djnz loop
 
 #### Walk memory
 
@@ -176,9 +176,10 @@ Assume:
 * Others only safe if documented
 
 Always comment:
-; inputs:
-; outputs:
-; clobbers:
+
+* inputs:
+* outputs:
+* clobbers:
 
 ### 9. Smells to avoid
 
