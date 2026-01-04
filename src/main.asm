@@ -367,16 +367,17 @@ render_sprites:
 camera_adjust:
 ;-------------------------------------------------------------------------------
 
-    ; if hero is to far to the left or right start camera panning
+    ; if hero is too far to the left or right start camera panning
 
     ; get hero tile x
     ld a, (hero_x_screen)
     rept TILE_SHIFT
         srl a                ; convert to tile x
     endm
-    ; A is now tile x
+    ; A is now column
 
     ld hl, camera_x
+    ; A = column 
     cp HERO_CAMERA_LFT_EDGE  ; check left boundary
     jr c, _left              ; jump if hero < left edge
 
@@ -605,7 +606,7 @@ _set_right_dx:
     ld a, h
     or l
     jr nz, _check_hero_right_done
-    ; note: this logic works with tuned constants, however, is hero is skipping
+    ; note: this logic works with tuned constants, however, if hero is skipping
     ;       and frame coincides with skip rate and dy is 0 then hero skips again
     ;       giving the effect of hero floating upwards
 
