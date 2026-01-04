@@ -100,7 +100,7 @@ ANIMATION_SET MACRO ID, RATE, table, id, rate, frame, ptr, sprite
     ; check if same animation and if so then done
     ld a, (id)
     cp ID
-    jr z, _done
+    jr z, _end
 
     ld a, ID
     ld (id), a
@@ -120,7 +120,7 @@ ANIMATION_SET MACRO ID, RATE, table, id, rate, frame, ptr, sprite
     ld d, (hl)
     ld (sprite), de
 
-_done:
+_end:
 ENDM
 
 ;-------------------------------------------------------------------------------
