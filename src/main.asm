@@ -122,7 +122,7 @@ _done:
 ENDM
 
 ;-------------------------------------------------------------------------------
-; advances a frame in animation if `hero_frame` bitwise and `(rate)` is zero
+; advances a frame in animation if `hero_frame` bitwise and `(rate)` is zero and
 ; if end is reached then restart at first frame
 ;
 ; input:    id = address of animation id field
