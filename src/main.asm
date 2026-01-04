@@ -427,6 +427,9 @@ _check_sprites:
 
 _check_sprites_done:
 
+    ; note: checking tile collisions is not fully correct but makes good
+    ;       gameplay
+
 _check_tiles:
     ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
