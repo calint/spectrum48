@@ -48,8 +48,8 @@ CAMERA_STATE_RIGHT    equ 2
 TILE_WIDTH            equ 8
 TILE_SHIFT            equ 3
 
-SCREEN_WIDTH          equ 32
-SCREEN_HEIGHT         equ 24
+SCREEN_WIDTH_CHARS    equ 32
+SCREEN_HEIGHT_CHARS   equ 24
 
 ;-------------------------------------------------------------------------------
 ; variables
@@ -305,7 +305,7 @@ _loop:
     include "render_rows.asm"
     ld a, ixh           ; restore A
     inc a
-    cp SCREEN_WIDTH
+    cp SCREEN_WIDTH_CHARS
     jp nz, _loop
 
 ;-------------------------------------------------------------------------------
@@ -773,11 +773,11 @@ _draw_loop:
     ld d, (ix + 0)               ; load left sprite byte
     ld e, (ix + 1)               ; load right sprite byte
 
-    ; shift 16-bit row right by (.shift_amt)
-    ; we need to shift DE into a 3rd byte (C)
+    ; shift 16-bit row right by IYL
+    ; need to shift DE into a 3rd byte (C)
     ld c, 0                     ; C will hold the "spillover" bits
 
-    ld a, IYL
+    ld a, IYL                   ; A = number of shifts
     or a                        ; check if shift is 0
     jr z, _shift_done           ; skip if no shift needed (fast path)
  
@@ -830,17 +830,17 @@ _no_collision_3:
     ld (hl), a
 
     ; advance pointers
-    pop hl                      ; restore start of line address
+    pop hl                     ; restore start of line address
 
     ; move down scanline
-    inc h                       ; increment high byte (pixel row)
+    inc h                      ; increment high byte (pixel row)
     ld a, h
-    and $07                     ; check if we crossed 8-line char boundary
+    and 7                      ; check if we crossed 8-line char boundary
     jr nz, _move_down_scanline_done ; if not 0 then continue
 
     ; if wrapped 0-7 then fix the lower byte of the address
     ld a, l
-    add a, SCREEN_WIDTH         ; move to next character row
+    add a, SCREEN_WIDTH_CHARS  ; move to next character row
     ld l, a
     ; if carry then 256 and moved to next third, continue
     jr c, _move_down_scanline_done
@@ -855,6 +855,7 @@ _move_down_scanline_done:
  
     pop bc                      ; restore loop counter
     djnz _draw_loop
+
     ret
 
 ;-------------------------------------------------------------------------------
