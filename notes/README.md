@@ -64,18 +64,13 @@ $7FFE       SPACE   SYM     M       N       B
 
 ### 1. Register Roles (not equal)
 
-A   = arithmetic, logic, decisions (volatile)
-F   = flags (side effects only)
-
-B   = loop counter
-C   = I/O port, helper
-
-D,E = data transport
-H,L = pointer (HL)
-
-IX/IY = structured access (slow, document use)
-
----
+* A   = arithmetic, logic, decisions (volatile)
+* F   = flags (side effects only)
+* B   = loop counter
+* C   = I/O port, helper
+* D,E = data transport
+* H,L = pointer (HL)
+* IX/IY = structured access (slow, document use)
 
 ### 2. Where values want to live
 
@@ -86,8 +81,6 @@ IX/IY = structured access (slow, document use)
 * secondary pointer   → DE
 * length              → BC
 * temp scratch        → A
-
----
 
 ### 3. Core idioms
 
@@ -133,12 +126,10 @@ IX/IY = structured access (slow, document use)
     or l
     jr z, zero
 
----
-
 ### 4. Shifts & rotates
 
-A  = full support
-HL = manual
+* A  = full support
+* HL = manual
 
 #### 8-bit
 
@@ -151,8 +142,6 @@ HL = manual
     srl h
     rr  l
 
----
-
 ### 5. Flags rules
 
 * Flags are temporary
@@ -162,8 +151,6 @@ HL = manual
 Idiomatic flag set:
     or a
 
----
-
 ### 6. Scratch register priority
 
 1) A
@@ -172,17 +159,13 @@ Idiomatic flag set:
 4) B
 5) H / L (only if not pointer)
 
----
-
 ### 7. Pointer conventions
 
-HL = active pointer
-DE = secondary pointer
-BC = length
+* HL = active pointer
+* DE = secondary pointer
+* BC = length
 
 Follow this or code feels wrong.
-
----
 
 ### 8. Calling convention mindset
 
@@ -197,8 +180,6 @@ Always comment:
 ; outputs:
 ; clobbers:
 
----
-
 ### 9. Smells to avoid
 
 * math in HL when A fits
@@ -207,16 +188,12 @@ Always comment:
 * relying on flags after CALL
 * silent IX/IY clobber
 
----
-
 ### 10. Acceptable advanced tricks (document!)
 
 * IXH / IYL usage
 * unrolled loops
 * recompute vs maintain state
 * clarity over micro-optimizations
-
----
 
 ### 11. Mental rule
 
@@ -230,8 +207,6 @@ Then assign:
 * pointing → HL
 * moving → DE
 * temporary → A
-
----
 
 ### 12. Mantra
 
