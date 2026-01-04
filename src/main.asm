@@ -858,9 +858,7 @@ _move_down_scanline_done:
 ;   B = x pixel
 ;   C = y pixel
 ;
-; output:
-;   B = column
-;   C = row
+; output: -
 ;
 ; clobbers:
 ;   AF, BC, DE, IX
