@@ -4,7 +4,7 @@
 
 The pixel data occupies 6,144 bytes, starting at memory address $4000
 (16,384 decimal) and extending to $57FF (22,527 decimal)
-
+```text
 256 pixels wide
 ┌────────────────────────────────────────┐
 │                                        │ 192 pixels tall
@@ -43,6 +43,7 @@ L = |char_row||column|
 
 After +32:
 L = |char_row+1||column|
+```
 
 ## keyboard
 
