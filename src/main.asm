@@ -417,9 +417,9 @@ _check_sprites:
     ld (hero_x), hl
     ld hl, (hero_y_prv)
     ld (hero_y), hl
-    ld hl, 0
-    ld (hero_dx), hl
-    ld (hero_dy), hl
+    ld de, 0
+    ld (hero_dx), de
+    ld (hero_dy), de
 
     ; clear hero flags
     ld a, (hero_flags)
