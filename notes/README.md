@@ -56,36 +56,6 @@ $DFFE       P       O       I       U       Y
 $BFFE       ENTER   L       K       J       H
 $7FFE       SPACE   SYM     M       N       B
 
-## instruction set
-
-* Only A can be stored directly to an 8-bit memory location.
-
-### idioms
-
-| Intent          | Register |
-| --------------- | -------- |
-| decision / math | **A**    |
-| loop counter    | **B**    |
-| pointer         | **HL**   |
-| second pointer  | **DE**   |
-| block size      | **BC**   |
-| I/O port        | **C**    |
-| temp scratch    | **A**    |
-
-#### scratch register priority
-
-1) A   ← always volatile
-2) E/D
-3) C
-4) B
-5) H/L (only if HL not a pointer)
-
-### pointer convention
-
-HL = active pointer
-DE = secondary pointer
-BC = length
-
 ## Z80 Register Usage & Idioms — Mental Cheat Sheet
 
 ### 1. Register Roles (not equal)
@@ -213,6 +183,7 @@ Follow this or code feels wrong.
 ### 8. Calling convention mindset
 
 Assume:
+
 * A clobbered
 * F clobbered
 * Others only safe if documented
@@ -249,6 +220,7 @@ Ask:
 "What is this value doing?"
 
 Then assign:
+
 * deciding → A
 * counting → B
 * pointing → HL
