@@ -730,8 +730,8 @@ render_sprite:
     ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ld a, c                     ; y to A
-    and $07                     ; mask 00000111 (y bits 0-2)
-    or $40                      ; add base address
+    and %00000111               ; mask 00000111 (y bits 0-2)
+    or %01000000                ; add base address
     ld h, a                     ; store in H
 
     ld a, c                     ; y to A
@@ -761,7 +761,7 @@ render_sprite:
     ; prepare shift counter
     ld a, b
     and %111                    ; x % 8 (shift amount)
-    ld IYL, a          ; save for later loop
+    ld IYL, a                   ; save for later loop
  
     ld b, 16                    ; loop counter (16 lines)
 
