@@ -708,11 +708,16 @@ _done:
 ;-------------------------------------------------------------------------------
 ; renders a sprite
 ;
-; inputs:   B = x coordinate (0-255 pixels)
-;           C = y coordinate (0-191 pixels)
-;           IX = pointer to sprite data
-; outputs:  sprite_collided = non-zero if rendered over content
-; clobbers: AF, BC, DE, HL, IX, IYL
+; input:
+;   B = x coordinate (0-255 pixels)
+;   C = y coordinate (0-191 pixels)
+;   IX = pointer to sprite data
+;
+; output:
+;   sprite_collided = non-zero if rendered over content
+;
+; clobbers:
+;   AF, BC, DE, HL, IX, IYL
 ;-------------------------------------------------------------------------------
 render_sprite:
     ; clear collision byte (0 = no collision)
