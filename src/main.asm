@@ -89,7 +89,7 @@ sprite_collided  db 0   ; 0 = no collisions
 ;           table = address of animation table
 ;           id = address of animation id field
 ;           rate = address of animation rate field
-;           ptr = address of current pointer field to the animation table
+;           ptr = address of animation table pointer
 ;           sprite = address of sprite field
 ; output:   initiates addresses with animation
 ; clobbers: A, DE, HL
@@ -174,8 +174,9 @@ _use_frame:
     ld (sprite), de
 
     ; advance frame index
-    ld hl, frame
-    inc (hl)
+    ld a, (frame)
+    inc a
+    ld (frame), a
 
 _done:
 ENDM
@@ -207,7 +208,7 @@ start:
 ; 6.2. right
 ; 6.3. jump
 ; 7. apply game logic physics
-; 8. advance animation
+; 8. advance animations
 ; 9. frame done, loop
 ;-------------------------------------------------------------------------------
 
