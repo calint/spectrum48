@@ -193,6 +193,8 @@ ENDM
 ;-------------------------------------------------------------------------------
 start:
 ;-------------------------------------------------------------------------------
+
+    ; set foreground and background to white on black
     ld hl, $5800        ; color attribute start, 768 bytes
     ld (hl), 7          ; white on black
     ld de, $5801        ; destination one byte ahead to copy previous byte
@@ -232,12 +234,13 @@ main_loop:
 ;-------------------------------------------------------------------------------
 camera_pane:
 ;-------------------------------------------------------------------------------
+
     ; handle panning camera to new position
 
     ; if idle then continue
     ld a, (camera_state)
     cp CAMERA_STATE_IDLE
-    jr z, _continue
+    jr z, _end
 
     ; check if panning left
     ld hl, camera_x
@@ -246,39 +249,39 @@ camera_pane:
     jr nz, _right
 
 _left:
-    ld bc, 8 << SUBPIXELS   ; hero moves right relative to screen
-    ld d, -1                ; camera moves left
+    ld de, 8 << SUBPIXELS   ; hero moves right relative to screen
+    ld c, -1                ; camera moves left
     jr _apply
 
 _right:
-    ld bc, -(8 << SUBPIXELS)
-    ld d, 1
+    ld de, -(8 << SUBPIXELS)
+    ld c, 1
 
 _apply:
     ; update camera x
     ld a, (hl)              ; HL = camera_x
-    add a, d
+    add a, c
     ld (hl), a
 
     ; adjust hero x and x_prv
     ld hl, (hero_x)
-    add hl, bc
+    add hl, de
     ld (hero_x), hl
     ld hl, (hero_x_prv)
-    add hl, bc
+    add hl, de
     ld (hero_x_prv), hl
 
     ; check if destination reached
     ld hl, camera_dest_x
     ; A = camera_x
     cp (hl)
-    jr nz, _continue
+    jr nz, _end
 
     ; camera reached destination
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
 
-_continue:
+_end:
 
 ;-------------------------------------------------------------------------------
 render:
