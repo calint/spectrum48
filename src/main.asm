@@ -55,8 +55,6 @@ SCREEN_HEIGHT         equ 24
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
-sprites_collision_bits: db 0   ; 8 bits for sprite collisions
-
 camera_x         db -16
 camera_x_prv     db $ff
 camera_state     db CAMERA_STATE_IDLE
@@ -317,9 +315,6 @@ render_sprites:
     ld a, BORDER_RENDER_SPRITES
     out ($fe), a
 
-    xor a
-    ld (sprites_collision_bits), a
-
     ; render hero
 
     ; restore dirty tiles
@@ -340,38 +335,39 @@ render_sprites:
         rr  l
     endm
     ld b, l
-    ld a, b             ; save x where sprite was rendered
+    ; argument B = hero_x >> SUBPIXELS
+
+    ; save x where sprite was rendered
+    ld a, b
     ld (hero_x_screen), a
-    ; C = hero_x >> SUBPIXELS
+
     ld hl, (hero_y)
     rept SUBPIXELS
         srl h
         rr  l
     endm
     ld c, l
-    ld a, c             ; save y where sprite was rendered
+    ; argument C = hero_y >> SUBPIXELS
+
+    ; save y where sprite was rendered
+    ld a, c
     ld (hero_y_screen), a
+
+    ; argument IX = pointer to sprite data
     ld ix, (hero_sprite)
     call render_sprite
 
-    ; update sprites collision bits
-    ld a, (sprite_collided)
-    or a
-    jr z, _done
-    ld a, (sprites_collision_bits)
-    or HERO_SPRITE_BIT
-    ld (sprites_collision_bits), a
-_done:
-
     ; done render hero
+
     ; debugging on screen
-    ld a, (sprites_collision_bits)
+    ld a, (sprite_collided)
     ld hl, $401f
     ld (hl), a
 
 ;-------------------------------------------------------------------------------
 camera_adjust:
 ;-------------------------------------------------------------------------------
+
     ; if hero is to far to the left or right start camera panning
 
     ; get hero tile x
@@ -386,25 +382,25 @@ camera_adjust:
     jr c, _left              ; jump if hero < left edge
 
     cp HERO_CAMERA_RHT_EDGE  ; check right boundary
-    jr c, _continue          ; jump if hero < right edge
+    jr c, _end               ; jump if hero < right edge
 
 _right:
-    ld b, CAMERA_STATE_RIGHT ; prepare state for pane right
+    ld e, CAMERA_STATE_RIGHT ; prepare state for pane right
     ld a, (hl)               ; get current `camera_x`
     add a, HERO_CAMERA_PANE  ; calculate destination
     jr _apply                ; jump to shared store
 
 _left:
-    ld b, CAMERA_STATE_LEFT  ; prepare state for pane left
+    ld e, CAMERA_STATE_LEFT  ; prepare state for pane left
     ld a, (hl)               ; get current `camera_x`
     sub HERO_CAMERA_PANE     ; calculate destination
 
 _apply:
     ld (camera_dest_x), a    ; store new destination
-    ld a, b                  ; move state to accumulator
+    ld a, e                  ; move state to accumulator
     ld (camera_state), a     ; update camera state
 
-_continue:
+_end:
 
 ;-------------------------------------------------------------------------------
 collisions:
@@ -412,8 +408,8 @@ collisions:
 ; note: after this phase x and y must be out of collision since next phase will
 ;       save current x and y into previous for next frame
 _check_sprites:
-    ld a, (sprites_collision_bits)
-    and HERO_SPRITE_BIT
+    ld a, (sprite_collided)
+    or a
     jr z, _check_sprites_done
 
     ; restore previous position and set dx, dy to 0
@@ -561,8 +557,8 @@ _check_hero_left:
 
     ; choose dx boost if in collision
     ld hl, -HERO_MOVE_DX
-    ld a, (sprites_collision_bits)
-    and HERO_SPRITE_BIT
+    ld a, (sprite_collided)
+    or a
     jr z, _set_left_dx
     ld hl, -HERO_MOVE_BOOST_DX
 _set_left_dx:
@@ -601,8 +597,8 @@ _check_hero_right:
 
     ; choose dx boost if in collision
     ld hl, HERO_MOVE_DX
-    ld a, (sprites_collision_bits)
-    and HERO_SPRITE_BIT
+    ld a, (sprite_collided)
+    or a
     jr z, _set_right_dx
     ld hl, HERO_MOVE_BOOST_DX
 _set_right_dx:
