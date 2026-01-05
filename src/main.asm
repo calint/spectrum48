@@ -721,11 +721,12 @@ RENDER_SPRITE_LINE macro
     ld c, 0                     ; C will hold the "spillover" bits
 
     ; shift 16-bit row right by IYL
+    ; note: this is very expensive, thus preshifted sprites would be better
 
     ld a, IYL                   ; A = number of shifts
     or a                        ; check if shift is 0
     jr z, _shift_done           ; skip if no shift needed
- 
+
     ld b, a                     ; B = shift counter
 _shift:
     srl d                       ; shift left byte, bit 0 goes to carry
