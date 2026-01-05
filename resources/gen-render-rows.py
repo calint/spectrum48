@@ -55,7 +55,7 @@ for row in range(24):
     print("    rlca             ; shift to bottom")
     print("    rlca")
     print("    rlca")
-    print("    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte")
+    print("    add a, (charset / 256) & $ff ; set upper 5 bits in high byte")
     print("    ld h, a          ; H = charset page")
     print("    ld a, l          ; shift tile index by 3")
     print("    add a, a         ; x2")

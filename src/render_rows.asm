@@ -24,7 +24,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -75,7 +75,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -126,7 +126,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -177,7 +177,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -228,7 +228,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -279,7 +279,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -330,7 +330,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -381,7 +381,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -430,7 +430,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -481,7 +481,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -532,7 +532,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -583,7 +583,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -634,7 +634,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -685,7 +685,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -736,7 +736,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -787,7 +787,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -836,7 +836,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -887,7 +887,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -938,7 +938,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -989,7 +989,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1040,7 +1040,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1091,7 +1091,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1142,7 +1142,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1193,7 +1193,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set 3 lowest bits in high byte
+    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
