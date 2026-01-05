@@ -2,7 +2,7 @@
 
 ## intention
 
-* learn cpu z80 by writing assembler for spectrum 48k
+* learn cpu z80 by writing assembler for zx spectrum 48k
 * render tile map
 * sprites with collision detection
 * read keyboard
