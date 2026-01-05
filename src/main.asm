@@ -47,6 +47,8 @@ CAMERA_STATE_RIGHT    equ 2
 TILE_WIDTH            equ 8
 TILE_SHIFT            equ 3
 
+SPRITE_WIDTH          equ 16
+
 SCREEN_WIDTH_CHARS    equ 32
 SCREEN_HEIGHT_CHARS   equ 24
 
@@ -707,6 +709,97 @@ _end:
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
+; helper macro for `render_sprite` to avoid lable clashes in `rept` block
+;-------------------------------------------------------------------------------
+RENDER_SPRITE_LINE macro
+    ; fetch sprite bytes
+    ld d, (ix + 0)              ; load left sprite byte
+    ld e, (ix + 1)              ; load right sprite byte
+    ld c, 0                     ; C will hold the "spillover" bits
+
+    ; shift 16-bit row right by IYL
+
+    ld a, IYL                   ; A = number of shifts
+    or a                        ; check if shift is 0
+    jr z, _shift_done           ; skip if no shift needed
+ 
+    ld b, a                     ; B = shift counter
+_shift:
+    srl d                       ; shift left byte, bit 0 goes to carry
+    rr e                        ; rotate right byte, carry goes into bit 7
+    rr c                        ; rotate spill byte, carry goes into bit 7
+    djnz _shift
+
+_shift_done:
+    ; 3 bytes to draw: D, E, C
+    ; D = left, E = middle, C = right (spill)
+
+    ; byte D
+    ld a, (hl)                  ; load current screen pixels
+    ld b, a                     ; save screen pixels
+    and d                       ; check collision
+    jr z, _no_collision_1       ; skip if no collision
+    ld (sprite_collided), a     ; store any non-zero = collision
+_no_collision_1:
+    ld a, b                     ; reload screen pixels
+    or d                        ; or with sprite left
+    ld (hl), a                  ; write back
+    inc hl
+
+    ; byte E
+    ld a, (hl)
+    ld b, a
+    and e
+    jr z, _no_collision_2
+    ld (sprite_collided), a
+_no_collision_2:
+    ld a, b
+    or e
+    ld (hl), a
+    inc hl
+
+    ; byte C
+    ld a, (hl)
+    ld b, a
+    and c
+    jr z, _no_collision_3
+    ld (sprite_collided), a
+_no_collision_3:
+    ld a, b
+    or c
+    ld (hl), a
+
+    ; move HL back to starting position
+    dec hl
+    dec hl
+
+    ; move sprite pointer +2
+    inc ix
+    inc ix
+
+    ; move down 1 scanline
+
+    inc h                      ; increment high byte (pixel row)
+    ld a, h
+    and 7                      ; check if we crossed 8-line char boundary
+    jr nz, _end                ; if not 0 then continue
+
+    ; if wrapped 0-7 then fix the lower byte of the address
+    ld a, l
+    add a, SCREEN_WIDTH_CHARS  ; move to next character row
+    ld l, a
+    ; if carry then 256 and moved to next third, continue
+    jr c, _end
+
+    ; otherwise, subtract 8 from H to stay in correct third and continue
+    ld a, h
+    sub 8
+    ld h, a
+
+_end:
+endm
+
+;-------------------------------------------------------------------------------
 ; renders a sprite
 ;
 ; input:
@@ -763,99 +856,10 @@ render_sprite:
     ld a, b
     and %111                    ; x % 8 (shift amount)
     ld IYL, a                   ; save for later loop
- 
-    ld b, 16                    ; loop counter (16 lines)
 
-_draw_loop:
-    push bc                     ; save loop counter
-    push hl                     ; save screen address start of line
-
-    ; fetch sprite bytes
-    ld d, (ix + 0)               ; load left sprite byte
-    ld e, (ix + 1)               ; load right sprite byte
-
-    ; shift 16-bit row right by IYL
-    ; need to shift DE into a 3rd byte (C)
-    ld c, 0                     ; C will hold the "spillover" bits
-
-    ld a, IYL                   ; A = number of shifts
-    or a                        ; check if shift is 0
-    jr z, _shift_done           ; skip if no shift needed (fast path)
- 
-    ld b, a                     ; B = shift counter
-_shift_bits:
-    srl d                       ; shift left byte, bit 0 goes to carry
-    rr e                        ; rotate right byte, carry goes into bit 7
-    rr c                        ; rotate spill byte, carry goes into bit 7
-    djnz _shift_bits
-
-_shift_done:
-    ; 3 bytes to draw: D, E, C
-    ; D = left, E = middle, C = right (spill)
-
-    ; draw to screen and detect collision 
-
-    ; byte 1
-    ld a, (hl)                  ; load current screen pixels
-    ld b, a                     ; save screen pixels
-    and d                       ; check collision
-    jr z, _no_collision_1       ; skip if no collision
-    ld (sprite_collided), a     ; store any non-zero = collision
-_no_collision_1:
-    ld a, b                     ; reload screen pixels
-    or d                        ; or with sprite left
-    ld (hl), a                  ; write back
-    inc hl
-
-    ; byte 2
-    ld a, (hl)
-    ld b, a
-    and e
-    jr z, _no_collision_2
-    ld (sprite_collided), a
-_no_collision_2:
-    ld a, b
-    or e
-    ld (hl), a
-    inc hl
-
-    ; byte 3 (spillover)
-    ld a, (hl)
-    ld b, a
-    and c
-    jr z, _no_collision_3
-    ld (sprite_collided), a
-_no_collision_3:
-    ld a, b
-    or c
-    ld (hl), a
-
-    ; advance pointers
-    pop hl                     ; restore start of line address
-
-    ; move down scanline
-    inc h                      ; increment high byte (pixel row)
-    ld a, h
-    and 7                      ; check if we crossed 8-line char boundary
-    jr nz, _move_down_scanline_done ; if not 0 then continue
-
-    ; if wrapped 0-7 then fix the lower byte of the address
-    ld a, l
-    add a, SCREEN_WIDTH_CHARS  ; move to next character row
-    ld l, a
-    ; if carry then 256 and moved to next third, continue
-    jr c, _move_down_scanline_done
-    ; otherwise, subtract 8 from H to stay in correct third and continue
-    ld a, h
-    sub 8
-    ld h, a
-_move_down_scanline_done:
-
-    inc ix                     ; move sprite pointer +2
-    inc ix
- 
-    pop bc                     ; restore loop counter
-    djnz _draw_loop
+rept SPRITE_WIDTH
+    RENDER_SPRITE_LINE
+endm 
 
     ret
 
