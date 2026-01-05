@@ -964,6 +964,7 @@ render_single_tile:
 
     ; copy 8 bytes
 
+    ; scanline 1 to 7
 rept 7
     ld a, (de)                  ; fetch byte from DE
     ld (hl), a                  ; write to HL screen
@@ -971,7 +972,7 @@ rept 7
     inc h                       ; next screen line in H
 endm
 
-    ; scanline 7
+    ; scanline 8
     ld a, (de)                  ; fetch byte from DE
     ld (hl), a                  ; write to HL screen
  
