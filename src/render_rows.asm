@@ -8,15 +8,15 @@
 
     ; note: since `charset` is aligned on 2048 the lowest 11 bits in
     ;       the pointer are 0's which opens for optimization using bit
-    ;       operations such as roll 3 top bits in lower byte into the
-    ;       high byte of the pointer (bit 10, 9, 8 with base 0 in the
-    ;       16-bit pointer) then left shift lower byte by 3 (8 bytes 
-    ;       per character bitmap) then compose the pointer with HL
+    ;       operations such as roll 3 high bits in lower byte into the
+    ;       low bits of the high byte of the pointer, then left shift
+    ;       tile index byte by 3 (high bits have already been moved to
+    ;       high byte) then compose HL
 
     ; row 0
     ld d, $40
     ld e, b          ; screen column offset
-    ld h, (tile_map / 256) + 0
+    ld h, (high tile_map) + 0
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -24,7 +24,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -67,7 +67,7 @@
     ld a, b          ; screen column offset
     add a, 32
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 1
+    ld h, (high tile_map) + 1
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -75,7 +75,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -118,7 +118,7 @@
     ld a, b          ; screen column offset
     add a, 64
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 2
+    ld h, (high tile_map) + 2
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -126,7 +126,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -169,7 +169,7 @@
     ld a, b          ; screen column offset
     add a, 96
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 3
+    ld h, (high tile_map) + 3
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -177,7 +177,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -220,7 +220,7 @@
     ld a, b          ; screen column offset
     add a, 128
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 4
+    ld h, (high tile_map) + 4
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -228,7 +228,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -271,7 +271,7 @@
     ld a, b          ; screen column offset
     add a, 160
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 5
+    ld h, (high tile_map) + 5
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -279,7 +279,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -322,7 +322,7 @@
     ld a, b          ; screen column offset
     add a, 192
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 6
+    ld h, (high tile_map) + 6
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -330,7 +330,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -373,7 +373,7 @@
     ld a, b          ; screen column offset
     add a, 224
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 7
+    ld h, (high tile_map) + 7
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -381,7 +381,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -422,7 +422,7 @@
     ; row 8
     ld d, $48
     ld e, b          ; screen column offset
-    ld h, (tile_map / 256) + 8
+    ld h, (high tile_map) + 8
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -430,7 +430,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -473,7 +473,7 @@
     ld a, b          ; screen column offset
     add a, 32
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 9
+    ld h, (high tile_map) + 9
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -481,7 +481,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -524,7 +524,7 @@
     ld a, b          ; screen column offset
     add a, 64
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 10
+    ld h, (high tile_map) + 10
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -532,7 +532,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -575,7 +575,7 @@
     ld a, b          ; screen column offset
     add a, 96
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 11
+    ld h, (high tile_map) + 11
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -583,7 +583,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -626,7 +626,7 @@
     ld a, b          ; screen column offset
     add a, 128
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 12
+    ld h, (high tile_map) + 12
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -634,7 +634,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -677,7 +677,7 @@
     ld a, b          ; screen column offset
     add a, 160
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 13
+    ld h, (high tile_map) + 13
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -685,7 +685,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -728,7 +728,7 @@
     ld a, b          ; screen column offset
     add a, 192
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 14
+    ld h, (high tile_map) + 14
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -736,7 +736,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -779,7 +779,7 @@
     ld a, b          ; screen column offset
     add a, 224
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 15
+    ld h, (high tile_map) + 15
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -787,7 +787,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -828,7 +828,7 @@
     ; row 16
     ld d, $50
     ld e, b          ; screen column offset
-    ld h, (tile_map / 256) + 16
+    ld h, (high tile_map) + 16
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -836,7 +836,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -879,7 +879,7 @@
     ld a, b          ; screen column offset
     add a, 32
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 17
+    ld h, (high tile_map) + 17
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -887,7 +887,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -930,7 +930,7 @@
     ld a, b          ; screen column offset
     add a, 64
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 18
+    ld h, (high tile_map) + 18
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -938,7 +938,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -981,7 +981,7 @@
     ld a, b          ; screen column offset
     add a, 96
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 19
+    ld h, (high tile_map) + 19
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -989,7 +989,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1032,7 +1032,7 @@
     ld a, b          ; screen column offset
     add a, 128
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 20
+    ld h, (high tile_map) + 20
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -1040,7 +1040,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1083,7 +1083,7 @@
     ld a, b          ; screen column offset
     add a, 160
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 21
+    ld h, (high tile_map) + 21
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -1091,7 +1091,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1134,7 +1134,7 @@
     ld a, b          ; screen column offset
     add a, 192
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 22
+    ld h, (high tile_map) + 22
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -1142,7 +1142,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2
@@ -1185,7 +1185,7 @@
     ld a, b          ; screen column offset
     add a, 224
     ld e, a          ; DE = screen dest
-    ld h, (tile_map / 256) + 23
+    ld h, (high tile_map) + 23
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
     ld l, a          ; backup tile index
@@ -1193,7 +1193,7 @@
     rlca             ; shift to bottom
     rlca
     rlca
-    add a, (charset / 256) & $ff ; set upper 5 bits in high byte
+    or high charset  ; set upper 5 bits in high byte
     ld h, a          ; H = charset page
     ld a, l          ; shift tile index by 3
     add a, a         ; x2

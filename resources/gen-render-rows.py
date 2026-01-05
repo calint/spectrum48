@@ -14,10 +14,10 @@ print("    ; clobbers: A, D, E, H, L")
 print()
 print("    ; note: since `charset` is aligned on 2048 the lowest 11 bits in")
 print("    ;       the pointer are 0's which opens for optimization using bit")
-print("    ;       operations such as roll 3 top bits in lower byte into the")
-print("    ;       high byte of the pointer (bit 10, 9, 8 with base 0 in the")
-print("    ;       16-bit pointer) then left shift lower byte by 3 (8 bytes ")
-print("    ;       per character bitmap) then compose the pointer with HL")
+print("    ;       operations such as roll 3 high bits in lower byte into the")
+print("    ;       low bits of the high byte of the pointer, then left shift")
+print("    ;       tile index byte by 3 (high bits have already been moved to")
+print("    ;       high byte) then compose HL")
 print()
 
 for row in range(24):
@@ -45,7 +45,7 @@ for row in range(24):
         print("    ld e, a          ; DE = screen dest")
 
     # tile map pointer HL
-    print(f"    ld h, (tile_map / 256) + {row}")
+    print(f"    ld h, (high tile_map) + {row}")
     print("    ld l, c          ; tile map offset")
     print("    ld a, (hl)       ; A = tile index")
 
@@ -55,7 +55,7 @@ for row in range(24):
     print("    rlca             ; shift to bottom")
     print("    rlca")
     print("    rlca")
-    print("    add a, (charset / 256) & $ff ; set upper 5 bits in high byte")
+    print("    or high charset  ; set upper 5 bits in high byte")
     print("    ld h, a          ; H = charset page")
     print("    ld a, l          ; shift tile index by 3")
     print("    add a, a         ; x2")
