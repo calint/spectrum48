@@ -940,14 +940,21 @@ render_single_tile:
 
     ld a, (hl)                  ; A is tile id from HL
  
-    ; get charset address
-    ld l, a
-    ld h, 0
-    add hl, hl                  ; shift HL left 3 for id * 8
-    add hl, hl
-    add hl, hl
-    ld de, charset
-    add hl, de                  ; HL is bitmap source
+    ; make HL to point at address of bitmap of tile index
+    ; bit trickery because `charset` is aligned on 2048 boundary
+    ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
+    and %11100000               ;  of high byte
+    rlca
+    rlca
+    rlca
+    or high charset             ; set upper 5 bits in high byte
+    ld h, a                     ; H = high byte of the pointer
+    ld a, l                     ; shift lower byte by 3 because a character is 8
+    add a, a                    ;  bytes
+    add a, a
+    add a, a
+    ld l, a                     ; L = low byte of the pointer
+    ; HL is now bitmap source
 
     ; calculate screen address
     ld a, c                     ; A is screen row
