@@ -9,8 +9,8 @@ print("    ; generated code by `gen-render-rows.py`, do not edit")
 print("    ;")
 print()
 print("    ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256")
-print("    ;    input: IXL = tile map column offset, IXH = screen column number")
-print("    ; clobbers: A, C, D, E, H, L")
+print("    ;    input: B = screen column number, C = tile map offset")
+print("    ; clobbers: A, D, E, H, L")
 print()
 print("    ; note: since `charset` is aligned on 2048 the lowest 11 bits in")
 print("    ;       the pointer are 0's which opens for optimization using bit")
@@ -18,12 +18,6 @@ print("    ;       operations such as roll 3 top bits in lower byte into the")
 print("    ;       high byte of the pointer (bit 10, 9, 8 with base 0 in the")
 print("    ;       16-bit pointer) then left shift lower byte by 3 (8 bytes ")
 print("    ;       per character bitmap) then compose the pointer with HL")
-print()
-
-# pre-calculate the column index once to save 2 instructions per row
-print("    ld a, ixl")
-print("    add a, ixh")
-print("    ld c, a          ; C = constant tile map column")
 print()
 
 for row in range(24):
@@ -44,15 +38,15 @@ for row in range(24):
     # screen pointer DE
     print(f"    ld d, ${base_d:02X}")
     if e_offset == 0:
-        print("    ld e, ixh")
+        print("    ld e, b          ; screen column offset")
     else:
-        print("    ld a, ixh")
+        print("    ld a, b          ; screen column offset")
         print(f"    add a, {e_offset}")
         print("    ld e, a          ; DE = screen dest")
 
     # tile map pointer HL
     print(f"    ld h, (tile_map / 256) + {row}")
-    print("    ld l, c")
+    print("    ld l, c          ; tile map offset")
     print("    ld a, (hl)       ; A = tile index")
 
     # tile bitmap pointer to HL
@@ -71,9 +65,9 @@ for row in range(24):
 
     # unrolled scanline copy
     for scanline in range(8):
-        print("    ld a, (hl)")
-        print("    ld (de), a       ; copy scanline")
+        print(f"    ld a, (hl)       ; copy scanline {scanline}")
+        print("    ld (de), a")
         if scanline < 7:
-            print("    inc hl")
+            print("    inc l")
             print("    inc d")
     print()
