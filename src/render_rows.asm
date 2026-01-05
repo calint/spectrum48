@@ -4,7 +4,7 @@
 
     ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256
     ;    input: IXL = tile map column offset, IXH = screen column number
-    ; clobbers: A, B, C, D, E, H, L
+    ; clobbers: A, C, D, E, H, L
 
     ; note: since `charset` is aligned on 2048 the lowest 11 bits in
     ;       the pointer are 0's which opens for optimization using bit
