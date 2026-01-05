@@ -84,8 +84,8 @@ sprite_collided  db 0   ; 0 = no collisions
 ; initiates animation if not same
 ;
 ; input:
-;   ID = animation id constant
-;   RATE = animation rate constant
+;   ANIM_ID = animation id constant
+;   ANIM_RATE = animation rate constant
 ;   table = address of animation table
 ;   id = address of animation id field
 ;   rate = address of animation rate field
@@ -98,16 +98,16 @@ sprite_collided  db 0   ; 0 = no collisions
 ; clobbers:
 ;   A, DE, HL
 ;-------------------------------------------------------------------------------
-ANIMATION_SET MACRO ID, RATE, table, id, rate, frame, ptr, sprite
+ANIMATION_SET MACRO ANIM_ID, ANIM_RATE, table, id, rate, frame, ptr, sprite
     ; check if same animation and if so then done
     ld a, (id)
-    cp ID
+    cp ANIM_ID
     jr z, _end
 
-    ld a, ID
+    ld a, ANIM_ID
     ld (id), a
 
-    ld a, RATE
+    ld a, ANIM_RATE
     ld (rate), a
 
     xor a
@@ -126,8 +126,8 @@ _end:
 ENDM
 
 ;-------------------------------------------------------------------------------
-; advances a frame in animation if `hero_frame` bitwise and `(rate)` is zero and
-; if end is reached then restart at first frame
+; advances a frame in animation if `timer` bitwise and `(rate)` is zero and if
+; end of animation is reached then restart at first frame
 ;
 ; input:
 ;   id = address of animation id field
@@ -141,10 +141,10 @@ ENDM
 ; clobbers:
 ;   A, DE, HL
 ;-------------------------------------------------------------------------------
-ANIMATION_DO MACRO id, rate, frame, ptr, sprite
+ANIMATION_DO MACRO timer, id, rate, frame, ptr, sprite
     ld a, (rate)
     ld e, a
-    ld a, (hero_frame)
+    ld a, (timer)
     and e
     jr nz, _end
 
@@ -194,7 +194,7 @@ start:
 ;-------------------------------------------------------------------------------
 
     ; in order to disable regular "stutter" due to rom routines taking many
-    ; cycles during interrupts, disable it by making dummy interrupt handlers 
+    ; cycles during interrupts, disable it by making dummy interrupt handlers
     ; and setting machine in "im 2" mode
 
     di                  ; disable interrupts
@@ -726,7 +726,7 @@ animation:
     and HERO_FLAG_JUMPING
     jr nz, _end
 
-    ANIMATION_DO hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
+    ANIMATION_DO hero_frame, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
 _end:
 
