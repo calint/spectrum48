@@ -48,6 +48,7 @@ TILE_WIDTH            equ 8
 TILE_SHIFT            equ 3
 
 SPRITE_WIDTH          equ 16
+SPRITE_HEIGHT         equ 16
 
 SCREEN_WIDTH_CHARS    equ 32
 SCREEN_HEIGHT_CHARS   equ 24
@@ -856,7 +857,7 @@ render_sprite:
     ld IYL, a                   ; save for later use
 
     ; render the characters that enclose the sprite
-rept SPRITE_WIDTH
+rept SPRITE_HEIGHT
     RENDER_SPRITE_LINE
 endm 
 
