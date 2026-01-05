@@ -390,9 +390,9 @@ render_sprites:
     ; done render hero
 
     ; debugging on screen
-    ld a, (sprite_collided)
-    ld hl, $401f
-    ld (hl), a
+    ; ld a, (sprite_collided)
+    ; ld hl, $401f
+    ; ld (hl), a
 
 ;-------------------------------------------------------------------------------
 camera_adjust:
