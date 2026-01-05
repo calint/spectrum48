@@ -709,7 +709,7 @@ _end:
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
-; helper macro for `render_sprite` to avoid lable clashes in `rept` block
+; helper macro for `render_sprite` to avoid label clashes in `rept` block
 ;-------------------------------------------------------------------------------
 RENDER_SPRITE_LINE macro
     ; fetch sprite bytes
