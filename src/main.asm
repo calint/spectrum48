@@ -731,6 +731,7 @@ _shift:
     djnz _shift
 
 _shift_done:
+
     ; 3 bytes to draw: D, E, C
     ; D = left, E = middle, C = right (spill)
 
@@ -738,21 +739,21 @@ _shift_done:
     ld a, (hl)                  ; load current screen pixels
     ld b, a                     ; save screen pixels
     and d                       ; check collision
-    jr z, _no_collision_1       ; skip if no collision
+    jr z, _no_col_d             ; skip if no collision
     ld (sprite_collided), a     ; store any non-zero = collision
-_no_collision_1:
+_no_col_d:
     ld a, b                     ; reload screen pixels
-    or d                        ; or with sprite left
+    or d                        ; OR with sprite left
     ld (hl), a                  ; write back
-    inc hl
+    inc hl                      ; next byte in scanline
 
     ; byte E
     ld a, (hl)
     ld b, a
     and e
-    jr z, _no_collision_2
+    jr z, _no_col_e
     ld (sprite_collided), a
-_no_collision_2:
+_no_col_e:
     ld a, b
     or e
     ld (hl), a
@@ -762,16 +763,16 @@ _no_collision_2:
     ld a, (hl)
     ld b, a
     and c
-    jr z, _no_collision_3
+    jr z, _no_col_c
     ld (sprite_collided), a
-_no_collision_3:
+_no_col_c:
     ld a, b
     or c
     ld (hl), a
 
     ; move HL back to starting position
-    dec hl
-    dec hl
+    dec l
+    dec l
 
     ; move sprite pointer +2
     inc ix
@@ -788,10 +789,9 @@ _no_collision_3:
     ld a, l
     add a, SCREEN_WIDTH_CHARS  ; move to next character row
     ld l, a
-    ; if carry then 256 and moved to next third, continue
-    jr c, _end
+    jr c, _end                 ; if carry then 256 and moved to next third
 
-    ; otherwise, subtract 8 from H to stay in correct third and continue
+    ; otherwise, subtract 8 from H to stay in correct third
     ld a, h
     sub 8
     ld h, a
@@ -850,13 +850,12 @@ render_sprite:
     or l                        ; combine with L
     ld l, a                     ; HL now points to screen byte
 
-    ; render the characters that enclose the sprite
-
     ; prepare shift counter
     ld a, b
-    and %111                    ; x % 8 (shift amount)
-    ld IYL, a                   ; save for later loop
+    and 7                       ; x % 8 (shift amount)
+    ld IYL, a                   ; save for later use
 
+    ; render the characters that enclose the sprite
 rept SPRITE_WIDTH
     RENDER_SPRITE_LINE
 endm 
