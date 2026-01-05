@@ -299,13 +299,13 @@ render_tile_map:
     ld a, BORDER_RENDER_TILE_MAP
     out ($fe), a
 
+    ld a, (camera_x)    ; calculate tile map offset used in `render_rows.asm`
+    ld c, a             ; C = tile map offset
     ld b, 0             ; current loop column (0-31)
 _loop:
-    ld a, (camera_x)    ; calculate tile map offset used in `render_rows.asm`
-    add a, b            ; add column number to `camera_x`
-    ld c, a             ; C = tile map offset
     include "render_rows.asm"
     inc b               ; next column
+    inc c               ; next tile map column
     ld a, b
     cp SCREEN_WIDTH_CHARS
     jp nz, _loop
