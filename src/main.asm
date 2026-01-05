@@ -948,13 +948,12 @@ render_single_tile:
     add hl, hl
     ld de, charset
     add hl, de                  ; HL is bitmap source
-    ex de, hl                   ; DE is now bitmap source
 
     ; calculate screen address
     ld a, c                     ; A is screen row
     and %00011000               ; isolate row bits 3 4
     or %01000000                ; screen base 4000
-    ld h, a                     ; screen high byte in H
+    ld d, a                     ; screen high byte in D
 
     ld a, c                     ; screen row to A
     and %00000111               ; isolate row bits 0 to 2
@@ -962,21 +961,21 @@ render_single_tile:
     rrca
     rrca                        ; moved low bits to 5 6 7
     or b                        ; add column B
-    ld l, a                     ; screen low byte in L
+    ld e, a                     ; screen low byte in E
 
     ; copy 8 bytes
 
-    ; scanline 1 to 7
+    ; scanline 0 to 6
 rept 7
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
+    ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d                       ; next screen line in D
 endm
 
-    ; scanline 8
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
+    ; scanline 7
+    ld a, (hl)
+    ld (de), a
  
     ret
 
