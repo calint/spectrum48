@@ -193,6 +193,31 @@ ENDM
 start:
 ;-------------------------------------------------------------------------------
 
+    ; in order to disable regular "stutter" due to rom routines taking many
+    ; cycles during interrupts, disable it by making dummy interrupt handlers 
+    ; and setting machine in "im 2" mode
+
+    di                  ; disable interrupts
+
+    ; build im2 table at $fe00
+    ld hl, $fe00        ; table address
+    ld a, $ff           ; point to address $ffff
+_loop:
+    ld (hl), a
+    inc l
+    jr nz, _loop
+    inc h               ; last byte of 257-byte table
+    ld (hl), a
+
+    ; place a 'ret' instruction at $ffff
+    ld a, $c9           ; opcode for 'ret'
+    ld ($ffff), a
+
+    ; activate im 2
+    ld a, $fe           ; high byte of table
+    ld i, a
+    im 2
+
     ; set foreground and background to white on black
     ld hl, $5800        ; color attribute start, 768 bytes
     ld (hl), 7          ; white on black
@@ -228,7 +253,9 @@ main_loop:
     ld a, BORDER_VBLANK
     out ($fe), a
 
+    ei                  ; enable interrupts to receive vblank
     halt                ; sleep until the start of the next frame
+    di                  ; disable interrupts while in game loop
 
 ;-------------------------------------------------------------------------------
 camera_pane:
@@ -720,19 +747,38 @@ RENDER_SPRITE_LINE macro
     ld e, (ix + 1)              ; load right sprite byte
     ld c, 0                     ; C will hold the "spillover" bits
 
-    ; shift 16-bit row right by IYL
-    ; note: this is very expensive, thus preshifted sprites would be better
+    ; shift 16-bit row right or left depending on IYL
+    ; note: this is very expensive, thus pre-shifted sprites would be better
 
-    ld a, IYL                   ; A = number of shifts
+    ld a, iyl                   ; A = number of shifts
     or a                        ; check if shift is 0
     jr z, _shift_done           ; skip if no shift needed
 
+    cp 5                        ; is shift > 4
+    jr nc, _shift_left
+
+_shift_right:
     ld b, a                     ; B = shift counter
-_shift:
+_loop_right:
     srl d                       ; shift left byte, bit 0 goes to carry
     rr e                        ; rotate right byte, carry goes into bit 7
     rr c                        ; rotate spill byte, carry goes into bit 7
-    djnz _shift
+    djnz _loop_right
+    jr _shift_done
+
+_shift_left:
+    ; flip sprite bytes for left shift
+    ld c, e
+    ld e, d
+    ld d, 0
+    neg                         ; calculate left shifts, 8 - right shifts
+    add a, 8
+    ld b, a
+_loop_left:
+    sla c                       ; shift spill left, bit 7 to carry
+    rl e                        ; rotate middle, carry to bit 0
+    rl d                        ; rotate left byte, carry to bit 0
+    djnz _loop_left
 
 _shift_done:
 
