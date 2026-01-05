@@ -23,7 +23,7 @@
     ld h, (tile_map / 256) + 0
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -74,7 +74,7 @@
     ld h, (tile_map / 256) + 1
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -125,7 +125,7 @@
     ld h, (tile_map / 256) + 2
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -176,7 +176,7 @@
     ld h, (tile_map / 256) + 3
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -227,7 +227,7 @@
     ld h, (tile_map / 256) + 4
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -278,7 +278,7 @@
     ld h, (tile_map / 256) + 5
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -329,7 +329,7 @@
     ld h, (tile_map / 256) + 6
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -380,7 +380,7 @@
     ld h, (tile_map / 256) + 7
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -429,7 +429,7 @@
     ld h, (tile_map / 256) + 8
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -480,7 +480,7 @@
     ld h, (tile_map / 256) + 9
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -531,7 +531,7 @@
     ld h, (tile_map / 256) + 10
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -582,7 +582,7 @@
     ld h, (tile_map / 256) + 11
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -633,7 +633,7 @@
     ld h, (tile_map / 256) + 12
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -684,7 +684,7 @@
     ld h, (tile_map / 256) + 13
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -735,7 +735,7 @@
     ld h, (tile_map / 256) + 14
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -786,7 +786,7 @@
     ld h, (tile_map / 256) + 15
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -835,7 +835,7 @@
     ld h, (tile_map / 256) + 16
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -886,7 +886,7 @@
     ld h, (tile_map / 256) + 17
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -937,7 +937,7 @@
     ld h, (tile_map / 256) + 18
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -988,7 +988,7 @@
     ld h, (tile_map / 256) + 19
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -1039,7 +1039,7 @@
     ld h, (tile_map / 256) + 20
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -1090,7 +1090,7 @@
     ld h, (tile_map / 256) + 21
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -1141,7 +1141,7 @@
     ld h, (tile_map / 256) + 22
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca
@@ -1192,7 +1192,7 @@
     ld h, (tile_map / 256) + 23
     ld l, c
     ld a, (hl)       ; A = tile index
-    ld l, a          ; backup index
+    ld l, a          ; backup tile index
     and %11100000    ; get top 3 bits
     rlca             ; shift to bottom
     rlca

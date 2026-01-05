@@ -56,7 +56,7 @@ for row in range(24):
     print("    ld a, (hl)       ; A = tile index")
 
     # tile bitmap pointer to HL
-    print("    ld l, a          ; backup index")
+    print("    ld l, a          ; backup tile index")
     print("    and %11100000    ; get top 3 bits")
     print("    rlca             ; shift to bottom")
     print("    rlca")
