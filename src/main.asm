@@ -299,9 +299,9 @@ render_tile_map:
     ld a, BORDER_RENDER_TILE_MAP
     out ($fe), a
 
-    ld a, (camera_x)    ; calculate tile map offset used in `render_rows.asm`
+    ld a, (camera_x)
     ld c, a             ; C = tile map offset
-    ld b, 0             ; current loop column (0-31)
+    ld b, 0             ; current column (0-31)
 _loop:
     include "render_rows.asm"
     inc b               ; next column
