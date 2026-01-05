@@ -13,7 +13,6 @@ BORDER_INPUT            equ 9
 GRAVITY               equ 3
 GRAVITY_RATE          equ %1111
 
-HERO_SPRITE_BIT       equ 1
 HERO_MOVE_DX          equ 8
 HERO_MOVE_BOOST_DX    equ 16
 HERO_JUMP_DY          equ 33
