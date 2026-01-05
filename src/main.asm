@@ -964,53 +964,16 @@ render_single_tile:
 
     ; copy 8 bytes
 
-    ; scanline 0
+rept 7
     ld a, (de)                  ; fetch byte from DE
     ld (hl), a                  ; write to HL screen
     inc de                      ; next source in DE
     inc h                       ; next screen line in H
-
-    ; scanline 1
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
-
-    ; scanline 2
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
-
-    ; scanline 3
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
-
-    ; scanline 4
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
-
-    ; scanline 5
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
-
-    ; scanline 6
-    ld a, (de)                  ; fetch byte from DE
-    ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
+endm
 
     ; scanline 7
     ld a, (de)                  ; fetch byte from DE
     ld (hl), a                  ; write to HL screen
-    inc de                      ; next source in DE
-    inc h                       ; next screen line in H
  
     ret
 
