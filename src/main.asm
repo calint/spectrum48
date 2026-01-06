@@ -145,13 +145,13 @@ _end:
 ENDM
 
 ;-------------------------------------------------------------------------------
-; advances a frame in animation if `timer` bitwise and `(rate)` is zero and if
-; end of animation is reached then restart at first frame
+; advances a frame in animation if `timer` bitwise and `(rate)` is zero
+; if end of animation is reached then restart at first frame
 ;
 ; input:
 ;   id = address of animation id field
 ;   rate = address of animation rate field
-;   ptr = address of current pointer field into the animation table
+;   ptr = address of pointer to animation table
 ;   sprite = address of sprite field
 ; 
 ; output:
@@ -242,7 +242,7 @@ _loop:
     ld (hl), 7          ; white on black
     ld de, $5801        ; destination one byte ahead to copy previous byte
     ld bc, 767          ; remaining bytes to fill
-    ldir                ; fastest hardware copy loop
+    ldir                ; hardware copy loop
 
 ;-------------------------------------------------------------------------------
 ; main loop:
@@ -262,7 +262,7 @@ _loop:
 ; 6.2. right
 ; 6.3. jump
 ; 7. apply game logic physics
-; 8. advance animations
+; 8. advance animation
 ; 9. frame done, loop
 ;-------------------------------------------------------------------------------
 
@@ -309,6 +309,7 @@ _apply:
     ld (hl), a
 
     ; adjust hero world x and previous x during camera pan
+    ; DE = delta in subpixels
     ld hl, (hero_x)
     add hl, de
     ld (hero_x), hl
@@ -322,7 +323,7 @@ _apply:
     cp (hl)
     jr nz, _end
 
-    ; camera reached destination
+    ; camera reached destination, set state
     ld a, CAMERA_STATE_IDLE
     ld (camera_state), a
 
@@ -331,8 +332,10 @@ _end:
 ;-------------------------------------------------------------------------------
 render:
 ;-------------------------------------------------------------------------------
+
     ; check if camera position changed since last frame and if so trigger
     ; `render_tile_map`, otherwise jump to `render_sprites`
+
     ld hl, camera_x_prv
     ld a, (camera_x)
     cp (hl)
@@ -355,8 +358,8 @@ _loop:
     ld a, b
     cp SCREEN_WIDTH_CHARS
     jp nz, _loop
-    ; note: djnz using B as counter does not work because `render_rows.asm` is
-    ;       is too many bytes for relative jump
+    ; note: djnz using B as counter does not work because `render_rows.asm` size
+    ;       is to large for relative jump
 
 ;-------------------------------------------------------------------------------
 render_sprites:
@@ -406,13 +409,6 @@ render_sprites:
     ld ix, (hero_sprite)
     call render_sprite
 
-    ; done render hero
-
-    ; debugging on screen
-    ; ld a, (sprite_collided)
-    ; ld hl, $401f
-    ; ld (hl), a
-
 ;-------------------------------------------------------------------------------
 camera_adjust:
 ;-------------------------------------------------------------------------------
@@ -421,8 +417,8 @@ camera_adjust:
 
     ; get hero tile x
     ld a, (hero_x_screen)
-    rept TILE_SHIFT
-        srl a                ; convert to tile x
+    rept TILE_SHIFT           ; convert to tile x
+        srl a
     endm
     ; A is now column
 
@@ -436,13 +432,13 @@ camera_adjust:
 
 _right:
     ld e, CAMERA_STATE_RIGHT ; prepare state for pane right
-    ld a, (hl)               ; get current `camera_x`
+    ld a, (hl)               ; HL = camera_x
     add a, HERO_CAMERA_PANE  ; calculate destination
     jr _apply                ; jump to shared store
 
 _left:
     ld e, CAMERA_STATE_LEFT  ; prepare state for pane left
-    ld a, (hl)               ; get current `camera_x`
+    ld a, (hl)               ; HL = camera_x
     sub HERO_CAMERA_PANE     ; calculate destination
 
 _apply:
@@ -455,8 +451,10 @@ _end:
 ;-------------------------------------------------------------------------------
 collisions:
 ;-------------------------------------------------------------------------------
+
 ; note: after this phase x and y must be out of collision since next phase will
 ;       save current x and y into previous for next frame
+
 _check_sprite:
     ld a, (sprite_collided)
     or a
@@ -553,7 +551,9 @@ _check_tiles_end:
 ;-------------------------------------------------------------------------------
 state:
 ;-------------------------------------------------------------------------------
-    ; save state to prv
+
+    ; save current x and y to previous
+
     ld hl, (hero_x)
     ld (hero_x_prv), hl
     ld hl, (hero_y)
@@ -566,7 +566,7 @@ input:
     out ($fe), a
 
     ; set horizontal velocity to 0
-    ld hl, 0
+    ld hl, 0            ; check key A
     ld (hero_dx), hl
 
     ; clear hero is moving flag
@@ -627,10 +627,10 @@ _set_left_dx:
 _check_hero_left_end:
 
 _check_hero_right:
-    bit 2, b
+    bit 2, b            ; check key D
     jr nz, _check_hero_right_end
 
-    ; flag hero moving
+    ; flag hero is moving
     ld a, (hero_flags)
     or HERO_FLAG_MOVING
     ld (hero_flags), a
@@ -667,7 +667,7 @@ _set_right_dx:
 _check_hero_right_end:
 
 _check_hero_jump:
-    bit 4, b
+    bit 4, b            ; check key G
     jr nz, _check_hero_jump_end
 
     ; if hero is jumping then done
@@ -679,7 +679,7 @@ _check_hero_jump:
     ld hl, -HERO_JUMP_DY
     ld (hero_dy), hl
 
-    ; flag hero with moving and jumping
+    ; flag hero with is moving and jumping
     ld a, HERO_FLAG_MOVING | HERO_FLAG_JUMPING
     ld (hero_flags), a
 
@@ -906,15 +906,15 @@ render_sprite:
     ld h, a                     ; H is now correct
 
     ld a, c                     ; y to A
-    rla                         ; rotate y bits 5-7 to position
+    rla                         ; rotate y bits to position
     rla
     and %11100000               ; isolate them
     ld l, a                     ; start L
 
     ld a, b                     ; x to A
-    rra                         ; shift out the pixel fractions in a character
-    rra
-    rra
+    rept TILE_SHIFT             ; shift out the pixel fractions in a character
+        rra
+    endm
     and %00011111               ; isolate the column bits (0-31)
     or l                        ; combine with L
     ld l, a                     ; HL now points to screen byte
@@ -946,20 +946,21 @@ endm
 restore_sprite_background
     ; calculate starting tile column x / 8
     ld a, b
-    rrca
-    rrca
-    rrca
-    and %00011111
+    rept TILE_SHIFT
+        rrca
+    endm
+    and %00011111       ; isolate column number
     ld b, a             ; B is screen column 0 to 31
 
     ; calculate starting tile row y / 8
     ld a, c
-    rrca
-    rrca
-    rrca
-    and %00011111
+    rept TILE_SHIFT
+        rrca
+    endm
+    and %00011111       ; isolate row number
     ld c, a             ; C is screen row 0 to 23
 
+    ; render the dirty 3 x 3 tiles
     call render_single_tile
     inc b
     call render_single_tile
@@ -994,19 +995,19 @@ restore_sprite_background
 ;-------------------------------------------------------------------------------
 render_single_tile:
     ; get tile id from map
-    ld h, high tile_map         ; tile_map base in H
+    ld h, high tile_map         ; H = tile_map base
     ld a, c
-    add a, h                    ; A is base high byte plus row
-    ld h, a                     ; H is now the correct high byte
+    add a, h                    ; A = base high byte plus row
+    ld h, a                     ; H = now the correct high byte
  
     ld a, (camera_x)            ; get current camera offset in A
-    add a, b                    ; add screen x in IXH
-    ld l, a                     ; L is final map column
+    add a, b                    ; add screen x in B
+    ld l, a                     ; L = map column
     ; HL = pointer to tile
 
-    ld a, (hl)                  ; A is tile id from HL
+    ld a, (hl)                  ; A = tile id
  
-    ; make HL to point at address of bitmap of tile index
+    ; make HL point at address of bitmap of tile index
     ; bit trickery because `charset` is aligned on 2048 boundary
     ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
     and %11100000               ;  of high byte
@@ -1023,18 +1024,22 @@ render_single_tile:
     ; HL is now bitmap source
 
     ; calculate screen address
-    ld a, c                     ; A is screen row
-    and %00011000               ; isolate row bits 3 4
-    or %01000000                ; screen base 4000
-    ld d, a                     ; screen high byte in D
 
-    ld a, c                     ; screen row to A
-    and %00000111               ; isolate row bits 0 to 2
+    ; D:   0  1  0 y7 y6 y2 y1 y0
+    ; E:  y5 y4 y3 x4 x3 x2 x1 x0
+
+    ld a, c                     ; A = screen row
+    and %00011000               ; isolate row bits
+    or %01000000                ; screen base 4000
+    ld d, a                     ; D = screen high byte
+
+    ld a, c                     ; A = screen row
+    and %00000111               ; isolate lower row bits
     rrca                        ; rotate lower bits to high bits
     rrca
     rrca                        ; moved low bits to 5 6 7
     or b                        ; add column B
-    ld e, a                     ; screen low byte in E
+    ld e, a                     ; E = screen low byte
 
     ; copy 8 bytes
 
@@ -1043,7 +1048,7 @@ rept 7
     ld a, (hl)
     ld (de), a
     inc hl
-    inc d                       ; next screen line in D
+    inc d                       ; D = next screen line
 endm
 
     ; scanline 7
@@ -1053,28 +1058,28 @@ endm
     ret
 
 ;-------------------------------------------------------------------------------
-; charset: 256 * 8 = 2048 B
+; charset: 256 * 8 = 2048 B, aligned on 2048 B
 ;-------------------------------------------------------------------------------
 org ($ + 2047) & $f800
 charset:
     include "charset.asm"
 
 ;-------------------------------------------------------------------------------
-; tile map: 24 x 256 = 6144 B
+; tile map: 24 x 256 = 6144 B, aligned on 256 B
 ;-------------------------------------------------------------------------------
 org ($ + 255) & $ff00
 tile_map:
     include "tile_map.asm"
 
 ;-------------------------------------------------------------------------------
-; sprites data: 48 x 2 x 16 = 1536 B
+; sprites data: 48 x 2 x 16 = 1536 B, aligned on 256 B
 ;-------------------------------------------------------------------------------
 org ($ + 255) & $ff00
 sprites_data:
     include "sprites.asm"
 
 ;-------------------------------------------------------------------------------
-; animations
+; animations, aligned on 256 B
 ;-------------------------------------------------------------------------------
 org ($ + 255) & $ff00
 hero_animation_idle:
