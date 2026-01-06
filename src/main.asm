@@ -89,8 +89,8 @@ hero_y_prv       dw 0
 hero_x_screen    db 132
 hero_y_screen    db 0
 hero_flags       db 0
-hero_sprite      dw sprites_data_8
 hero_frame       db 0
+hero_sprite      dw sprites_data_8
 hero_anim_id     db HERO_ANIM_ID_IDLE
 hero_anim_frame  db 0
 hero_anim_rate   db HERO_ANIM_RATE_IDLE
