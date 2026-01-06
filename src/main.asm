@@ -823,7 +823,7 @@ _no_col_d:
     ld a, b                     ; reload screen pixels
     or d                        ; OR with sprite left
     ld (hl), a                  ; write back to screen
-    inc hl
+    inc l
 
     ; byte E
     ld a, (hl)
@@ -835,7 +835,7 @@ _no_col_e:
     ld a, b
     or e
     ld (hl), a
-    inc hl
+    inc l
 
     ; byte C
     ld a, (hl)
