@@ -161,8 +161,8 @@ Idiomatic flag set:
 
 ### 7. Pointer conventions
 
-* HL = active pointer
-* DE = secondary pointer
+* HL = active pointer (source)
+* DE = secondary pointer (destination)
 * BC = length
 
 Follow this or code feels wrong.
