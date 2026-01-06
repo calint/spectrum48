@@ -1,3 +1,5 @@
+[ ] fix bug when hero falls below the screen into the color attributes
+    generating color artifacts
 [ ] pre-shifted sprites
 [ ] extend from 1 sprite to multiple stored in a table
 [ ] consider using screen_lut
