@@ -1,4 +1,21 @@
+;-------------------------------------------------------------------------------
+; memory map
+;-------------------------------------------------------------------------------
+; $4000-$57ff : screen bitmap (6144 bytes)
+; $5800-$5aff : color attributes (768 bytes)
+; $8000-$xxxx : code (this file)
+; $fe00-$feff : im2 interrupt vector table
+; $ffff       : interrupt handler (ret instruction)
+;
+; aligned data:
+; charset   : 2kb aligned ($x800) - 2048 bytes
+; tile_map  : 256b aligned ($xx00) - 6144 bytes
+; sprites   : 256b aligned ($xx00) - 1536 bytes
+; animations: 256b aligned ($xx00) - variable
+;-------------------------------------------------------------------------------
+
 org $8000
+
 ;-------------------------------------------------------------------------------
 ; constants
 ;-------------------------------------------------------------------------------
@@ -53,6 +70,8 @@ SPRITE_HEIGHT         equ 16
 SCREEN_WIDTH_CHARS    equ 32
 SCREEN_HEIGHT_CHARS   equ 24
 
+KEYBOARD_ROW_ASDGF    equ $fdfe
+
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
@@ -61,7 +80,6 @@ camera_x_prv     db $ff
 camera_state     db CAMERA_STATE_IDLE
 camera_dest_x    db -16
 
-hero_frame       db 0
 hero_x           dw 132 << SUBPIXELS 
 hero_y           dw 0
 hero_dx          dw 0
@@ -72,6 +90,7 @@ hero_x_screen    db 132
 hero_y_screen    db 0
 hero_flags       db 0
 hero_sprite      dw sprites_data_8
+hero_frame       db 0
 hero_anim_id     db HERO_ANIM_ID_IDLE
 hero_anim_frame  db 0
 hero_anim_rate   db HERO_ANIM_RATE_IDLE
@@ -556,7 +575,7 @@ input:
     ld (hero_flags), a
 
 _check_hero:
-    ld bc, $fdfe        ; row for a, s, d, f, g
+    ld bc, KEYBOARD_ROW_ASDGF
     in b, (c)           ; read row (0 = pressed)
 
 _check_hero_left:
@@ -795,7 +814,7 @@ _no_col_d:
     ld a, b                     ; reload screen pixels
     or d                        ; OR with sprite left
     ld (hl), a                  ; write back
-    inc hl                      ; next byte in scanline
+    inc hl
 
     ; byte E
     ld a, (hl)
@@ -876,7 +895,7 @@ render_sprite:
     ld a, c                     ; y to A
     and %00000111               ; mask 00000111 (y bits 0-2)
     or %01000000                ; add base address
-    ld h, a                     ; store in H
+    ld h, a
 
     ld a, c                     ; y to A
     rra                         ; rotate y bits to position
