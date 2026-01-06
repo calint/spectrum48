@@ -1,0 +1,194 @@
+Instruction       Length  Name                            Flags         
+                                                          C   Z  P/V  S   N   H
+ADC  A,(HL)       7       Add with Carry (HL)             X | X | V | X | 0 | X
+ADC  A,(Ix+d)     19      Add with Carry Indexed          X | X | V | X | 0 | X
+ADC  A,r          4       Add with Carry Register         X | X | V | X | 0 | X
+ADC  A,n          7       Add with Carry Immediate        X | X | V | X | 0 | X
+ADC  HL,rr        15      Add with Carry HL, Reg16        X | X | V | X | 0 | ?
+ADD  A,(HL)       7       Add (HL)                        X | X | V | X | 0 | X
+ADD  A,(Ix+d)     19      Add Indexed                     X | X | V | X | 0 | X
+ADD  A,r          4       Add Register                    X | X | V | X | 0 | X
+ADD  A,n          7       Add Immediate                   X | X | V | X | 0 | X
+ADD  HL,rr        15      Add HL, Reg16                   X |   |   |   | 0 | ?
+ADD  Ix,rr        15      Add Ix, Reg16                   X |   |   |   | 0 | ?
+ADD  Ix,Ix        15      Add Ix, Ix                      X |   |   |   | 0 | ?
+AND  (HL)         7       Logical AND (HL)                0 | X | P | X | 0 | 1
+AND  (Ix+d)       19      Logical AND Indexed             0 | X | P | X | 0 | 1
+AND  r            4       Logical AND Register            0 | X | P | X | 0 | 1
+AND  n            7       Logical AND Immediate           0 | X | P | X | 0 | 1
+BIT  b,(HL)       12      Test Bit (HL)                     | X | # | # | 0 | 1
+BIT  b,(Ix+d)     20      Test Bit Indexed                  | X | # | # | 0 | 1
+BIT  b,r          8       Test Bit Register                 | X | # | # | 0 | 1
+CALL nn           17      Call Unconditional                |   |   |   |   |  
+CALL cc,nn        10/17   Call Conditional                  |   |   |   |   |  
+CCF               4       Complement Carry Flag           X |   |   |   | 0 | #
+CP   (HL)         7       Compare (HL)                    X | X | V | X | 1 | X
+CP   (Ix+d)       19      Compare Indexed                 X | X | V | X | 1 | X
+CP   r            4       Compare Register                X | X | V | X | 1 | X
+CP   n            7       Compare Immediate               X | X | V | X | 1 | X
+CPD               16      Compare and Decrement             | X | X | X | 1 | #
+CPDR              16/21   Compare, Dec, and Repeat          | X | X | X | 1 | #
+CPI               16      Compare and Increment             | X | X | X | 1 | #
+CPIR              16/21   Compare, Inc, and Repeat          | X | X | X | 1 | #
+CPL               4       Complement Accumulator            |   |   |   | 1 | 1
+DAA               4       Decimal Adjust Acc              X | X | P | X |   | X
+DEC  (HL)         11      Decrement (HL)                    | X | V | X | 1 | X
+DEC  (Ix+d)       23      Decrement Indexed                 | X | V | X | 1 | X
+DEC  r            4       Decrement Register                | X | V | X | 1 | X
+DEC  rr           6       Decrement Reg16                   |   |   |   |   |  
+DEC  Ix           10      Decrement Ix                      |   |   |   |   |  
+DI                4       Disable Interrupts                |   |   |   |   |  
+DJNZ e            8/13    Dec B, Jump if Not Zero           |   |   |   |   |  
+EI                4       Enable Interrupts                 |   |   |   |   |  
+EX   (SP),HL      19      Exchange (SP) with HL             |   |   |   |   |  
+EX   (SP),Ix      23      Exchange (SP) with Ix             |   |   |   |   |  
+EX   AF,AF'       4       Exchange AF with Shadows          |   |   |   |   |  
+EX   DE,HL        4       Exchange DE and HL                |   |   |   |   |  
+EXX               4       Exchange BC/DE/HL with Shadows    |   |   |   |   |  
+HALT              8       Halt CPU                          |   |   |   |   |  
+IM   0-2          8       Set Interrupt Mode                |   |   |   |   |  
+IN   r,(C)        12      Input Register from Port (C)      | X | P | X | 0 | 0
+IN   A,(n)        11      Input Acc from Port (n)           | X | P | X | 0 | 0
+INC  (HL)         11      Increment (HL)                    | X | V | X | 0 | X
+INC  (Ix+d)       23      Increment Indexed                 | X | V | X | 0 | X
+INC  r            4       Increment Register                | X | V | X | 0 | X
+INC  rr           6       Increment Reg16                   |   |   |   |   |  
+INC  Ix           10      Increment Ix                      |   |   |   |   |  
+IND               16      Input and Decrement               | X | # | # | 1 | #
+INDR              16/21   Input, Dec, and Repeat            | X | # | # | 1 | #
+INI               16      Input and Increment               | X | # | # | 1 | #
+INIR              16/21   Input, Inc, and Repeat            | X | # | # | 1 | #
+JP   nn           10      Jump Unconditional                |   |   |   |   |  
+JP   (HL)         4       Jump to (HL)                      |   |   |   |   |  
+JP   (Ix)         8       Jump to (Ix)                      |   |   |   |   |  
+JP   cc,nn        10      Jump Conditional                  |   |   |   |   |  
+JR   e            12      Jump Relative                     |   |   |   |   |  
+JR   cc,e         7/12    Jump Relative Conditional         |   |   |   |   |  
+LD   (rr),A       7       Store Acc via Reg16               |   |   |   |   |  
+LD   (HL),r       7       Store Register via (HL)           |   |   |   |   |  
+LD   (HL),n       10      Store Immediate via (HL)          |   |   |   |   |  
+LD   (Ix+d),r     19      Store Register via Indexed        |   |   |   |   |  
+LD   (Ix+d),n     19      Store Immediate via Indexed       |   |   |   |   |  
+LD   (nn),A       13      Store Acc to Address              |   |   |   |   |  
+LD   (nn),rr      20      Store Reg16 to Address            |   |   |   |   |  
+LD   (nn),HL      16      Store HL to Address               |   |   |   |   |  
+LD   (nn),Ix      20      Store Ix to Address               |   |   |   |   |  
+LD   (nn),SP      20      Store SP to Address               |   |   |   |   |  
+LD   A,(rr)       7       Load Acc via Reg16                |   |   |   |   |  
+LD   r,(HL)       7       Load Register via (HL)            |   |   |   |   |  
+LD   r,(Ix+d)     19      Load Register via Indexed         |   |   |   |   |  
+LD   A,(nn)       13      Load Acc from Address             |   |   |   |   |  
+LD   r,r          4       Load Register from Register       |   |   |   |   |  
+LD   r,n          7       Load Register Immediate           |   |   |   |   |  
+LD   rr,(nn)      20      Load Reg16 from Address           |   |   |   |   |  
+LD   HL,(nn)      16      Load HL from Address              |   |   |   |   |  
+LD   Ix,(nn)      20      Load Ix from Address              |   |   |   |   |  
+LD   rr,nn        10      Load Reg16 Immediate              |   |   |   |   |  
+LD   Ix,nn        14      Load Ix Immediate                 |   |   |   |   |  
+LD   SP,(nn)      20      Load SP from Address              |   |   |   |   |  
+LD   SP,HL        6       Load SP from HL                   |   |   |   |   |  
+LD   SP,Ix        10      Load SP from Ix                   |   |   |   |   |  
+LD   SP,nn        10      Load SP Immediate                 |   |   |   |   |  
+LDD               16      Load and Decrement                | # | X | # | 0 | 0
+LDDR              16/21   Load, Dec, and Repeat             | # | 0 | # | 0 | 0
+LDI               16      Load and Increment                | # | X | # | 0 | 0
+LDIR              16/21   Load, Inc, and Repeat             | # | X | # | 0 | 0
+NEG               8       Two's Complement Acc            X | X | V | X | 1 | X
+NOP               4       No Operation                      |   |   |   |   |  
+OR   (HL)         7       Logical OR (HL)                 0 | X | P | X | 0 | 0
+OR   (Ix+d)       19      Logical OR Indexed              0 | X | P | X | 0 | 0
+OR   r            4       Logical OR Register             0 | X | P | X | 0 | 0
+OR   n            7       Logical OR Immediate            0 | X | P | X | 0 | 0
+OTDR              16/21   Output, Dec, and Repeat         | 1 | # | # | 1 | #
+OTIR              16/21   Output, Inc, and Repeat         | 1 | # | # | 1 | #
+OUT  (C),r        12      Output Register to Port (C)       |   |   |   |   |  
+OUT  (n),A        11      Output Acc to Port (n)            |   |   |   |   |  
+OUTD              16      Output and Decrement              | X | # | # | 1 | #
+OUTI              16      Output and Increment              | X | # | # | 1 | #
+POP  rr           10      Pop Reg16 from Stack              |   |   |   |   |  
+POP  Ix           14      Pop Ix from Stack                 |   |   |   |   |  
+PUSH rr           11      Push Reg16 to Stack               |   |   |   |   |  
+PUSH Ix           15      Push Ix to Stack                  |   |   |   |   |  
+RES  b,(HL)       15      Reset Bit (HL)                    |   |   |   |   |  
+RES  b,(Ix+d)     23      Reset Bit Indexed                 |   |   |   |   |  
+RES  b,r          8       Reset Bit Register                |   |   |   |   |  
+RET               10      Return Unconditional              |   |   |   |   |  
+RET  cc           5/11    Return Conditional                |   |   |   |   |  
+RETI              14      Return from Interrupt             |   |   |   |   |  
+RETN              14      Return from Non-maskable Int      |   |   |   |   |  
+RL   (HL)         15      Rotate Left (HL)                X | X | P | X | 0 | 0
+RL   (Ix+d)       23      Rotate Left Indexed             X | X | P | X | 0 | 0
+RL   r            8       Rotate Left Register            X | X | P | X | 0 | 0
+RLA               4       Rotate Left Accumulator         X |   |   |   | 0 | 0
+RLC  (HL)         15      Rotate Left Circular (HL)       X | X | P | X | 0 | 0
+RLC  (Ix+d)       23      Rotate Left Circular Indexed    X | X | P | X | 0 | 0
+RLC  r            8       Rotate Left Circular Register   X | X | P | X | 0 | 0
+RLCA              4       Rotate Left Circular Acc        X | X | P | X | 0 | 0
+RLD               18      Rotate Left Decimal               | X | P | X | 0 | 0
+RR   (HL)         15      Rotate Right (HL)               X | X | P | X | 0 | 0
+RR   (Ix+d)       23      Rotate Right Indexed            X | X | P | X | 0 | 0
+RR   r            8       Rotate Right Register           X | X | P | X | 0 | 0
+RRA               4       Rotate Right Accumulator        X |   |   |   | 0 | 0
+RRC  (HL)         15      Rotate Right Circular (HL)      X | X | P | X | 0 | 0
+RRC  (Ix+d)       23      Rotate Right Circular Indexed   X | X | P | X | 0 | 0
+RRC  r            8       Rotate Right Circular Register  X | X | P | X | 0 | 0
+RRCA              4       Rotate Right Circular Acc       X | X | P | X | 0 | 0
+RRD               18      Rotate Right Decimal              |   |   |   |   |  
+RST  n            11      Restart / Software Interrupt    # | # | # | # | # | #
+SBC  A,n          7       Sub with Carry Immediate        X | X | V | X | 1 | X
+SBC  A,(HL)       7       Sub with Carry (HL)             X | X | V | X | 1 | X
+SBC  A,(Ix+d)     19      Sub with Carry Indexed          X | X | V | X | 1 | X
+SBC  A,r          4       Sub with Carry Register         X | X | V | X | 1 | X
+SBC  HL,rr        15      Sub with Carry HL, Reg16        X | X | V | X | 1 | X
+SCF               4       Set Carry Flag                  1 |   |   |   | 0 | 0
+SET  b,(HL)       15      Set Bit (HL)                      |   |   |   |   |  
+SET  b,(Ix+d)     23      Set Bit Indexed                   |   |   |   |   |  
+SET  b,r          8       Set Bit Register                  |   |   |   |   |  
+SLA  (HL)         15      Shift Left Arithmetic (HL)      X | X | P | X | 0 | 0
+SLA  (Ix+d)       23      Shift Left Arithmetic Indexed   X | X | P | X | 0 | 0
+SLA  r            8       Shift Left Arithmetic Register  X | X | P | X | 0 | 0
+SRA  (HL)         15      Shift Right Arithmetic (HL)     X | X | P | X | 0 | 0
+SRA  (Ix+d)       23      Shift Right Arithmetic Indexed  X | X | P | X | 0 | 0
+SRA  r            8       Shift Right Arithmetic Register X | X | P | X | 0 | 0
+SLR  (HL)         15      Shift Left Logical (HL)         X | X | P | X | 0 | 0
+SLR  (Ix+d)       23      Shift Left Logical Indexed      X | X | P | X | 0 | 0
+SLR  r            8       Shift Left Logical Register     X | X | P | X | 0 | 0
+SUB  (HL)         7       Subtract (HL)                   X | X | V | X | 1 | X
+SUB  (Ix+d)       19      Subtract Indexed                X | X | V | X | 1 | X
+SUB  r            4       Subtract Register               X | X | V | X | 1 | X
+SUB  n            7       Subtract Immediate              X | X | V | X | 1 | X
+XOR  (HL)         7       Logical XOR (HL)                0 | X | P | X | 0 | 0
+XOR  (Ix+d)       19      Logical XOR Indexed             0 | X | P | X | 0 | 0
+XOR  r            4       Logical XOR Register            0 | X | P | X | 0 | 0
+XOR  n            7       Logical XOR Immediate           0 | X | P | X | 0 | 0
+
+
+Operands:
+r    = 8-bit register (A, B, C, D, E, H, I, L, R)
+rr   = 16-bit register (AF, BC, DE, HL, IX, IY, SP)
+Ix   = Either IX or IY
+n    = 8-bit number
+nn   = 16-bit number
+b    = Bit value (0-7)
+d    = Offset onto IX or IY
+e    = Offset destination address
+cc   = Condition (flag)
+
+Flags:
+C    = Carry flag (C, NC)
+Z    = Zero (Z, NZ)
+P/V  = Parity/oVerflow (PO, PE)
+S    = Sign (P, M)
+N    = additioN
+H    = Half carry
+
+1    = Flag is set
+0    = Flag is reset
+X    = Flag is (re)set according to the operation
+#    = Status is not important
+P    = The P/V flag indicates Parity
+V    = The P/V flag indicates oVerflow
+?    = Status is unknown (undefined)
+
+Length:
+The length field is in T-states. 1 T-state is 1/4,000,000 seconds at 4MHz clock
