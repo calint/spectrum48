@@ -212,3 +212,14 @@ Then assign:
 ### 12. Mantra
 
 "Let the Z80 lead — don’t fight it."
+
+### 13. One sentence rule
+
+Good z80 code can be read aloud:
+
+* hl walks the map
+* de copies the sprite
+* b counts the rows
+* a decides what happens next
+
+If you cannot narrate it, simplify.
