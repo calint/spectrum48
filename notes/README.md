@@ -223,3 +223,174 @@ Good z80 code can be read aloud:
 * a decides what happens next
 
 If you cannot narrate it, simplify.
+
+### 14. load direction bias
+
+* load from memory into registers early
+* write back to memory late
+* keep values in registers as long as possible
+* memory access is expensive mentally even when it is cheap in cycles.
+
+### 15. fallthrough is a feature
+
+* structure code so the common path falls through
+* jump only for rare cases
+* avoid jump ladders
+
+Good z80 code reads top to bottom.
+
+### 16. compare is cheaper than you think
+
+* cp is often clearer than clever bit tests
+* explicit compares beat flag archaeology
+* readability wins over one instruction savings
+
+If you must explain a compare, it is too clever.
+
+### 17. stack discipline
+
+* stack is not scratch space
+* push pop only around clear ownership boundaries
+* deep push pop chains are a smell
+
+If you push more than two registers, reconsider the design.
+
+### 18. sp is sacred
+
+* never repurpose sp
+* never do arithmetic on sp
+* never use stack tricks in gameplay code
+
+Stack bugs are catastrophic and hard to debug.
+
+### 19. instruction shape matters
+
+Prefer:
+    ld a,(hl)
+    inc hl
+
+Over:
+    inc hl
+    ld a,(hl)
+
+Because the first matches how humans read memory walking.
+
+### 20. self modifying code rule
+
+* acceptable only for inner loops
+* must be isolated and commented
+* never mix with logic
+
+If smc leaks into control flow, maintenance collapses.
+
+### 21. jr vs jp instinct
+
+* jr for local structure
+* jp for architectural jumps
+* jr implies relationship
+* jp implies separation
+
+If a jr crosses a screen of code, rethink layout.
+
+### 22. labels express intent
+
+* labels are not comments
+* label names should explain why, not what
+* avoid generic labels like loop1 temp skip
+
+If the label lies, the code will too.
+
+### 23. constants vs memory rule
+
+* constants are immutable truths
+* memory variables represent state
+* never blur the two
+
+If something changes, it should live in memory.
+
+### 24. interrupt awareness rule
+
+* any code may be interrupted
+* do not assume atomicity unless interrupts are disabled
+* shared data must be designed intentionally
+
+If an interrupt can break it, it eventually will.
+
+### 25. disable interrupts sparingly
+
+* di is a strong smell
+* ei must be near di
+* long critical sections are wrong
+
+If di feels necessary, question the architecture.
+
+### 26. slow instructions are not evil
+
+* ldir is slow but clear
+* ix iy are slow but expressive
+* clarity beats premature speed
+
+Optimize only after measuring or feeling pain.
+
+### 25. screen math isolation
+
+* keep screen address math in one place
+* never sprinkle screen calculations everywhere
+* wrap them in routines or macros
+
+Screen bugs multiply when logic leaks.
+
+### 26. symmetry rule
+
+If you:
+
+* save something
+* allocate something
+* modify something
+
+Then somewhere you must:
+
+* restore it
+* free it
+* undo it
+
+Asymmetry causes long term bugs.
+
+### 27. one owner per variable
+
+* every variable should have a conceptual owner
+* avoid shared responsibility
+* document ownership in comments if needed
+
+Shared ownership causes subtle corruption.
+
+### 28. test on real hardware mindset
+
+* emulators forgive timing
+* real hardware does not
+* clean logic survives both
+
+Write as if the machine is unforgiving.
+
+### 29. comfort test
+
+Ask:
+“Would i trust this code at 3 am with a bug report”
+
+If not, simplify.
+
+### 30. boredom test
+
+Good z80 code is slightly boring.
+
+If it feels exciting, it is probably fragile.
+
+### 31. final instinct
+
+When stuck:
+
+* reload values
+* recompute addresses
+* reset assumptions
+
+The z80 prefers recomputation over clever state.
