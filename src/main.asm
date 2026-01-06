@@ -694,7 +694,7 @@ _check_hero_jump:
 
 _check_hero_jump_end:
 
-    ; if hero is moving continue
+    ; if hero is moving skip idle animation
     ld hl, hero_flags
     bit HERO_FLAG_MOVING_BIT, (hl)
     jr nz, _end
