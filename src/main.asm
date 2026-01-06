@@ -294,13 +294,13 @@ camera_pane:
     jr nz, _right
 
 _left:
-    ld de, 8 << SUBPIXELS   ; hero moves right relative to screen
-    ld c, -1                ; camera moves left
+    ld de, 8 << SUBPIXELS    ; hero moves right relative to screen
+    ld c, -1                 ; camera moves left
     jr _apply
 
 _right:
-    ld de, -(8 << SUBPIXELS)
-    ld c, 1
+    ld de, -(8 << SUBPIXELS) ; hero moves left relative to screen
+    ld c, 1                  ; camera moves right
 
 _apply:
     ; update camera x
