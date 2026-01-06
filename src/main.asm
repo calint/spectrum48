@@ -308,7 +308,7 @@ _apply:
     add a, c
     ld (hl), a
 
-    ; adjust hero x and x_prv
+    ; adjust hero world x and previous x during camera pan
     ld hl, (hero_x)
     add hl, de
     ld (hero_x), hl
@@ -446,9 +446,9 @@ _left:
     sub HERO_CAMERA_PANE     ; calculate destination
 
 _apply:
-    ld (camera_dest_x), a    ; store new destination
-    ld a, e                  ; move state to accumulator
-    ld (camera_state), a     ; update camera state
+    ld (camera_dest_x), a
+    ld a, e
+    ld (camera_state), a
 
 _end:
 
@@ -813,7 +813,7 @@ _shift_done:
 _no_col_d:
     ld a, b                     ; reload screen pixels
     or d                        ; OR with sprite left
-    ld (hl), a                  ; write back
+    ld (hl), a                  ; write back to screen
     inc hl
 
     ; byte E
