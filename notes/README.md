@@ -62,7 +62,7 @@ $7FFE       SPACE   SYM     M       N       B
 
 ## Z80 Register Usage & Idioms — Mental Cheat Sheet
 
-### 1. Register Roles (not equal)
+### 1. register roles (not equal)
 
 * A   = arithmetic, logic, decisions (volatile)
 * F   = flags (side effects only)
@@ -72,7 +72,7 @@ $7FFE       SPACE   SYM     M       N       B
 * H,L = pointer (HL)
 * IX/IY = structured access (slow, document use)
 
-### 2. Where values want to live
+### 2. where values want to live
 
 * decision / compare → A
 * boolean test        → A
@@ -82,51 +82,51 @@ $7FFE       SPACE   SYM     M       N       B
 * length              → BC
 * temp scratch        → A
 
-### 3. Core idioms
+### 3. core idioms
 
-#### Test zero
+#### test zero
 
-    ld a,(x)
+    ld a, (x)
     or a
     jr z, zero
 
-#### Compare
+#### compare
 
-    ld a,(x)
+    ld a, (x)
     cp y
     jr c, smaller
 
-#### Loop
+#### loop
 
-    ld b,n
+    ld b, n
     loop:
         ...
     djnz loop
 
-#### Walk memory
+#### walk memory
 
-    ld hl,table
-    ld a,(hl)
+    ld hl, table
+    ld a, (hl)
     inc hl
 
-#### Block copy
+#### block copy
 
-    ld hl,dst
-    ld de,src
-    ld bc,len
+    ld hl, src
+    ld de, dst
+    ld bc, len
     ldir
 
 #### 16-bit add
 
-    add hl,de
+    add hl, de
 
-#### Test HL == 0
+#### test hl == 0
 
-    ld a,h
+    ld a, h
     or l
     jr z, zero
 
-### 4. Shifts & rotates
+### 4. shifts & rotates
 
 * A  = full support
 * HL = manual
@@ -142,7 +142,7 @@ $7FFE       SPACE   SYM     M       N       B
     srl h
     rr  l
 
-### 5. Flags rules
+### 5. flags rules
 
 * Flags are temporary
 * Flags die after CALL
@@ -151,7 +151,7 @@ $7FFE       SPACE   SYM     M       N       B
 Idiomatic flag set:
     or a
 
-### 6. Scratch register priority
+### 6. scratch register priority
 
 1) A
 2) E / D
@@ -159,7 +159,7 @@ Idiomatic flag set:
 4) B
 5) H / L (only if not pointer)
 
-### 7. Pointer conventions
+### 7. pointer conventions
 
 * HL = active pointer (source)
 * DE = secondary pointer (destination)
@@ -167,7 +167,7 @@ Idiomatic flag set:
 
 Follow this or code feels wrong.
 
-### 8. Calling convention mindset
+### 8. calling convention mindset
 
 Assume:
 
@@ -181,7 +181,7 @@ Always comment:
 * outputs:
 * clobbers:
 
-### 9. Smells to avoid
+### 9. smells to avoid
 
 * math in HL when A fits
 * loop counter in A
@@ -189,14 +189,14 @@ Always comment:
 * relying on flags after CALL
 * silent IX/IY clobber
 
-### 10. Acceptable advanced tricks (document!)
+### 10. acceptable advanced tricks (document!)
 
 * IXH / IYL usage
 * unrolled loops
 * recompute vs maintain state
 * clarity over micro-optimizations
 
-### 11. Mental rule
+### 11. mental rule
 
 Ask:
 "What is this value doing?"
@@ -209,11 +209,11 @@ Then assign:
 * moving → DE
 * temporary → A
 
-### 12. Mantra
+### 12. mantra
 
 "Let the Z80 lead — don’t fight it."
 
-### 13. One sentence rule
+### 13. one sentence rule
 
 Good z80 code can be read aloud:
 
