@@ -6,3 +6,6 @@
 org ($ + 255) & $ff00
 screen_lut:
     include "screen_lut.asm"
+
+[ ] extend from 1 sprite to multiple stored in a table
+
