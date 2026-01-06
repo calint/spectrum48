@@ -54,7 +54,9 @@ SUBPIXELS             equ 4
 
 ; hard constants
 
+HERO_FLAG_MOVING_BIT  equ 0
 HERO_FLAG_MOVING      equ 1
+HERO_FLAG_JUMPING_BIT equ 1
 HERO_FLAG_JUMPING     equ 2
 
 CAMERA_STATE_IDLE     equ 0
@@ -62,7 +64,9 @@ CAMERA_STATE_LEFT     equ 1
 CAMERA_STATE_RIGHT    equ 2
 
 TILE_WIDTH            equ 8
+TILE_HEIGHT           equ 8
 TILE_SHIFT            equ 3
+TILE_CENTER_OFFSET    equ 4
 
 SPRITE_WIDTH          equ 16
 SPRITE_HEIGHT         equ 16
@@ -75,22 +79,31 @@ KEYBOARD_ROW_ASDGF    equ $fdfe
 ;-------------------------------------------------------------------------------
 ; variables
 ;-------------------------------------------------------------------------------
+
+; camera state
 camera_x         db -16
 camera_x_prv     db $ff
 camera_state     db CAMERA_STATE_IDLE
 camera_dest_x    db -16
 
+; hero position / velocity
 hero_x           dw 132 << SUBPIXELS 
 hero_y           dw 0
 hero_dx          dw 0
 hero_dy          dw 0
 hero_x_prv       dw 132 << SUBPIXELS
 hero_y_prv       dw 0
+
+; hero rendering
 hero_x_screen    db 132
 hero_y_screen    db 0
+hero_sprite      dw sprites_data_8
+
+; hero state
 hero_flags       db 0
 hero_frame       db 0
-hero_sprite      dw sprites_data_8
+
+; hero animation
 hero_anim_id     db HERO_ANIM_ID_IDLE
 hero_anim_rate   db HERO_ANIM_RATE_IDLE
 hero_anim_ptr    dw hero_animation_idle
@@ -359,7 +372,7 @@ _loop:
     cp SCREEN_WIDTH_CHARS
     jp nz, _loop
     ; note: djnz using B as counter does not work because `render_rows.asm` size
-    ;       is to large for relative jump
+    ;       is too large for relative jump
 
 ;-------------------------------------------------------------------------------
 render_sprites:
@@ -470,9 +483,8 @@ _check_sprite:
     ld (hero_dy), de
 
     ; clear hero jumping flag
-    ld a, (hero_flags)
-    and ~HERO_FLAG_JUMPING
-    ld (hero_flags), a
+    ld hl, hero_flags
+    res HERO_FLAG_JUMPING_BIT, (hl)
 
 _check_sprite_end:
 
@@ -481,7 +493,7 @@ _check_sprite_end:
 _check_tiles:
     ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
-    add a, TILE_WIDTH / 2   ; bias toward tile center (rounded tile coordinate)
+    add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
     rept TILE_SHIFT
         srl a
     endm
@@ -492,7 +504,7 @@ _check_tiles:
 
     ; calculate tile y
     ld a, (hero_y_screen)
-    add a, TILE_WIDTH / 2   ; bias toward tile center (rounded tile coordinate)
+    add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
     rept TILE_SHIFT
         srl a
     endm
@@ -566,26 +578,24 @@ input:
     out ($fe), a
 
     ; set horizontal velocity to 0
-    ld hl, 0            ; check key A
+    ld hl, 0
     ld (hero_dx), hl
 
     ; clear hero is moving flag
-    ld a, (hero_flags)
-    and ~HERO_FLAG_MOVING
-    ld (hero_flags), a
+    ld hl, hero_flags
+    res HERO_FLAG_MOVING_BIT, (hl)
 
 _check_hero:
     ld bc, KEYBOARD_ROW_ASDGF
     in b, (c)           ; read row (0 = pressed)
 
 _check_hero_left:
-    bit 0, b
+    bit 0, b            ; check key A
     jr nz, _check_hero_left_end
 
     ; flag hero is moving
-    ld a, (hero_flags)
-    or HERO_FLAG_MOVING
-    ld (hero_flags), a
+    ld hl, hero_flags
+    set HERO_FLAG_MOVING_BIT, (hl)
 
     ; initiate animation
     ANIMATION_SET HERO_ANIM_ID_LEFT, HERO_ANIM_RATE_LEFT, hero_animation_left, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
@@ -631,9 +641,8 @@ _check_hero_right:
     jr nz, _check_hero_right_end
 
     ; flag hero is moving
-    ld a, (hero_flags)
-    or HERO_FLAG_MOVING
-    ld (hero_flags), a
+    ld hl, hero_flags
+    set HERO_FLAG_MOVING_BIT, (hl)
 
     ANIMATION_SET HERO_ANIM_ID_RIGHT, HERO_ANIM_RATE_RIGHT, hero_animation_right, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
 
@@ -671,23 +680,23 @@ _check_hero_jump:
     jr nz, _check_hero_jump_end
 
     ; if hero is jumping then done
-    ld a, (hero_flags)
-    and HERO_FLAG_JUMPING
+    ld hl, hero_flags
+    bit HERO_FLAG_JUMPING_BIT, (hl)
     jr nz, _check_hero_jump_end
 
     ; set jump velocity
     ld hl, -HERO_JUMP_DY
     ld (hero_dy), hl
 
-    ; flag hero with is moving and jumping
+    ; flag hero is moving and jumping
     ld a, HERO_FLAG_MOVING | HERO_FLAG_JUMPING
     ld (hero_flags), a
 
 _check_hero_jump_end:
 
     ; if hero is moving continue
-    ld a, (hero_flags)
-    and HERO_FLAG_MOVING
+    ld hl, hero_flags
+    bit HERO_FLAG_MOVING_BIT, (hl)
     jr nz, _end
 
     ANIMATION_SET HERO_ANIM_ID_IDLE, HERO_ANIM_RATE_IDLE, hero_animation_idle, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
@@ -698,8 +707,8 @@ _end:
 physics:
 ;-------------------------------------------------------------------------------
     ; if hero is jumping then apply gravity
-    ld a, (hero_flags)
-    and HERO_FLAG_JUMPING
+    ld hl, hero_flags
+    bit HERO_FLAG_JUMPING_BIT, (hl)
     jr nz, _gravity
 
     ; apply gravity in intervals
@@ -741,8 +750,8 @@ _gravity_end:
 animation:
 ;-------------------------------------------------------------------------------
     ; don't animate if jumping for funny gameplay effect
-    ld a, (hero_flags)
-    and HERO_FLAG_JUMPING
+    ld hl, hero_flags
+    bit HERO_FLAG_JUMPING_BIT, (hl)
     jr nz, _end
 
     ANIMATION_DO hero_frame, hero_anim_id, hero_anim_rate, hero_anim_frame, hero_anim_ptr, hero_sprite
