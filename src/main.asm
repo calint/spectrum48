@@ -1029,12 +1029,12 @@ render_single_tile:
     ; E:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ld a, c                     ; A = screen row
-    and %00011000               ; isolate row bits
-    or %01000000                ; screen base 4000
-    ld d, a                     ; D = screen high byte
+    and %00011000               ; isolate row bits 3, 4
+    or %01000000                ; add screen base 4000 
+    ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
 
     ld a, c                     ; A = screen row
-    and %00000111               ; isolate lower row bits
+    and %00000111               ; isolate row bits 0,1, 2
     rrca                        ; rotate lower bits to high bits
     rrca
     rrca                        ; moved low bits to 5 6 7
