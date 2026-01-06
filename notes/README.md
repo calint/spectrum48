@@ -126,6 +126,15 @@ $7FFE       SPACE   SYM     M       N       B
     or l
     jr z, zero
 
+#### Pointer conventions
+
+* `hl` is the active pointer
+* `de` is the secondary pointer
+* `hl` is usually source
+* `de` is usually destination
+
+swap only with a reason
+
 ### 4. Shifts & rotates
 
 * A  = full support
