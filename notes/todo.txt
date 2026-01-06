@@ -1,4 +1,5 @@
 [ ] pre-shifted sprites
+[ ] extend from 1 sprite to multiple stored in a table
 [ ] consider using screen_lut
 ;-------------------------------------------------------------------------------
 ; screen address look up table: 192 x 2 = 284 B, aligned on 256 B
@@ -6,6 +7,4 @@
 org ($ + 255) & $ff00
 screen_lut:
     include "screen_lut.asm"
-
-[ ] extend from 1 sprite to multiple stored in a table
 
