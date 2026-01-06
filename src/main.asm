@@ -92,9 +92,9 @@ hero_flags       db 0
 hero_frame       db 0
 hero_sprite      dw sprites_data_8
 hero_anim_id     db HERO_ANIM_ID_IDLE
-hero_anim_frame  db 0
 hero_anim_rate   db HERO_ANIM_RATE_IDLE
 hero_anim_ptr    dw hero_animation_idle
+hero_anim_frame  db 0
 
 ; set in `render_sprite` when any sprite pixel wrote over current screen content
 sprite_collided  db 0   ; 0 = no collisions
