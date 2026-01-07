@@ -1,5 +1,7 @@
 [ ] fix bug when hero falls below the screen into the color attributes
     generating color artifacts
+[ ] `render_sprite_occupied_tiles` for a tighter version rather than
+    `render_single_tile`
 [ ] pre-shifted sprites
 [ ] extend from 1 sprite to multiple stored in a table
 [ ] consider using screen_lut
