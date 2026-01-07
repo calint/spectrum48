@@ -396,7 +396,7 @@ render_sprites:
     ; C = previous render y 
     ld a, (hero_y_screen)
     ld c, a
-    call restore_sprite_background
+    call restore_sprite_tiles
 
     ; call render_sprite
     ld hl, (hero_x)
@@ -946,39 +946,6 @@ endm
     ret
 
 ;-------------------------------------------------------------------------------
-; restores tiles from tile_map for a 16 x 16 sprite area
-;
-; input:
-;   B = x pixel
-;   C = y pixel
-;
-; output: -
-;
-; clobbers:
-;   AF, BC, DE, IX
-;-------------------------------------------------------------------------------
-restore_sprite_background
-    ; calculate starting tile column x / 8
-    ld a, b
-    rept TILE_SHIFT
-        rrca
-    endm
-    and %00011111       ; isolate column number
-    ld b, a             ; B is screen column 0 to 31
-
-    ; calculate starting tile row y / 8
-    ld a, c
-    rept TILE_SHIFT
-        rrca
-    endm
-    and %00011111       ; isolate row number
-    ld c, a             ; C is screen row 0 to 23
-
-    call sprite_restore_tiles
-
-    ret
-
-;-------------------------------------------------------------------------------
 ; helper macro for `sprite_restore_3_tiles`
 ;-------------------------------------------------------------------------------
 RENDER_TILE macro
@@ -1003,7 +970,7 @@ RENDER_TILE macro
 rept 7
     ld a, (hl)
     ld (de), a
-    inc hl
+    inc hl                      ; HL = next tile scanline
     inc d                       ; D = next screen line
 endm
     ld a, (hl)
@@ -1011,18 +978,57 @@ endm
 endm
 
 ;-------------------------------------------------------------------------------
-; restores 3 tiles in a row
+; helper macro for `sprite_restore_3_tiles`
+;-------------------------------------------------------------------------------
+ADVANCE_ROW macro
+    ; advance 1 row on screen
+    ld a, d
+    add a, 8
+    ld d, a
+    and 7
+    jr nz, _end
+
+    ld a, e
+    add a, SCREEN_WIDTH_CHARS
+    ld e, a
+    jr c, _end
+
+    ld a, d
+    sub 8
+    ld d, a
+
+_end:
+endm
+
+;-------------------------------------------------------------------------------
+; restores 3 x 3 tiles occupied by a sprite
 ;
 ; input:
-;   B = column
-;   C = row
+;   B = x pixel
+;   C = y pixel
 ;
 ; output: -
 ;
 ; clobbers:
-;   AF, DE, HL
+;   AF, BC, DE, HL
 ;-------------------------------------------------------------------------------
-sprite_restore_tiles:
+restore_sprite_tiles:
+    ; calculate starting tile column x / 8
+    ld a, b
+    rept TILE_SHIFT
+        rrca
+    endm
+    and %00011111       ; isolate column number
+    ld b, a             ; B is screen column 0 to 31
+
+    ; calculate starting tile row y / 8
+    ld a, c
+    rept TILE_SHIFT
+        rrca
+    endm
+    and %00011111       ; isolate row number
+    ld c, a             ; C is screen row 0 to 23
+
     ; calculate screen address
 
     ; D:   0  1  0 y7 y6 y2 y1 y0
@@ -1054,7 +1060,7 @@ sprite_restore_tiles:
     ; HL = pointer to tile
 
     push de                     ; will be popped when advancing a row
-    push hl
+    push hl                     ;
 
     push de
     push hl
@@ -1072,29 +1078,12 @@ sprite_restore_tiles:
     inc e
     RENDER_TILE
 
-    pop hl
-    pop de
+    pop hl                      ; restore values prior rendering a tile row
+    pop de                      ;
 
-    ; advance 1 row on screen
-    ld a, d
-    add a, 8
-    ld d, a
-    and 7
-    jr nz, _row_ok_1
+    ADVANCE_ROW
 
-    ld a, e
-    add a, SCREEN_WIDTH_CHARS
-    ld e, a
-    jr c, _row_ok_1
-
-    ld a, d
-    sub 8
-    ld d, a
-
-_row_ok_1:
-
-    ; advance 1 row in tile map
-    inc h
+    inc h                       ; advance 1 row in tile map
 
     push de                     ; will be popped when advancing a row
     push hl
@@ -1118,26 +1107,9 @@ _row_ok_1:
     pop hl
     pop de
 
-    ; advance 1 row on screen
-    ld a, d
-    add a, 8
-    ld d, a
-    and 7
-    jr nz, _row_ok_2
+    ADVANCE_ROW
 
-    ld a, e
-    add a, SCREEN_WIDTH_CHARS
-    ld e, a
-    jr c, _row_ok_2
-
-    ld a, d
-    sub 8
-    ld d, a
-
-_row_ok_2:
-
-    ; advance 1 row in tile map
-    inc h
+    inc h                       ; advance 1 row in tile map
 
     push de
     push hl
