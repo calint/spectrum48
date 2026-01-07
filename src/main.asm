@@ -233,6 +233,8 @@ start:
 
     di                  ; disable interrupts
 
+    ld sp, $ffff        ; set stack to start push at $fffd / $ffde
+
     ; build im2 table at $fe00
     ld hl, $fe00        ; table address
     ld a, $ff           ; point to address $ffff
