@@ -974,24 +974,158 @@ restore_sprite_background
     and %00011111       ; isolate row number
     ld c, a             ; C is screen row 0 to 23
 
-    ; render the dirty 3 x 3 tiles
-    call render_single_tile
-    inc b
-    call render_single_tile
-    inc b
-    call render_single_tile
+    ; render the dirty 3 rows
+    call sprite_restore_3_tiles
     inc c
-    call render_single_tile
-    dec b
-    call render_single_tile
-    dec b
-    call render_single_tile
+    call sprite_restore_3_tiles
     inc c
-    call render_single_tile
-    inc b
-    call render_single_tile
-    inc b
-    call render_single_tile
+    call sprite_restore_3_tiles
+
+    ret
+
+;-------------------------------------------------------------------------------
+; restores 3 tiles in a row
+;
+; input:
+;   B = column
+;   C = row
+;
+; output: -
+;
+; clobbers:
+;   AF, DE, HL
+;-------------------------------------------------------------------------------
+sprite_restore_3_tiles:
+    ; get tile id from map
+    ld h, high tile_map         ; H = tile_map base
+    ld a, c
+    add a, h                    ; A = base high byte plus row
+    ld h, a                     ; H = now the correct high byte
+ 
+    ld a, (camera_x)            ; get current camera offset in A
+    add a, b                    ; add screen x in B
+    ld l, a                     ; L = map column
+    ; HL = pointer to tile
+
+    push hl                     ; save for use at next tile
+
+    ; calculate screen address
+
+    ; D:   0  1  0 y7 y6 y2 y1 y0
+    ; E:  y5 y4 y3 x4 x3 x2 x1 x0
+
+    ld a, c                     ; A = screen row
+    and %00011000               ; isolate row bits 3, 4
+    or %01000000                ; add screen base 4000
+    ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
+
+    ld a, c                     ; A = screen row
+    and %00000111               ; isolate row bits 0,1, 2
+    rrca                        ; rotate lower bits to high bits
+    rrca
+    rrca                        ; moved low bits to 5 6 7
+    or b                        ; add column B
+    ld e, a                     ; E = screen low byte
+    ; DE = screen destination
+
+    push de                     ; save for use at next tile
+
+    ld a, (hl)                  ; A = tile id
+ 
+    ; make HL point at address of bitmap of tile index
+    ; bit trickery because `charset` is aligned on 2048 boundary
+    ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
+    and %11100000               ;  of high byte
+    rlca
+    rlca
+    rlca
+    or high charset             ; set upper 5 bits in high byte
+    ld h, a                     ; H = high byte of the pointer
+    ld a, l                     ; shift lower byte by 3 because a character is 8
+    add a, a                    ;  bytes
+    add a, a
+    add a, a
+    ld l, a                     ; L = low byte of the pointer
+    ; HL = bitmap source
+
+    ; render tile
+rept 7
+    ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d                       ; D = next screen line
+endm
+    ld a, (hl)
+    ld (de), a
+
+    pop de                      ; DE = previous tile screen destination
+    pop hl                      ; HL = previous pointer in tile map
+
+    inc l                       ; next tile in row
+    inc e                       ; next character on screen
+
+    push hl                     ; save before used
+    push de                     ; save before used
+
+    ld a, (hl)                  ; A = tile id
+ 
+    ; make HL point at address of bitmap of tile index
+    ; bit trickery because `charset` is aligned on 2048 boundary
+    ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
+    and %11100000               ;  of high byte
+    rlca
+    rlca
+    rlca
+    or high charset             ; set upper 5 bits in high byte
+    ld h, a                     ; H = high byte of the pointer
+    ld a, l                     ; shift lower byte by 3 because a character is 8
+    add a, a                    ;  bytes
+    add a, a
+    add a, a
+    ld l, a                     ; L = low byte of the pointer
+    ; HL = bitmap source
+
+rept 7
+    ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d                       ; D = next screen line
+endm
+    ld a, (hl)
+    ld (de), a
+
+    pop de                      ; DE = previous tile screen destination
+    pop hl                      ; HL = previous tile in tile map
+
+    inc l
+    inc e
+
+    ld a, (hl)                  ; A = tile id
+ 
+    ; make HL point at address of bitmap of tile index
+    ; bit trickery because `charset` is aligned on 2048 boundary
+    ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
+    and %11100000               ;  of high byte
+    rlca
+    rlca
+    rlca
+    or high charset             ; set upper 5 bits in high byte
+    ld h, a                     ; H = high byte of the pointer
+    ld a, l                     ; shift lower byte by 3 because a character is 8
+    add a, a                    ;  bytes
+    add a, a
+    add a, a
+    ld l, a                     ; L = low byte of the pointer
+    ; HL = bitmap source
+
+rept 7
+    ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d                       ; D = next screen line
+endm
+    ld a, (hl)
+    ld (de), a
 
     ret
 
