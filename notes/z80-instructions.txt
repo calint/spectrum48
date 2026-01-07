@@ -1,4 +1,4 @@
-Instruction       Length  Name                            Flags         
+Mnemonic          T       Name                            Flags
                                                           C   Z  P/V  S   N   H
 ADC  A,(HL)       7       Add with Carry (HL)             X | X | V | X | 0 | X
 ADC  A,(Ix+d)     19      Add with Carry Indexed          X | X | V | X | 0 | X
