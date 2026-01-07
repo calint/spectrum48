@@ -440,7 +440,7 @@ camera_adjust:
     ; get hero tile x
     ld a, (hero_x_screen)
     rept TILE_SHIFT           ; convert to tile x
-        rrca
+        rra
     endm
     and TILE_SHIFT_MASK
     ; A = column
@@ -504,9 +504,9 @@ _check_tiles:
     ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
     add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
-    ; use rrca + mask to save 5t over srl for 3 rept
+    ; use rra + mask to save 5t over srl for 3 rept
     rept TILE_SHIFT
-        rrca
+        rra
     endm
     and TILE_SHIFT_MASK
     ld b, a                 ; B = column
@@ -517,9 +517,9 @@ _check_tiles:
     ; calculate tile y
     ld a, (hero_y_screen)
     add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
-    ; use rrca + mask to save 5t over srl for 3 rept
+    ; use rra + mask to save 5t over srl for 3 rept
     rept TILE_SHIFT
-        rrca
+        rra
     endm
     and TILE_SHIFT_MASK
     ld c, a                 ; C = row
@@ -942,7 +942,7 @@ render_sprite:
 
     ld a, b                     ; x to A
     rept TILE_SHIFT             ; shift out the pixel fractions in a character
-        rrca
+        rra
     endm
     and TILE_SHIFT_MASK         ; isolate the column bits (0-31)
     or l                        ; combine with L
@@ -1030,11 +1030,13 @@ endm
 ;-------------------------------------------------------------------------------
 restore_sprite_tiles:
     ; calculate starting tile column
+    ; note: same T as ld / rra * 3 / and / ld
     rept TILE_SHIFT
         srl b
     endm
 
     ; calculate starting tile row
+    ; note: same T as ld / rra * 3 / and / ld
     rept TILE_SHIFT
         srl c
     endm
