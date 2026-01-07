@@ -11,10 +11,10 @@
 ; $ffff       : interrupt handler (ret instruction)
 ;
 ; aligned data:
-; charset   : 2kb aligned ($x800) - 2048 bytes
-; tile_map  : 256b aligned ($xx00) - 6144 bytes
-; sprites   : 256b aligned ($xx00) - 1536 bytes
-; animations: 256b aligned ($xx00) - variable
+; charset   : aligned $x800 - 2048 bytes
+; tile_map  : aligned $xx00 - 6144 bytes
+; sprites   : aligned $xx00 - 1536 bytes
+; animations: aligned $xx00 - variable
 ;-------------------------------------------------------------------------------
 
 org $8000
