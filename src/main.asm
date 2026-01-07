@@ -69,6 +69,7 @@ CAMERA_STATE_RIGHT    equ 2
 TILE_WIDTH            equ 8
 TILE_HEIGHT           equ 8
 TILE_SHIFT            equ 3
+TILE_SHIFT_MASK       equ %00011111
 TILE_CENTER_OFFSET    equ 4
 
 SPRITE_WIDTH          equ 16
@@ -405,7 +406,7 @@ render_sprites:
     ld hl, (hero_x)
     rept SUBPIXELS
         srl h
-        rr  l
+        rr l
     endm
     ld b, l
     ; argument B = hero_x >> SUBPIXELS
@@ -417,7 +418,7 @@ render_sprites:
     ld hl, (hero_y)
     rept SUBPIXELS
         srl h
-        rr  l
+        rr l
     endm
     ld c, l
     ; argument C = hero_y >> SUBPIXELS
@@ -439,8 +440,9 @@ camera_adjust:
     ; get hero tile x
     ld a, (hero_x_screen)
     rept TILE_SHIFT           ; convert to tile x
-        srl a
+        rrca
     endm
+    and TILE_SHIFT_MASK
     ; A is now column
 
     ld hl, camera_x
@@ -502,9 +504,11 @@ _check_tiles:
     ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
     add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
+    ; use rrca + mask to save 5t over srl for 3 rept
     rept TILE_SHIFT
-        srl a
+        rrca
     endm
+    and TILE_SHIFT_MASK
     ld b, a                 ; B = column
     ld a, (camera_x)
     add a, b
@@ -513,9 +517,11 @@ _check_tiles:
     ; calculate tile y
     ld a, (hero_y_screen)
     add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
+    ; use rrca + mask to save 5t over srl for 3 rept
     rept TILE_SHIFT
-        srl a
+        rrca
     endm
+    and TILE_SHIFT_MASK
     ld c, a                 ; C = row
     ld h, a                 ; H = top left tile y
 
@@ -531,7 +537,9 @@ _check_top_left:
     ; overwrite the picked tile
     ld (hl), TILE_ID_PICKED
 
+    push hl
     call render_tile
+    pop hl
 
 _check_top_right:
     inc l
@@ -542,7 +550,9 @@ _check_top_right:
 
     ld (hl), TILE_ID_PICKED
 
+    push hl
     call render_tile
+    pop hl
 
 _check_bottom_right:
     inc h
@@ -553,7 +563,9 @@ _check_bottom_right:
 
     ld (hl), TILE_ID_PICKED
 
+    push hl
     call render_tile
+    pop hl
 
 _check_bottom_left:
     dec l
@@ -930,9 +942,9 @@ render_sprite:
 
     ld a, b                     ; x to A
     rept TILE_SHIFT             ; shift out the pixel fractions in a character
-        rra
+        rrca
     endm
-    and %00011111               ; isolate the column bits (0-31)
+    and TILE_SHIFT_MASK         ; isolate the column bits (0-31)
     or l                        ; combine with L
     ld l, a                     ; HL now points to screen byte
 
@@ -1017,31 +1029,25 @@ endm
 ;   AF, BC, DE, HL
 ;-------------------------------------------------------------------------------
 restore_sprite_tiles:
-    ; calculate starting tile column x / 8
-    ld a, b
+    ; calculate starting tile column
     rept TILE_SHIFT
-        rrca
+        srl b
     endm
-    and %00011111       ; isolate column number
-    ld b, a             ; B is screen column 0 to 31
 
-    ; calculate starting tile row y / 8
-    ld a, c
+    ; calculate starting tile row
     rept TILE_SHIFT
-        rrca
+        srl c
     endm
-    and %00011111       ; isolate row number
-    ld c, a             ; C is screen row 0 to 23
 
     ; calculate tile pointer
-    ld h, high tile_map         ; H = tile_map base
+    ld h, high tile_map ; H = tile_map base
     ld a, c
-    add a, h                    ; A = base high byte plus row
-    ld h, a                     ; H = now the correct high byte
+    add a, h            ; A = base high byte plus row
+    ld h, a             ; H = correct high byte
  
-    ld a, d                     ; get column offset in tile map
-    add a, b                    ; add screen x in B
-    ld l, a                     ; L = map column
+    ld a, d             ; column offset in tile map
+    add a, b            ; add screen column
+    ld l, a             ; L = map column
     ; HL = pointer to tile
 
     ; calculate screen address
@@ -1191,16 +1197,12 @@ render_tile:
     ; DE = screen destination
 
     ; copy 8 bytes
-
-    ; scanline 0 to 6
 rept 7
     ld a, (hl)
     ld (de), a
-    inc hl
+    inc l                       ; L = next bitmap byte
     inc d                       ; D = next screen line
 endm
-
-    ; scanline 7
     ld a, (hl)
     ld (de), a
  
