@@ -443,7 +443,7 @@ camera_adjust:
         rrca
     endm
     and TILE_SHIFT_MASK
-    ; A is now column
+    ; A = column
 
     ld hl, camera_x
     ; A = column 
