@@ -1190,10 +1190,10 @@ render_tile:
     ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
 
     ld a, c                     ; A = screen row
-    and %00000111               ; isolate row bits 0,1, 2
+    and %00000111               ; isolate row bits 0, 1, 2
     rrca                        ; rotate lower bits to high bits
     rrca
-    rrca                        ; moved low bits to 5 6 7
+    rrca                        ; moved low bits to 5, 6, 7
     or b                        ; add column B
     ld e, a                     ; E = screen low byte
     ; DE = screen destination
