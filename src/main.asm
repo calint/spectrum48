@@ -974,12 +974,7 @@ restore_sprite_background
     and %00011111       ; isolate row number
     ld c, a             ; C is screen row 0 to 23
 
-    ; render the dirty 3 rows
-    call sprite_restore_3_tiles
-    inc c
-    call sprite_restore_3_tiles
-    inc c
-    call sprite_restore_3_tiles
+    call sprite_restore_tiles
 
     ret
 
@@ -1027,7 +1022,7 @@ endm
 ; clobbers:
 ;   AF, DE, HL
 ;-------------------------------------------------------------------------------
-sprite_restore_3_tiles:
+sprite_restore_tiles:
     ; calculate screen address
 
     ; D:   0  1  0 y7 y6 y2 y1 y0
@@ -1057,6 +1052,92 @@ sprite_restore_3_tiles:
     add a, b                    ; add screen x in B
     ld l, a                     ; L = map column
     ; HL = pointer to tile
+
+    push de                     ; will be popped when advancing a row
+    push hl
+
+    push de
+    push hl
+    RENDER_TILE
+    pop hl
+    pop de
+    inc l                       ; next tile in row
+    inc e                       ; next character on screen
+    push de
+    push hl
+    RENDER_TILE
+    pop hl
+    pop de
+    inc l
+    inc e
+    RENDER_TILE
+
+    pop hl
+    pop de
+
+    ; advance 1 row on screen
+    ld a, d
+    add a, 8
+    ld d, a
+    and 7
+    jr nz, _row_ok_1
+
+    ld a, e
+    add a, SCREEN_WIDTH_CHARS
+    ld e, a
+    jr c, _row_ok_1
+
+    ld a, d
+    sub 8
+    ld d, a
+
+_row_ok_1:
+
+    ; advance 1 row in tile map
+    inc h
+
+    push de                     ; will be popped when advancing a row
+    push hl
+
+    push de
+    push hl
+    RENDER_TILE
+    pop hl
+    pop de
+    inc l                       ; next tile in row
+    inc e                       ; next character on screen
+    push de
+    push hl
+    RENDER_TILE
+    pop hl
+    pop de
+    inc l
+    inc e
+    RENDER_TILE
+
+    pop hl
+    pop de
+
+    ; advance 1 row on screen
+    ld a, d
+    add a, 8
+    ld d, a
+    and 7
+    jr nz, _row_ok_2
+
+    ld a, e
+    add a, SCREEN_WIDTH_CHARS
+    ld e, a
+    jr c, _row_ok_2
+
+    ld a, d
+    sub 8
+    ld d, a
+
+_row_ok_2:
+
+    ; advance 1 row in tile map
+    inc h
 
     push de
     push hl
