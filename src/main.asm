@@ -1,8 +1,10 @@
 ;-------------------------------------------------------------------------------
 ; memory map
 ;-------------------------------------------------------------------------------
+; $0000-$3fff : sinclair basic rom (read only)
 ; $4000-$57ff : screen bitmap (6144 bytes)
 ; $5800-$5aff : color attributes (768 bytes)
+; $5b00-$7fff : printer buffer / user ram
 ; $8000-$xxxx : code (this file)
 ; $fe00-$ff00 : im2 interrupt vector table (257 bytes)
 ; $ffff       : interrupt handler (ret instruction)
