@@ -389,7 +389,7 @@ render_sprites:
 
     ; restore dirty tiles
 
-    ; call restore_sprite_background
+    ; call restore_sprite_tiles
     ; B = previous render x 
     ld a, (hero_x_screen)
     ld b, a
@@ -946,7 +946,7 @@ endm
     ret
 
 ;-------------------------------------------------------------------------------
-; helper macro for `sprite_restore_3_tiles`
+; helper macro for `restore_sprite_tiles`
 ;-------------------------------------------------------------------------------
 RENDER_TILE macro
     ld a, (hl)                  ; A = tile id
@@ -978,7 +978,7 @@ endm
 endm
 
 ;-------------------------------------------------------------------------------
-; helper macro for `sprite_restore_3_tiles`
+; helper macro for `restore_sprite_tiles`
 ;-------------------------------------------------------------------------------
 ADVANCE_ROW macro
     ; advance 1 row on screen
