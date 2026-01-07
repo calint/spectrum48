@@ -7,6 +7,7 @@
 ; $5b00-$7fff : printer buffer / user ram
 ; $8000-$xxxx : code (this file)
 ; $fe00-$ff00 : im2 interrupt vector table (257 bytes)
+; $ff01-ffffe : stack
 ; $ffff       : interrupt handler (ret instruction)
 ;
 ; aligned data:
