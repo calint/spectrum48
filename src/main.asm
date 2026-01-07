@@ -1080,13 +1080,11 @@ restore_sprite_tiles:
 
     pop hl                      ; restore values prior rendering a tile row
     pop de                      ;
-
-    ADVANCE_ROW
-
+    ADVANCE_ROW                 ; advance 1 row on screen
     inc h                       ; advance 1 row in tile map
 
     push de                     ; will be popped when advancing a row
-    push hl
+    push hl                     ;
 
     push de
     push hl
@@ -1104,11 +1102,9 @@ restore_sprite_tiles:
     inc e
     RENDER_TILE
 
-    pop hl
-    pop de
-
-    ADVANCE_ROW
-
+    pop hl                      ; restore values prior rendering a tile row
+    pop de                      ;
+    ADVANCE_ROW                 ; advance 1 row on screen
     inc h                       ; advance 1 row in tile map
 
     push de
