@@ -472,16 +472,15 @@ _apply:
 _end:
 
 ;-------------------------------------------------------------------------------
-collisions:
+collision_background:
 ;-------------------------------------------------------------------------------
 
 ; note: after this phase x and y must be out of collision since next phase will
 ;       save current x and y into previous for next frame
 
-_check_sprite:
     ld a, (sprite_collided)
     or a
-    jr z, _check_sprite_end
+    jr z, _end
 
     ; restore previous position and set dx, dy to 0
     ld hl, (hero_x_prv)
@@ -496,11 +495,14 @@ _check_sprite:
     ld hl, hero_flags
     res HERO_FLAG_JUMPING_BIT, (hl)
 
-_check_sprite_end:
+_end:
+
+;-------------------------------------------------------------------------------
+collision_tiles:
+;-------------------------------------------------------------------------------
 
     ; note: tiles collision check is not fully correct but makes good gameplay
 
-_check_tiles:
     ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
     add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
@@ -529,10 +531,10 @@ _check_tiles:
     ld de, tile_map
     add hl, de
 
-_check_top_left:
+_top_left:
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
-    jr nz, _check_top_right
+    jr nz, _top_right
 
     ; overwrite the picked tile
     ld (hl), TILE_ID_PICKED
@@ -541,12 +543,12 @@ _check_top_left:
     call render_tile
     pop hl
 
-_check_top_right:
+_top_right:
     inc l
     inc b
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
-    jr nz, _check_bottom_right
+    jr nz, _bottom_right
 
     ld (hl), TILE_ID_PICKED
 
@@ -554,12 +556,12 @@ _check_top_right:
     call render_tile
     pop hl
 
-_check_bottom_right:
+_bottom_right:
     inc h
     inc c
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
-    jr nz, _check_bottom_left
+    jr nz, _bottom_left
 
     ld (hl), TILE_ID_PICKED
 
@@ -567,21 +569,21 @@ _check_bottom_right:
     call render_tile
     pop hl
 
-_check_bottom_left:
+_bottom_left:
     dec l
     dec b
     ld a, (hl)              ; A = tile id
     cp TILE_ID_PICKABLE
-    jr nz, _check_tiles_end
+    jr nz, _end
 
     ld (hl), TILE_ID_PICKED
 
     call render_tile
 
-_check_tiles_end:
+_end:
 
 ;-------------------------------------------------------------------------------
-state:
+save_state:
 ;-------------------------------------------------------------------------------
 
     ; save current x and y to previous
