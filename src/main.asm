@@ -996,19 +996,6 @@ restore_sprite_background
 ;   AF, DE, HL
 ;-------------------------------------------------------------------------------
 sprite_restore_3_tiles:
-    ; get tile id from map
-    ld h, high tile_map         ; H = tile_map base
-    ld a, c
-    add a, h                    ; A = base high byte plus row
-    ld h, a                     ; H = now the correct high byte
- 
-    ld a, (camera_x)            ; get current camera offset in A
-    add a, b                    ; add screen x in B
-    ld l, a                     ; L = map column
-    ; HL = pointer to tile
-
-    push hl                     ; save for use at next tile
-
     ; calculate screen address
 
     ; D:   0  1  0 y7 y6 y2 y1 y0
@@ -1029,6 +1016,19 @@ sprite_restore_3_tiles:
     ; DE = screen destination
 
     push de                     ; save for use at next tile
+
+    ; get tile id from map
+    ld h, high tile_map         ; H = tile_map base
+    ld a, c
+    add a, h                    ; A = base high byte plus row
+    ld h, a                     ; H = now the correct high byte
+ 
+    ld a, (camera_x)            ; get current camera offset in A
+    add a, b                    ; add screen x in B
+    ld l, a                     ; L = map column
+    ; HL = pointer to tile
+
+    push hl                     ; save for use at next tile
 
     ld a, (hl)                  ; A = tile id
  
@@ -1058,14 +1058,14 @@ endm
     ld a, (hl)
     ld (de), a
 
-    pop de                      ; DE = previous tile screen destination
     pop hl                      ; HL = previous pointer in tile map
+    pop de                      ; DE = previous tile screen destination
 
     inc l                       ; next tile in row
     inc e                       ; next character on screen
 
-    push hl                     ; save before used
     push de                     ; save before used
+    push hl                     ; save before used
 
     ld a, (hl)                  ; A = tile id
  
@@ -1094,8 +1094,8 @@ endm
     ld a, (hl)
     ld (de), a
 
-    pop de                      ; DE = previous tile screen destination
     pop hl                      ; HL = previous tile in tile map
+    pop de                      ; DE = previous tile screen destination
 
     inc l
     inc e
