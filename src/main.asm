@@ -396,6 +396,9 @@ render_sprites:
     ; C = previous render y 
     ld a, (hero_y_screen)
     ld c, a
+    ; D = column offset in tile map
+    ld a, (camera_x)
+    ld d, a
     call restore_sprite_tiles
 
     ; call render_sprite
@@ -528,7 +531,7 @@ _check_top_left:
     ; overwrite the picked tile
     ld (hl), TILE_ID_PICKED
 
-    call render_single_tile
+    call render_tile
 
 _check_top_right:
     inc l
@@ -539,7 +542,7 @@ _check_top_right:
 
     ld (hl), TILE_ID_PICKED
 
-    call render_single_tile
+    call render_tile
 
 _check_bottom_right:
     inc h
@@ -550,7 +553,7 @@ _check_bottom_right:
 
     ld (hl), TILE_ID_PICKED
 
-    call render_single_tile
+    call render_tile
 
 _check_bottom_left:
     dec l
@@ -561,7 +564,7 @@ _check_bottom_left:
 
     ld (hl), TILE_ID_PICKED
 
-    call render_single_tile
+    call render_tile
 
 _check_tiles_end:
 
@@ -1006,6 +1009,7 @@ endm
 ; input:
 ;   B = x pixel
 ;   C = y pixel
+;   D = column offset in tile map
 ;
 ; output: -
 ;
@@ -1029,6 +1033,17 @@ restore_sprite_tiles:
     and %00011111       ; isolate row number
     ld c, a             ; C is screen row 0 to 23
 
+    ; calculate poinget tile id from map
+    ld h, high tile_map         ; H = tile_map base
+    ld a, c
+    add a, h                    ; A = base high byte plus row
+    ld h, a                     ; H = now the correct high byte
+ 
+    ld a, d                     ; get column offset in tile map
+    add a, b                    ; add screen x in B
+    ld l, a                     ; L = map column
+    ; HL = pointer to tile
+
     ; calculate screen address
 
     ; D:   0  1  0 y7 y6 y2 y1 y0
@@ -1047,17 +1062,6 @@ restore_sprite_tiles:
     or b                        ; add column B
     ld e, a                     ; E = screen low byte
     ; DE = screen destination
-
-    ; calculate poinget tile id from map
-    ld h, high tile_map         ; H = tile_map base
-    ld a, c
-    add a, h                    ; A = base high byte plus row
-    ld h, a                     ; H = now the correct high byte
- 
-    ld a, (camera_x)            ; get current camera offset in A
-    add a, b                    ; add screen x in B
-    ld l, a                     ; L = map column
-    ; HL = pointer to tile
 
     push de                     ; will be popped when advancing a row
     push hl                     ;
@@ -1137,7 +1141,7 @@ restore_sprite_tiles:
 ; clobbers:
 ;   AF, DE, HL
 ;-------------------------------------------------------------------------------
-render_single_tile:
+render_tile:
     ; get tile id from map
     ld h, high tile_map         ; H = tile_map base
     ld a, c
