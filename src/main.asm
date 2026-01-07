@@ -1033,7 +1033,7 @@ restore_sprite_tiles:
     and %00011111       ; isolate row number
     ld c, a             ; C is screen row 0 to 23
 
-    ; calculate tile id pointer
+    ; calculate tile pointer
     ld h, high tile_map         ; H = tile_map base
     ld a, c
     add a, h                    ; A = base high byte plus row
