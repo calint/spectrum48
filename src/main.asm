@@ -1035,7 +1035,7 @@ render_single_tile:
     add a, a
     add a, a
     ld l, a                     ; L = low byte of the pointer
-    ; HL is now bitmap source
+    ; HL = bitmap source
 
     ; calculate screen address
 
@@ -1054,6 +1054,7 @@ render_single_tile:
     rrca                        ; moved low bits to 5 6 7
     or b                        ; add column B
     ld e, a                     ; E = screen low byte
+    ; DE = screen destination
 
     ; copy 8 bytes
 
