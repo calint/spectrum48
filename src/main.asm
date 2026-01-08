@@ -926,39 +926,39 @@ render_sprite:
     ; H:   0  1  0 y7 y6 y2 y1 y0
     ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
-    ld a, c                     ; y to A
+    ld a, c                     ; screen y to A
     and %00000111               ; mask 00000111 (y bits 0-2)
     or %01000000                ; add base address
     ld h, a
 
-    ld a, c                     ; y to A
-    rra                         ; rotate y bits to position
+    ld a, c                     ; screen y to A
+    rra                         ; rotate y7, y6 bits to position
     rra
     rra
-    and %00011000               ; isolate y bits 3-4 (sector offset)
+    and %00011000
     or h
-    ld h, a                     ; H is now correct
+    ld h, a                     ; H = screen address high byte
 
-    ld a, c                     ; y to A
-    rla                         ; rotate y bits to position
+    ld a, c                     ; screen y to A
+    rla                         ; rotate y5, y4, y3 bits to position
     rla
-    and %11100000               ; isolate them
+    and %11100000
     ld l, a                     ; start L
 
-    ld a, b                     ; x to A
-    rept TILE_SHIFT             ; shift out the pixel fractions in a character
+    ld a, b                     ; screen x to A
+    rept TILE_SHIFT             ; shift out the pixel fractions in a tile
         rra
     endm
     and TILE_SHIFT_MASK         ; isolate the column bits (0-31)
-    or l                        ; combine with L
-    ld l, a                     ; HL now points to screen byte
+    or l
+    ld l, a                     ; HL = screen address
 
     ; prepare shift counter
     ld a, b
     and 7                       ; x % 8 (shift amount)
-    ld IYL, a                   ; save for later use
+    ld iyl, a                   ; save for later use
 
-    ; render the characters that enclose the sprite
+    ; render over the tiles that enclose the sprite
 rept SPRITE_HEIGHT
     RENDER_SPRITE_LINE
 endm 
@@ -971,7 +971,7 @@ endm
 RENDER_TILE macro
     ld a, (hl)                  ; A = tile id
  
-    ; make HL point at address of bitmap of tile index
+    ; make HL pointer to address of tile bitmap
     ; bit trickery because `charset` is aligned on 2048 boundary
     ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
     and %11100000               ;  of high byte
@@ -979,12 +979,12 @@ RENDER_TILE macro
     rlca
     rlca
     or high charset             ; set upper 5 bits in high byte
-    ld h, a                     ; H = high byte of the pointer
+    ld h, a                     ; H = pointer high byte
     ld a, l                     ; shift lower byte by 3 because a character is 8
     add a, a                    ;  bytes
     add a, a
     add a, a
-    ld l, a                     ; L = low byte of the pointer
+    ld l, a                     ; L = pointer low byte
     ; HL = bitmap source
 
 rept 7
@@ -1050,11 +1050,11 @@ restore_sprite_tiles:
     ld h, high tile_map ; H = tile_map base
     ld a, c
     add a, h            ; A = base high byte plus row
-    ld h, a             ; H = correct high byte
+    ld h, a             ; H = pointer high byte
  
     ld a, d             ; column offset in tile map
     add a, b            ; add screen column
-    ld l, a             ; L = map column
+    ld l, a             ; L = tile map column
     ; HL = pointer to tile
 
     ; calculate screen address
@@ -1063,17 +1063,17 @@ restore_sprite_tiles:
     ; E:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ld a, c                     ; A = screen row
-    and %00011000               ; row bits already "shifted"" due to 8 lines
-    or %01000000                ; add screen base 4000
+    and %00011000               ; row bits already "shifted" due to 8 lines
+    or %01000000                ; add screen base $4000
     ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
 
     ld a, c                     ; A = screen row
-    and %00000111               ; isolate row bits 0, 1, 2
+    and %00000111               ; isolate y5, y4, y3
     rrca                        ; rotate lower bits to high bits
     rrca
-    rrca                        ; moved low bits to 5 6 7
+    rrca                        ; moved low bits to 5, 6, 7
     or b                        ; add column B
-    ld e, a                     ; E = screen low byte
+    ld e, a                     ; E = screen destination low byte
     ; DE = screen destination
 
     push de                     ; will be popped when advancing a row
@@ -1146,8 +1146,8 @@ restore_sprite_tiles:
 ; renders a 8 x 8 tile to the screen
 ;
 ; input:
-;   B = column
-;   C = row
+;   B = screen column
+;   C = screen row
 ;
 ; output: -
 ;
@@ -1157,12 +1157,12 @@ restore_sprite_tiles:
 render_tile:
     ; get tile id from map
     ld h, high tile_map         ; H = tile_map base
-    ld a, c
+    ld a, c                     ; C = screen row
     add a, h                    ; A = base high byte plus row
     ld h, a                     ; H = now the correct high byte
  
-    ld a, (camera_x)            ; get current camera offset in A
-    add a, b                    ; add screen x in B
+    ld a, (camera_x)            ; note: a bit ugly accessing global state here
+    add a, b                    ; B = screen column
     ld l, a                     ; L = map column
     ; HL = pointer to tile
 
@@ -1190,17 +1190,17 @@ render_tile:
     ; E:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ld a, c                     ; A = screen row
-    and %00011000               ; isolate row bits 3, 4
-    or %01000000                ; add screen base 4000 
+    and %00011000               ; y7, y6 already "shifted" due to 8 line tile 
+    or %01000000                ; add screen base $4000 
     ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
 
     ld a, c                     ; A = screen row
-    and %00000111               ; isolate row bits 0, 1, 2
+    and %00000111               ; isolate y5, y4, y3
     rrca                        ; rotate lower bits to high bits
     rrca
     rrca                        ; moved low bits to 5, 6, 7
     or b                        ; add column B
-    ld e, a                     ; E = screen low byte
+    ld e, a                     ; E = screen destination low byte
     ; DE = screen destination
 
     ; copy 8 bytes
