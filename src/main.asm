@@ -987,7 +987,7 @@ SCREEN_ADDRESS_FROM_BC_TO_DE macro
     ld a, c                     ; A = screen row
     and %00011000               ; row bits already "shifted" due to 8 lines
     or %01000000                ; add screen base $4000
-    ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
+    ld d, a                     ; D = screen high byte (y2, y1, y0 always 0)
 
     ld a, c                     ; A = screen row
     and %00000111               ; isolate y5, y4, y3
