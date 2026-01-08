@@ -528,8 +528,10 @@ collision_tiles:
     ld h, a                 ; H = top left tile y
 
     ; point HL to top left tile
+    ; note: since `tile_map` is aligned on 256 B do slightly faster (2 T) 8 bit
+    ;       operations
     ld a, h
-    ld d, high tile_map     ; because aligned on 256
+    ld d, high tile_map
     add a, d
     ld h, a
 
