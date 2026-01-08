@@ -134,7 +134,7 @@ sprite_collided  db 0   ; 0 = no collisions
 ; clobbers:
 ;   A, DE, HL
 ;-------------------------------------------------------------------------------
-ANIMATION_SET MACRO ANIM_ID, ANIM_RATE, table, id, rate, frame, ptr, sprite
+ANIMATION_SET macro ANIM_ID, ANIM_RATE, table, id, rate, frame, ptr, sprite
     ; check if same animation and if so then done
     ld a, (id)
     cp ANIM_ID
@@ -177,7 +177,7 @@ ENDM
 ; clobbers:
 ;   A, DE, HL
 ;-------------------------------------------------------------------------------
-ANIMATION_DO MACRO timer, id, rate, frame, ptr, sprite
+ANIMATION_DO macro timer, id, rate, frame, ptr, sprite
     ld a, (rate)
     ld e, a
     ld a, (timer)
@@ -230,7 +230,7 @@ start:
 ;-------------------------------------------------------------------------------
 
     ; in order to disable regular "stutter" due to rom routines taking many
-    ; cycles during interrupts, disable it by making dummy interrupt handlers
+    ; cycles during interrupts, disable it by making dummy interrupt handler
     ; and setting machine in "im 2" mode
 
     di                  ; disable interrupts
@@ -274,8 +274,8 @@ _loop:
 ; 3. trigger camera pane if hero is at left or right edge of screen 
 ; 4. check collision
 ; 4.1. sprite vs background
-; 4.2. sprite vs tile
-; 5. save current hero state
+; 4.2. sprite vs tiles
+; 5. save current state
 ; 6. handle input
 ; 6.1. left
 ; 6.2. right
@@ -528,8 +528,10 @@ collision_tiles:
     ld h, a                 ; H = top left tile y
 
     ; point HL to top left tile
-    ld de, tile_map
-    add hl, de
+    ld a, h
+    ld d, high tile_map     ; because aligned on 256
+    add a, d
+    ld h, a
 
 _top_left:
     ld a, (hl)              ; A = tile id
@@ -821,6 +823,7 @@ _shift_left:
     ld c, e
     ld e, d
     ld d, 0
+    ; A = shifts right
     neg                         ; calculate left shifts, 8 - right shifts
     add a, 8
     ld b, a
