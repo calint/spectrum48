@@ -1060,7 +1060,7 @@ restore_sprite_tiles:
     ; E:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ld a, c                     ; A = screen row
-    and %00011000               ; isolate row bits 3, 4
+    and %00011000               ; row bits already "shifted"" due to 8 lines
     or %01000000                ; add screen base 4000
     ld d, a                     ; D = screen high byte (y0, y1, y2 always 0)
 
