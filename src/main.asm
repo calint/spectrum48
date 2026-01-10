@@ -1002,7 +1002,7 @@ endm
 ;-------------------------------------------------------------------------------
 ; helper macro for `restore_sprite_tiles` and `render_tile`
 ;-------------------------------------------------------------------------------
-TILE_ADDRESS_FROM_BC_TO_HL macro
+TILE_ADDRESS_FROM_BCD_TO_HL macro
     ; get tile id from map
     ld h, high tile_map         ; H = tile_map base
     ld a, c                     ; C = screen row
@@ -1096,7 +1096,7 @@ restore_sprite_tiles:
         srl c
     endm
 
-    TILE_ADDRESS_FROM_BC_TO_HL
+    TILE_ADDRESS_FROM_BCD_TO_HL
     SCREEN_ADDRESS_FROM_BC_TO_DE
 
     push de                     ; will be popped when advancing a row
@@ -1179,7 +1179,7 @@ restore_sprite_tiles:
 ;   AF, DE, HL
 ;-------------------------------------------------------------------------------
 render_tile:
-    TILE_ADDRESS_FROM_BC_TO_HL
+    TILE_ADDRESS_FROM_BCD_TO_HL
     SCREEN_ADDRESS_FROM_BC_TO_DE
     RENDER_TILE
     ret
