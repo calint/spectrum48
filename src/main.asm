@@ -936,12 +936,12 @@ render_sprite:
     ; H:   0  1  0 y7 y6 y2 y1 y0
     ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
-    ld a, c                     ; screen y to A
+    ld a, c                     ; A = screen y
     and %00000111               ; mask y2, y1, y0
     or %01000000                ; add screen base $4000
     ld h, a
 
-    ld a, c                     ; screen y to A
+    ld a, c                     ; A = screen y
     rra                         ; rotate y7, y6 bits to position
     rra
     rra
@@ -953,7 +953,7 @@ render_sprite:
     rla                         ; rotate y5, y4, y3 bits to position
     rla
     and %11100000
-    ld l, a                     ; L = y5, y4, y3 done
+    ld l, a                     ; L = y5, y4, y3
 
     ld a, b                     ; A = screen x
     rept TILE_SHIFT             ; shift out the pixel fractions in a tile
