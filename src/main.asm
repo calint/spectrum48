@@ -937,8 +937,8 @@ render_sprite:
     ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
     ld a, c                     ; screen y to A
-    and %00000111               ; mask 00000111 (y bits 0-2)
-    or %01000000                ; add base address
+    and %00000111               ; mask y2, y1, y0
+    or %01000000                ; add screen base $4000
     ld h, a
 
     ld a, c                     ; screen y to A
@@ -993,7 +993,7 @@ SCREEN_ADDRESS_FROM_BC_TO_DE macro
     and %00000111               ; isolate y5, y4, y3
     rrca                        ; rotate lower bits to high bits
     rrca
-    rrca                        ; moved low bits to 5, 6, 7
+    rrca
     or b                        ; add column B
     ld e, a                     ; E = screen destination low byte
     ; DE = screen destination
