@@ -1,10 +1,11 @@
 [ ] consider controller keys to be more "spectrum era" such as q/o/p
 [ ] fix bug when hero falls below the screen into the color attributes
     generating color artifacts
-[ ] `render_sprite_occupied_tiles` for a tighter version rather than
+[x] `render_sprite_occupied_tiles` for a tighter version rather than
     `render_single_tile`
 [ ] pre-shifted sprites
 [ ] extend from 1 sprite to multiple stored in a table
+[ ] use sjasmplus with support for structs
 [-] consider using screen_lut
     => current method is most of the time more efficient and in certain cases
        such as tile to screen address is simpler because of the 8 lines per tile
