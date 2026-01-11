@@ -949,13 +949,13 @@ render_sprite:
     or h
     ld h, a                     ; H = screen address high byte
 
-    ld a, c                     ; screen y to A
+    ld a, c                     ; A = screen y
     rla                         ; rotate y5, y4, y3 bits to position
     rla
     and %11100000
-    ld l, a                     ; start L
+    ld l, a                     ; L = y5, y4, y3 done
 
-    ld a, b                     ; screen x to A
+    ld a, b                     ; A = screen x
     rept TILE_SHIFT             ; shift out the pixel fractions in a tile
         rra
     endm
