@@ -960,7 +960,7 @@ render_sprite:
         rra
     endm
     and TILE_SHIFT_MASK         ; isolate the column bits (0-31)
-    or l
+    or l                        ; add x4, x3, x2, x1, x0
     ld l, a                     ; HL = screen address
 
     ; prepare shift counter
