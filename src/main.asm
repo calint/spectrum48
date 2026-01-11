@@ -159,7 +159,7 @@ ANIMATION_SET macro ANIM_ID, ANIM_RATE, table, id, rate, frame, ptr, sprite
     ld (sprite), de
 
 _end:
-ENDM
+endm
 
 ;-------------------------------------------------------------------------------
 ; advances a frame in animation if `timer` bitwise and `(rate)` is zero
@@ -223,7 +223,7 @@ _use_frame:
     inc (hl)
 
 _end:
-ENDM
+endm
 
 ;-------------------------------------------------------------------------------
 start:
