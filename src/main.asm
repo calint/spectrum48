@@ -802,6 +802,16 @@ _end:
 
 ;-------------------------------------------------------------------------------
 ; helper macro for `render_sprite` to avoid label clashes in `rept` block
+;
+; input:
+;   HL = screen destination
+;   IX = pointer to sprite data
+;   IYL = number of shifts
+;
+; output: -
+;
+; clobbers:
+;   AF, BC, DE, HL, IX
 ;-------------------------------------------------------------------------------
 RENDER_SPRITE_LINE macro
     ; fetch sprite bytes
