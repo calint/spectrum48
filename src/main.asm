@@ -175,7 +175,7 @@ endm
 ;   adjusts `(ptr)` and `(sprite)`
 ;
 ; clobbers:
-;   A, DE, HL
+;   AF, DE, HL
 ;-------------------------------------------------------------------------------
 ANIMATION_DO macro timer, id, rate, frame, ptr, sprite
     ld a, (rate)
@@ -1056,7 +1056,7 @@ endm
 ; output: -
 ;
 ; clobbers:
-;   AF, HL
+;   AF, DE, HL
 ;-------------------------------------------------------------------------------
 RENDER_TILE macro
     ld a, (hl)                  ; A = tile id
