@@ -132,7 +132,7 @@ sprite_collided  db 0   ; 0 = no collisions
 ;   initiates addresses with animation
 ;
 ; clobbers:
-;   A, DE, HL
+;   AF, DE, HL
 ;-------------------------------------------------------------------------------
 ANIMATION_SET macro ANIM_ID, ANIM_RATE, table, id, rate, frame, ptr, sprite
     ; check if same animation and if so then done
@@ -977,6 +977,16 @@ endm
 
 ;-------------------------------------------------------------------------------
 ; helper macro for `restore_sprite_tiles` and `render_tile`
+;
+; input:
+;   B = screen column
+;   C = screen row
+;
+; output:
+;   DE = screen destination
+;
+; clobbers:
+;   AF
 ;-------------------------------------------------------------------------------
 SCREEN_ADDRESS_FROM_BC_TO_DE macro
     ; calculate screen address
@@ -1001,6 +1011,17 @@ endm
 
 ;-------------------------------------------------------------------------------
 ; helper macro for `restore_sprite_tiles` and `render_tile`
+;
+; input:
+;   B = screen column
+;   C = screen row
+;   D = tile map column offset
+;
+; output:
+;   HL = pointer to tile
+;
+; clobbers:
+;   AF
 ;-------------------------------------------------------------------------------
 TILE_ADDRESS_FROM_BCD_TO_HL macro
     ; get tile id from map
@@ -1017,6 +1038,15 @@ endm
 
 ;-------------------------------------------------------------------------------
 ; helper macro for `restore_sprite_tiles` and `render_tile`
+;
+; input:
+;   HL = pointer to tile
+;   DE = screen destination
+;
+; output: -
+;
+; clobbers:
+;   AF, HL
 ;-------------------------------------------------------------------------------
 RENDER_TILE macro
     ld a, (hl)                  ; A = tile id
@@ -1049,6 +1079,14 @@ endm
 
 ;-------------------------------------------------------------------------------
 ; helper macro for `restore_sprite_tiles`
+;
+; input:
+;   DE = screen destination
+;
+; output: -
+;
+; clobbers:
+;   AF
 ;-------------------------------------------------------------------------------
 ADVANCE_ROW macro
     ; advance 1 row on screen
