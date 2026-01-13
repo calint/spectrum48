@@ -1217,13 +1217,13 @@ hero_animation_idle:
     dw 0
 
 hero_animation_right:
-    dw sprites_data_0
     dw sprites_data_1
+    dw sprites_data_0
     dw 0
 
 hero_animation_left:
-    dw sprites_data_2
     dw sprites_data_3
+    dw sprites_data_2
     dw 0
 
 ;-------------------------------------------------------------------------------
