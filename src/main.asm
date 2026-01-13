@@ -258,7 +258,7 @@ _loop:
 
     ; set foreground and background to white on black
     ld hl, $5800        ; color attribute start, 768 bytes
-    ld (hl), 7          ; white on black
+    ld (hl), %01000111  ; bright white on black
     ld de, $5801        ; destination one byte ahead to copy previous byte
     ld bc, 767          ; remaining bytes to fill
     ldir                ; hardware copy loop
