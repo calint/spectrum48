@@ -31,35 +31,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 1
@@ -82,35 +81,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 2
@@ -133,35 +131,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 3
@@ -184,35 +181,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 4
@@ -235,35 +231,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 5
@@ -286,35 +281,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 6
@@ -337,35 +331,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 7
@@ -388,35 +381,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 8
@@ -437,35 +429,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 9
@@ -488,35 +479,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 10
@@ -539,35 +529,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 11
@@ -590,35 +579,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 12
@@ -641,35 +629,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 13
@@ -692,35 +679,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 14
@@ -743,35 +729,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 15
@@ -794,35 +779,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 16
@@ -843,35 +827,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 17
@@ -894,35 +877,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 18
@@ -945,35 +927,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 19
@@ -996,35 +977,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 20
@@ -1047,35 +1027,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 21
@@ -1098,35 +1077,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 22
@@ -1149,35 +1127,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 
     ; row 23
@@ -1200,34 +1177,33 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-    ld a, (hl)       ; copy scanline 0
+
+    ld sp, hl
+    pop hl           ; scanline 0, 1
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 1
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 2
+    pop hl           ; scanline 2, 3
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 3
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 4
+    pop hl           ; scanline 4, 5
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 5
+    ld a, h
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 6
+    pop hl           ; scanline 6, 7
+    ld a, l
     ld (de), a
-    inc l
     inc d
-    ld a, (hl)       ; copy scanline 7
+    ld a, h
     ld (de), a
 

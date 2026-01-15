@@ -116,7 +116,8 @@ hero_anim_frame  db 0
 ; set in `render_sprite` when any sprite pixel wrote over current screen content
 sprite_collided  db 0   ; 0 = no collisions
 
-; used in `render_sprite` to save stack pointer while used to read sprite data
+; used in `render_sprite` and `render_tile_map` to save stack pointer while used
+; to read sprite / tile data
 saved_sp         dw 0
 
 ;-------------------------------------------------------------------------------
@@ -373,6 +374,7 @@ render_tile_map:
     ld a, (camera_x)
     ld c, a             ; C = tile map offset
     ld b, 0             ; current column (0-31)
+    ld (saved_sp), sp
 _loop:
     include "render_rows.asm"
     inc b               ; next column
@@ -382,6 +384,7 @@ _loop:
     jp nz, _loop
     ; note: djnz using B as counter does not work because `render_rows.asm` size
     ;       is too large for relative jump
+    ld sp, (saved_sp)
 
 ;-------------------------------------------------------------------------------
 render_sprites:

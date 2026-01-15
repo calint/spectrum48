@@ -63,11 +63,16 @@ for row in range(24):
     print("    add a, a         ; x8")
     print("    ld l, a          ; HL = bitmap address")
 
+    print()
+    print("    ld sp, hl")
     # unrolled scanline copy
-    for scanline in range(8):
-        print(f"    ld a, (hl)       ; copy scanline {scanline}")
+    for scanline in range(4):
+        print(f"    pop hl           ; scanline {scanline * 2}, {scanline * 2 + 1}")
+        print("    ld a, l")
         print("    ld (de), a")
-        if scanline < 7:
-            print("    inc l")
+        print("    inc d")
+        print("    ld a, h")
+        print("    ld (de), a")
+        if scanline < 3:
             print("    inc d")
     print()
