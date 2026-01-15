@@ -6,7 +6,7 @@
 * render tile map
 * sprites with collision detection
 * read keyboard
-* miniature game running flicker-free 50 Hz
+* miniature game running flicker-free at 50 Hz
   * keys: `a`,`d`: left, right; `g`: jump
 
 ## tools
