@@ -861,10 +861,10 @@ _loop_left:
 
 _shift_done:
 
-    ; 3 bytes to draw: D, E, C
-    ; D = left, E = middle, C = right (spill)
+    ; 3 bytes to draw: E, D, C
+    ; E = left, D = middle, C = right (spill)
 
-    ; byte D
+    ; byte E
     ld a, (hl)                  ; load current screen pixels
     ld b, a                     ; save screen pixels
     and e                       ; check collision
@@ -876,7 +876,7 @@ _no_col_d:
     ld (hl), a                  ; write back to screen
     inc l
 
-    ; byte E
+    ; byte D
     ld a, (hl)
     ld b, a
     and d
