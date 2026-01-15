@@ -840,9 +840,9 @@ RENDER_SPRITE_LINE macro
 _shift_right:
     ld b, a                     ; B = shift counter
 _loop_right:
-    srl e                       ; shift left byte, bit 0 goes to carry
-    rr d                        ; rotate right byte, carry goes into bit 7
-    rr c                        ; rotate spill byte, carry goes into bit 7
+    srl e                       ; shift left byte, bit 0 to carry
+    rr d                        ; rotate right byte, carry to bit 7
+    rr c                        ; rotate spill byte, carry to bit 7
     djnz _loop_right
     jr _shift_done
 
@@ -856,9 +856,9 @@ _shift_left:
     add a, 8
     ld b, a
 _loop_left:
-    sla c                       ; shift spill left, bit 7 to carry
-    rl d                        ; rotate middle, carry to bit 0
-    rl e                        ; rotate left byte, carry to bit 0
+    sla c                       ; shift right byte, bit 7 to carry
+    rl d                        ; rotate left byte, carry to bit 0
+    rl e                        ; rotate spill byte, carry to bit 0
     djnz _loop_left
 
 _shift_done:
