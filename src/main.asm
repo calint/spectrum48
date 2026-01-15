@@ -545,7 +545,8 @@ _top_left:
 
     push hl
     ; call render_tile
-    ld d, (camera_x)
+    ld a, (camera_x)
+    ld b, a
     call render_tile
     pop hl
 
@@ -560,7 +561,8 @@ _top_right:
 
     push hl
     ; call render_tile
-    ld d, (camera_x)
+    ld a, (camera_x)
+    ld d, a
     call render_tile
     pop hl
 
@@ -575,7 +577,8 @@ _bottom_right:
 
     push hl
     ; call render_tile
-    ld d, (camera_x)
+    ld a, (camera_x)
+    ld d, a
     call render_tile
     pop hl
 
@@ -589,7 +592,8 @@ _bottom_left:
     ld (hl), TILE_ID_PICKED
 
     ; call render_tile
-    ld d, (camera_x)
+    ld a, (camera_x)
+    ld d, a
     call render_tile
 
 _end:
