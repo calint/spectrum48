@@ -812,13 +812,13 @@ _end:
 ;
 ; input:
 ;   HL = screen destination
-;   IX = pointer to sprite data
+;   SP = pointer to sprite data
 ;   IYL = number of shifts
 ;
 ; output: -
 ;
 ; clobbers:
-;   AF, BC, DE, HL, IX
+;   AF, BC, DE, HL, SP
 ;-------------------------------------------------------------------------------
 RENDER_SPRITE_LINE macro
     ; fetch sprite bytes
