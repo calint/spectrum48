@@ -821,8 +821,7 @@ _end:
 ;   AF, BC, DE, HL, SP
 ;-------------------------------------------------------------------------------
 RENDER_SPRITE_LINE macro
-    ; fetch sprite bytes
-    pop de
+    pop de                      ; fetch sprite bytes
     ld c, 0                     ; C will hold the "spillover" bits
 
     ; shift 16-bit row right or left depending on IYL
