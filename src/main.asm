@@ -116,6 +116,9 @@ hero_anim_frame  db 0
 ; set in `render_sprite` when any sprite pixel wrote over current screen content
 sprite_collided  db 0   ; 0 = no collisions
 
+; used in `render_sprite` to save stack pointer while used to read sprite data
+saved_sp         dw 0
+
 ;-------------------------------------------------------------------------------
 ; initiates animation if not same
 ;
@@ -819,8 +822,7 @@ _end:
 ;-------------------------------------------------------------------------------
 RENDER_SPRITE_LINE macro
     ; fetch sprite bytes
-    ld d, (ix + 0)              ; load left sprite byte
-    ld e, (ix + 1)              ; load right sprite byte
+    pop de
     ld c, 0                     ; C will hold the "spillover" bits
 
     ; shift 16-bit row right or left depending on IYL
@@ -836,25 +838,25 @@ RENDER_SPRITE_LINE macro
 _shift_right:
     ld b, a                     ; B = shift counter
 _loop_right:
-    srl d                       ; shift left byte, bit 0 goes to carry
-    rr e                        ; rotate right byte, carry goes into bit 7
+    srl e                       ; shift left byte, bit 0 goes to carry
+    rr d                        ; rotate right byte, carry goes into bit 7
     rr c                        ; rotate spill byte, carry goes into bit 7
     djnz _loop_right
     jr _shift_done
 
 _shift_left:
     ; flip sprite bytes for left shift
-    ld c, e
-    ld e, d
-    ld d, 0
+    ld c, d
+    ld d, e
+    ld e, 0
     ; A = shifts right
     neg                         ; calculate left shifts, 8 - right shifts
     add a, 8
     ld b, a
 _loop_left:
     sla c                       ; shift spill left, bit 7 to carry
-    rl e                        ; rotate middle, carry to bit 0
-    rl d                        ; rotate left byte, carry to bit 0
+    rl d                        ; rotate middle, carry to bit 0
+    rl e                        ; rotate left byte, carry to bit 0
     djnz _loop_left
 
 _shift_done:
@@ -865,24 +867,24 @@ _shift_done:
     ; byte D
     ld a, (hl)                  ; load current screen pixels
     ld b, a                     ; save screen pixels
-    and d                       ; check collision
+    and e                       ; check collision
     jr z, _no_col_d             ; skip if no collision
     ld (sprite_collided), a     ; store any non-zero = collision
 _no_col_d:
     ld a, b                     ; reload screen pixels
-    or d                        ; OR with sprite left
+    or e                        ; OR with sprite left
     ld (hl), a                  ; write back to screen
     inc l
 
     ; byte E
     ld a, (hl)
     ld b, a
-    and e
+    and d
     jr z, _no_col_e
     ld (sprite_collided), a
 _no_col_e:
     ld a, b
-    or e
+    or d
     ld (hl), a
     inc l
 
@@ -900,10 +902,6 @@ _no_col_c:
     ; move HL back to starting position
     dec l
     dec l
-
-    ; move sprite pointer +2
-    inc ix
-    inc ix
 
     ; move down 1 scanline
 
@@ -982,10 +980,13 @@ render_sprite:
     and 7                       ; x % 8 (shift amount)
     ld iyl, a                   ; save for later use
 
+    ld (saved_sp), sp
+    ld sp, ix
     ; render over the tiles that enclose the sprite
 rept SPRITE_HEIGHT
     RENDER_SPRITE_LINE
 endm 
+    ld sp, (saved_sp)
 
     ret
 
