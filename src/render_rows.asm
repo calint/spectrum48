@@ -4,7 +4,7 @@
 
     ;  assumes: `charset` aligned on 2048, `tile_map` aligned on 256
     ;    input: B = screen column number, C = tile map offset
-    ; clobbers: A, D, E, H, L
+    ; clobbers: AF, DE, HL, SP
 
     ; note: since `charset` is aligned on 2048 the lowest 11 bits in
     ;       the pointer are 0's which opens for optimization using bit
@@ -12,6 +12,8 @@
     ;       low bits of the high byte of the pointer, then left shift
     ;       tile index byte by 3 (high bits have already been moved to
     ;       high byte) then compose HL
+    ; note: using SP gives 162 T, 28 B  vs  168 T, 30 B when copying
+    ;       8 scanlines from HL to DE
 
     ; row 0
     ld d, $40
