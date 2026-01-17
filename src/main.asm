@@ -30,56 +30,56 @@ BORDER_RENDER_TILE_MAP  equ 1
 BORDER_RENDER_SPRITES   equ 6
 BORDER_INPUT            equ 9
 
-GRAVITY               equ 3
-GRAVITY_RATE          equ %1111
+GRAVITY                 equ 3
+GRAVITY_RATE            equ %1111
 
-HERO_MOVE_DX          equ 8
-HERO_MOVE_BOOST_DX    equ 16
-HERO_JUMP_DY          equ 33
-HERO_SKIP_DY          equ 20
-HERO_SKIP_RATE        equ %1111
+HERO_MOVE_DX            equ 8
+HERO_MOVE_BOOST_DX      equ 16
+HERO_JUMP_DY            equ 33
+HERO_SKIP_DY            equ 20
+HERO_SKIP_RATE          equ %1111
 
-HERO_ANIM_ID_IDLE     equ 1
-HERO_ANIM_RATE_IDLE   equ %11111
-HERO_ANIM_ID_LEFT     equ 2
-HERO_ANIM_RATE_LEFT   equ %111
-HERO_ANIM_ID_RIGHT    equ 3
-HERO_ANIM_RATE_RIGHT  equ %111
+HERO_ANIM_ID_IDLE       equ 1
+HERO_ANIM_RATE_IDLE     equ %11111
+HERO_ANIM_ID_LEFT       equ 2
+HERO_ANIM_RATE_LEFT     equ %111
+HERO_ANIM_ID_RIGHT      equ 3
+HERO_ANIM_RATE_RIGHT    equ %111
 
-HERO_CAMERA_LFT_EDGE  equ 4
-HERO_CAMERA_RHT_EDGE  equ 27
-HERO_CAMERA_PANE      equ 21
+HERO_CAMERA_LFT_EDGE    equ 4
+HERO_CAMERA_RHT_EDGE    equ 27
+HERO_CAMERA_PANE        equ 21
 
-TILE_ID_PICKABLE      equ 33
-TILE_ID_PICKED        equ 32
+TILE_ID_PICKABLE        equ 33
+TILE_ID_PICKED          equ 32
 
-SUBPIXELS             equ 4
+SUBPIXELS               equ 4
 
 ; hard constants
 
-HERO_FLAG_MOVING_BIT  equ 0
-HERO_FLAG_MOVING      equ 1
-HERO_FLAG_JUMPING_BIT equ 1
-HERO_FLAG_JUMPING     equ 2
+HERO_FLAG_MOVING_BIT    equ 0
+HERO_FLAG_MOVING        equ 1
+HERO_FLAG_JUMPING_BIT   equ 1
+HERO_FLAG_JUMPING       equ 2
 
-CAMERA_STATE_IDLE     equ 0
-CAMERA_STATE_LEFT     equ 1
-CAMERA_STATE_RIGHT    equ 2
+CAMERA_STATE_IDLE       equ 0
+CAMERA_STATE_LEFT       equ 1
+CAMERA_STATE_RIGHT      equ 2
 
-TILE_WIDTH            equ 8
-TILE_HEIGHT           equ 8
-TILE_SHIFT            equ 3
-TILE_SHIFT_MASK       equ %00011111
-TILE_CENTER_OFFSET    equ 4
+TILE_WIDTH              equ 8
+TILE_HEIGHT             equ 8
+TILE_SHIFT              equ 3
+TILE_SHIFT_MASK         equ %00011111
+TILE_CENTER_OFFSET      equ 4
 
-SPRITE_WIDTH          equ 16
-SPRITE_HEIGHT         equ 16
+SPRITE_WIDTH            equ 16
+SPRITE_HEIGHT           equ 16
 
-SCREEN_WIDTH_CHARS    equ 32
-SCREEN_HEIGHT_CHARS   equ 24
+SCREEN_WIDTH_CHARS      equ 32
+SCREEN_HEIGHT_CHARS     equ 24
 
-KEYBOARD_ROW_POIUY    equ $df
-KEYBOARD_ROW_QWERT    equ $fb
+KEYBOARD_ROW_POIUY      equ $df
+KEYBOARD_ROW_QWERT      equ $fb
 
 ;-------------------------------------------------------------------------------
 ; variables
