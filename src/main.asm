@@ -942,7 +942,7 @@ endm
 ;   sprite_collided = non-zero if rendered over content
 ;
 ; clobbers:
-;   AF, BC, DE, HL, IX, IYL
+;   AF, BC, DE, HL, IYL
 ;-------------------------------------------------------------------------------
 render_sprite:
     ; clear collision byte (0 = no collision)
@@ -1105,6 +1105,7 @@ endm
 ;   DE = screen destination
 ;
 ; output: -
+;   DE = next screen row
 ;
 ; clobbers:
 ;   AF
@@ -1182,16 +1183,16 @@ restore_sprite_tiles:
     ADVANCE_ROW             ; advance 1 row on screen
     inc h                   ; advance 1 row in tile map
 
-    push de                     ; will be popped when advancing a row
-    push hl                     ;
+    push de                 ; will be popped when advancing a row
+    push hl                 ;
 
     push de
     push hl
     RENDER_TILE
     pop hl
     pop de
-    inc l                       ; next tile in row
-    inc e                       ; next character on screen
+    inc l                   ; next tile in row
+    inc e                   ; next character on screen
     push de
     push hl
     RENDER_TILE
@@ -1201,18 +1202,18 @@ restore_sprite_tiles:
     inc e
     RENDER_TILE
 
-    pop hl                      ; restore values prior rendering a tile row
-    pop de                      ;
-    ADVANCE_ROW                 ; advance 1 row on screen
-    inc h                       ; advance 1 row in tile map
+    pop hl                  ; restore values prior rendering a tile row
+    pop de                  ;
+    ADVANCE_ROW             ; advance 1 row on screen
+    inc h                   ; advance 1 row in tile map
 
     push de
     push hl
     RENDER_TILE
     pop hl
     pop de
-    inc l                       ; next tile in row
-    inc e                       ; next character on screen
+    inc l                   ; next tile in row
+    inc e                   ; next character on screen
     push de
     push hl
     RENDER_TILE
