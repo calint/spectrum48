@@ -78,7 +78,8 @@ SPRITE_HEIGHT         equ 16
 SCREEN_WIDTH_CHARS    equ 32
 SCREEN_HEIGHT_CHARS   equ 24
 
-KEYBOARD_ROW_ASDGF    equ $fdfe
+KEYBOARD_ROW_POIUY    equ $df
+KEYBOARD_ROW_QWERT    equ $fb
 
 ;-------------------------------------------------------------------------------
 ; variables
@@ -629,12 +630,10 @@ input:
     ld hl, hero_flags
     res HERO_FLAG_MOVING_BIT, (hl)
 
-_check_hero:
-    ld bc, KEYBOARD_ROW_ASDGF
-    in b, (c)           ; read row (0 = pressed)
-
 _check_hero_left:
-    bit 0, b            ; check key A
+    ld a, KEYBOARD_ROW_POIUY
+    in a, ($fe)         ; read row (0 = pressed)
+    bit 1, a            ; check key O
     jr nz, _check_hero_left_end
 
     ; flag hero is moving
@@ -681,7 +680,9 @@ _set_left_dx:
 _check_hero_left_end:
 
 _check_hero_right:
-    bit 2, b            ; check key D
+    ld a, KEYBOARD_ROW_POIUY
+    in a, ($fe)         ; read row (0 = pressed)
+    bit 0, a            ; check key P
     jr nz, _check_hero_right_end
 
     ; flag hero is moving
@@ -720,7 +721,9 @@ _set_right_dx:
 _check_hero_right_end:
 
 _check_hero_jump:
-    bit 4, b            ; check key G
+    ld a, KEYBOARD_ROW_QWERT
+    in a, ($fe)         ; read row (0 = pressed)
+    bit 0, a            ; check key Q
     jr nz, _check_hero_jump_end
 
     ; if hero is jumping then done

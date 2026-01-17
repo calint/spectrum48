@@ -1,4 +1,4 @@
-[ ] consider controller keys to be more "spectrum era" such as q/o/p
+[x] consider controller keys to be more "spectrum era" such as q/o/p
 [ ] fix bug when hero falls below the screen into the color attributes
     generating color artifacts
 [x] `render_sprite_occupied_tiles` for a tighter version rather than

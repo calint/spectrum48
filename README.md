@@ -7,7 +7,7 @@
 * sprites with collision detection
 * read keyboard
 * miniature game running flicker-free at 50 Hz
-  * keys: `a`,`d`: left, right; `g`: jump
+  * keys: `o`,`p`: left, right; `q`: jump
 
 ## tools
 
