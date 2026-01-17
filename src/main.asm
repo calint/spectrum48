@@ -375,7 +375,7 @@ render_tile_map:
     ld a, (camera_x)
     ld c, a             ; C = tile map offset
     ld b, 0             ; current column (0-31)
-    ld (saved_sp), sp   ; save current SP that will be used in `render_rows.asm`
+    ld (saved_sp), sp   ; save SP that will be used in `render_rows.asm`
 _loop:
     include "render_rows.asm"
     inc b               ; next column
@@ -992,7 +992,7 @@ render_sprite:
 rept SPRITE_HEIGHT
     RENDER_SPRITE_LINE
 endm 
-    ld sp, (saved_sp)       ; restore SP
+    ld sp, (saved_sp)       ; restore SP to previous
 
     ret
 
@@ -1104,7 +1104,7 @@ endm
 ; input:
 ;   DE = screen destination
 ;
-; output: -
+; output:
 ;   DE = next screen row
 ;
 ; clobbers:
