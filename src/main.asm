@@ -234,13 +234,13 @@ endm
 start:
 ;-------------------------------------------------------------------------------
 
-    ; in order to disable regular "stutter" due to rom routines taking many
-    ; cycles during interrupts, disable it by making dummy interrupt handler
-    ; and setting machine in "im 2" mode
-
     di                  ; disable interrupts
 
     ld sp, $ffff        ; set stack to start push at $fffd / $fffe
+
+    ; in order to disable regular "stutter" due to rom routines taking many
+    ; cycles during interrupts, disable it by making dummy interrupt handler
+    ; and setting machine in "im 2" mode
 
     ; build im2 table at $fe00
     ld hl, $fe00        ; table address
@@ -261,7 +261,7 @@ _loop:
     ld i, a
     im 2
 
-    ; set foreground and background to white on black
+    ; set foreground and background to bright white on black
     ld hl, $5800        ; color attribute start, 768 bytes
     ld (hl), %01000111  ; bright white on black
     ld de, $5801        ; destination one byte ahead to copy previous byte
