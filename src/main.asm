@@ -844,8 +844,8 @@ RENDER_SPRITE_LINE macro
 _shift_right:
     ld b, a                     ; B = shift counter
 _loop_right:
-    srl e                       ; shift left byte, bit 0 to carry
-    rr d                        ; rotate right byte, carry to bit 7
+    srl e                       ; shift sprite left byte right, bit 0 to carry
+    rr d                        ; rotate sprite right byte, carry to bit 7
     rr c                        ; rotate spill byte, carry to bit 7
     djnz _loop_right
     jr _shift_done
@@ -860,8 +860,8 @@ _shift_left:
     add a, 8
     ld b, a
 _loop_left:
-    sla c                       ; shift right byte, bit 7 to carry
-    rl d                        ; rotate left byte, carry to bit 0
+    sla c                       ; shift sprite right byte left, bit 7 to carry
+    rl d                        ; rotate sprite left byte, carry to bit 0
     rl e                        ; rotate spill byte, carry to bit 0
     djnz _loop_left
 
@@ -878,7 +878,7 @@ _shift_done:
     ld (sprite_collided), a     ; store any non-zero = collision
 _no_col_d:
     ld a, b                     ; reload screen pixels
-    or e                        ; OR with sprite left
+    or e                        ; OR with sprite left byte
     ld (hl), a                  ; write back to screen
     inc l
 
@@ -954,45 +954,45 @@ render_sprite:
     ; H:   0  1  0 y7 y6 y2 y1 y0
     ; L:  y5 y4 y3 x4 x3 x2 x1 x0
 
-    ld a, c                     ; A = screen y
-    and %00000111               ; mask y2, y1, y0
-    or %01000000                ; add screen base $4000
+    ld a, c                 ; A = screen y
+    and %00000111           ; mask y2, y1, y0
+    or %01000000            ; add screen base $4000
     ld h, a
 
-    ld a, c                     ; A = screen y
-    rra                         ; rotate y7, y6 bits to position
+    ld a, c                 ; A = screen y
+    rra                     ; rotate y7, y6 bits to position
     rra
     rra
     and %00011000
     or h
-    ld h, a                     ; H = screen address high byte
+    ld h, a                 ; H = screen address high byte
 
-    ld a, c                     ; A = screen y
-    rla                         ; rotate y5, y4, y3 bits to position
+    ld a, c                 ; A = screen y
+    rla                     ; rotate y5, y4, y3 bits to position
     rla
     and %11100000
-    ld l, a                     ; L = y5, y4, y3
+    ld l, a                 ; L = y5, y4, y3
 
-    ld a, b                     ; A = screen x
-    rept TILE_SHIFT             ; shift out the pixel fractions in a tile
+    ld a, b                 ; A = screen x
+    rept TILE_SHIFT         ; shift out the pixel fractions in a tile
         rra
     endm
-    and TILE_SHIFT_MASK         ; isolate the column bits (0-31)
-    or l                        ; add x4, x3, x2, x1, x0
-    ld l, a                     ; HL = screen address
+    and TILE_SHIFT_MASK     ; isolate the column bits (0-31)
+    or l                    ; add x4, x3, x2, x1, x0
+    ld l, a                 ; HL = screen address
 
     ; prepare shift counter
     ld a, b
-    and 7                       ; x % 8 (shift amount)
-    ld iyl, a                   ; save for later use
+    and 7                   ; x % 8 (shift amount)
+    ld iyl, a               ; save for later use
 
-    ld (saved_sp), sp
+    ld (saved_sp), sp       ; save SP that will be used when rendering
     ld sp, ix
     ; render over the tiles that enclose the sprite
 rept SPRITE_HEIGHT
     RENDER_SPRITE_LINE
 endm 
-    ld sp, (saved_sp)
+    ld sp, (saved_sp)       ; restore SP
 
     ret
 
@@ -1015,18 +1015,18 @@ SCREEN_ADDRESS_FROM_BC_TO_DE macro
     ; D:   0  1  0 y7 y6 y2 y1 y0
     ; E:  y5 y4 y3 x4 x3 x2 x1 x0
 
-    ld a, c                     ; A = screen row
-    and %00011000               ; row bits already "shifted" due to 8 lines
-    or %01000000                ; add screen base $4000
-    ld d, a                     ; D = screen high byte (y2, y1, y0 always 0)
+    ld a, c                 ; A = screen row
+    and %00011000           ; row bits already "shifted" due to tile 8 lines
+    or %01000000            ; add screen base $4000
+    ld d, a                 ; D = screen high byte (y2, y1, y0 always 0)
 
-    ld a, c                     ; A = screen row
-    and %00000111               ; isolate y5, y4, y3
-    rrca                        ; rotate lower bits to high bits
+    ld a, c                 ; A = screen row
+    and %00000111           ; isolate y5, y4, y3
+    rrca                    ; rotate lower bits to high bits
     rrca
     rrca
-    or b                        ; add column B
-    ld e, a                     ; E = screen destination low byte
+    or b                    ; add column to B
+    ld e, a                 ; E = screen destination low byte
     ; DE = screen destination
 endm
 
@@ -1046,14 +1046,14 @@ endm
 ;-------------------------------------------------------------------------------
 TILE_ADDRESS_FROM_BCD_TO_HL macro
     ; get tile id from map
-    ld h, high tile_map         ; H = tile_map base
-    ld a, c                     ; C = screen row
-    add a, h                    ; A = base high byte plus row
-    ld h, a                     ; H = now the correct high byte
+    ld h, high tile_map     ; H = tile_map base
+    ld a, c                 ; C = screen row
+    add a, h                ; A = base high byte plus row
+    ld h, a                 ; H = now the correct high byte
  
-    ld a, d                     ; A = tile map column offset
-    add a, b                    ; B = screen column
-    ld l, a                     ; L = tile map column
+    ld a, d                 ; A = tile map column offset
+    add a, b                ; B = screen column
+    ld l, a                 ; L = tile map column
     ; HL = pointer to tile
 endm
 
@@ -1070,29 +1070,29 @@ endm
 ;   AF, DE, HL
 ;-------------------------------------------------------------------------------
 RENDER_TILE macro
-    ld a, (hl)                  ; A = tile id
+    ld a, (hl)              ; A = tile id
  
     ; make HL pointer to address of tile bitmap
     ; bit trickery because `charset` is aligned on 2048 boundary
-    ld l, a                     ; move upper 3 bits of low byte to lower 3 bits
-    and %11100000               ;  of high byte
+    ld l, a                 ; move upper 3 bits of low byte to lower 3 bits
+    and %11100000           ;  of high byte
     rlca
     rlca
     rlca
-    or high charset             ; set upper 5 bits in high byte
-    ld h, a                     ; H = pointer high byte
-    ld a, l                     ; shift lower byte by 3 because a character is 8
-    add a, a                    ;  bytes
+    or high charset         ; set upper 5 bits in high byte
+    ld h, a                 ; H = pointer high byte
+    ld a, l                 ; shift lower byte by 3 because a tile is 8
+    add a, a                ;  bytes
     add a, a
     add a, a
-    ld l, a                     ; L = pointer low byte
+    ld l, a                 ; L = pointer low byte
     ; HL = bitmap source
 
 rept 7
     ld a, (hl)
     ld (de), a
-    inc hl                      ; HL = next tile scanline
-    inc d                       ; D = next screen line
+    inc hl                  ; HL = next tile scanline
+    inc d                   ; D = next screen line
 endm
     ld a, (hl)
     ld (de), a
@@ -1158,16 +1158,16 @@ restore_sprite_tiles:
     TILE_ADDRESS_FROM_BCD_TO_HL
     SCREEN_ADDRESS_FROM_BC_TO_DE
 
-    push de                     ; will be popped when advancing a row
-    push hl                     ;
+    push de                 ; will be popped when advancing a row
+    push hl                 ;
 
     push de
     push hl
     RENDER_TILE
     pop hl
     pop de
-    inc l                       ; next tile in row
-    inc e                       ; next character on screen
+    inc l                   ; next tile in row
+    inc e                   ; next character on screen
     push de
     push hl
     RENDER_TILE
@@ -1177,10 +1177,10 @@ restore_sprite_tiles:
     inc e
     RENDER_TILE
 
-    pop hl                      ; restore values prior rendering a tile row
-    pop de                      ;
-    ADVANCE_ROW                 ; advance 1 row on screen
-    inc h                       ; advance 1 row in tile map
+    pop hl                  ; restore values prior rendering a new tile row
+    pop de                  ;
+    ADVANCE_ROW             ; advance 1 row on screen
+    inc h                   ; advance 1 row in tile map
 
     push de                     ; will be popped when advancing a row
     push hl                     ;
