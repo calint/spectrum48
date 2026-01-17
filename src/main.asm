@@ -375,17 +375,17 @@ render_tile_map:
     ld a, (camera_x)
     ld c, a             ; C = tile map offset
     ld b, 0             ; current column (0-31)
-    ld (saved_sp), sp
+    ld (saved_sp), sp   ; save current SP that will be used in `render_rows.asm`
 _loop:
     include "render_rows.asm"
     inc b               ; next column
     inc c               ; next tile map column
-    ld a, b
+    ld a, b             ; check if all columns have been rendered
     cp SCREEN_WIDTH_CHARS
     jp nz, _loop
     ; note: djnz using B as counter does not work because `render_rows.asm` size
     ;       is too large for relative jump
-    ld sp, (saved_sp)
+    ld sp, (saved_sp)   ; restore stack pointer to previous
 
 ;-------------------------------------------------------------------------------
 render_sprites:
@@ -411,6 +411,7 @@ render_sprites:
 
     ; call render_sprite
     ld hl, (hero_x)
+    ; remove the subpixels
     rept SUBPIXELS
         srl h
         rr l
@@ -422,6 +423,7 @@ render_sprites:
     ld a, b
     ld (hero_x_screen), a
 
+    ; remove the subpixels
     ld hl, (hero_y)
     rept SUBPIXELS
         srl h
@@ -452,7 +454,6 @@ camera_adjust:
     and TILE_SHIFT_MASK
     ; A = column
 
-    ld hl, camera_x
     ; A = column 
     cp HERO_CAMERA_LFT_EDGE  ; check left boundary
     jr c, _left              ; jump if hero < left edge
@@ -462,13 +463,13 @@ camera_adjust:
 
 _right:
     ld e, CAMERA_STATE_RIGHT ; prepare state for pane right
-    ld a, (hl)               ; HL = camera_x
+    ld a, (camera_x)
     add a, HERO_CAMERA_PANE  ; calculate destination
     jr _apply                ; jump to shared store
 
 _left:
     ld e, CAMERA_STATE_LEFT  ; prepare state for pane left
-    ld a, (hl)               ; HL = camera_x
+    ld a, (camera_x)
     sub HERO_CAMERA_PANE     ; calculate destination
 
 _apply:
@@ -494,9 +495,9 @@ collision_background:
     ld (hero_x), hl
     ld hl, (hero_y_prv)
     ld (hero_y), hl
-    ld de, 0
-    ld (hero_dx), de
-    ld (hero_dy), de
+    ld hl, 0
+    ld (hero_dx), hl
+    ld (hero_dy), hl
 
     ; clear hero jumping flag
     ld hl, hero_flags
@@ -512,7 +513,7 @@ collision_tiles:
 
     ; calculate tile x = L and column = B
     ld a, (hero_x_screen)
-    add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
+    add a, TILE_CENTER_OFFSET ; bias toward tile center (round tile coordinate)
     ; use rra + mask to save 5t over srl for 3 rept
     rept TILE_SHIFT
         rra
@@ -525,7 +526,7 @@ collision_tiles:
 
     ; calculate tile y
     ld a, (hero_y_screen)
-    add a, TILE_CENTER_OFFSET ; bias toward tile center (rounded tile coordinate)
+    add a, TILE_CENTER_OFFSET ; bias toward tile center (round tile coordinate)
     ; use rra + mask to save 5t over srl for 3 rept
     rept TILE_SHIFT
         rra
@@ -553,7 +554,7 @@ _top_left:
     push hl
     ; call render_tile
     ld a, (camera_x)
-    ld b, a
+    ld d, a
     call render_tile
     pop hl
 
