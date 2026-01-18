@@ -1167,15 +1167,15 @@ restore_sprite_tiles:
     RENDER_TILE
     pop hl
     pop de
-    inc l                   ; next row in tile map
+    inc l                   ; next tile in tile map
     inc e                   ; next tile on screen
     push de
     push hl
     RENDER_TILE
     pop hl
     pop de
-    inc l
-    inc e
+    inc l                   ; next tile in tile map
+    inc e                   ; next tile on screen
     RENDER_TILE
 
     pop hl                  ; restore values prior rendering a new tile row
@@ -1191,15 +1191,15 @@ restore_sprite_tiles:
     RENDER_TILE
     pop hl
     pop de
-    inc l                   ; next row in tile map
+    inc l                   ; next tile in tile map
     inc e                   ; next tile on screen
     push de
     push hl
     RENDER_TILE
     pop hl
     pop de
-    inc l
-    inc e
+    inc l                   ; next tile in tile map
+    inc e                   ; next tile on screen
     RENDER_TILE
 
     pop hl                  ; restore values prior rendering a tile row
@@ -1212,15 +1212,15 @@ restore_sprite_tiles:
     RENDER_TILE
     pop hl
     pop de
-    inc l                   ; next row in tile map
+    inc l                   ; next tile in tile map
     inc e                   ; next tile on screen
     push de
     push hl
     RENDER_TILE
     pop hl
     pop de
-    inc l
-    inc e
+    inc l                   ; next tile in tile map
+    inc e                   ; next tile on screen
     RENDER_TILE
 
     ret
