@@ -1091,8 +1091,8 @@ RENDER_TILE macro
 rept 7
     ld a, (hl)
     ld (de), a
-    inc hl                  ; HL = next tile scanline
-    inc d                   ; D = next screen line
+    inc l                   ; HL = next tile scanline
+    inc d                   ; DE = next screen line
 endm
     ld a, (hl)
     ld (de), a
@@ -1167,8 +1167,8 @@ restore_sprite_tiles:
     RENDER_TILE
     pop hl
     pop de
-    inc l                   ; next tile in row
-    inc e                   ; next character on screen
+    inc l                   ; next row in tile map
+    inc e                   ; next tile on screen
     push de
     push hl
     RENDER_TILE
@@ -1191,8 +1191,8 @@ restore_sprite_tiles:
     RENDER_TILE
     pop hl
     pop de
-    inc l                   ; next tile in row
-    inc e                   ; next character on screen
+    inc l                   ; next row in tile map
+    inc e                   ; next tile on screen
     push de
     push hl
     RENDER_TILE
@@ -1212,8 +1212,8 @@ restore_sprite_tiles:
     RENDER_TILE
     pop hl
     pop de
-    inc l                   ; next tile in row
-    inc e                   ; next character on screen
+    inc l                   ; next row in tile map
+    inc e                   ; next tile on screen
     push de
     push hl
     RENDER_TILE
