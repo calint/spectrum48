@@ -1162,6 +1162,7 @@ restore_sprite_tiles:
     push de                 ; will be popped when advancing a row
     push hl                 ;
 
+    ; first row of 3 tiles
     push de
     push hl
     RENDER_TILE
@@ -1178,6 +1179,7 @@ restore_sprite_tiles:
     inc e                   ; next tile on screen
     RENDER_TILE
 
+    ; second row of 3 tiles
     pop hl                  ; restore values prior rendering a new tile row
     pop de                  ;
     ADVANCE_ROW             ; advance 1 row on screen
@@ -1202,6 +1204,7 @@ restore_sprite_tiles:
     inc e                   ; next tile on screen
     RENDER_TILE
 
+    ; third row of 3 tiles
     pop hl                  ; restore values prior rendering a tile row
     pop de                  ;
     ADVANCE_ROW             ; advance 1 row on screen
