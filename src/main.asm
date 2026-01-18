@@ -1045,11 +1045,9 @@ endm
 ;   AF
 ;-------------------------------------------------------------------------------
 TILE_ADDRESS_FROM_BCD_TO_HL macro
-    ; get tile id from map
-    ld h, high tile_map     ; H = tile_map base
-    ld a, c                 ; C = screen row
-    add a, h                ; A = base high byte plus row
-    ld h, a                 ; H = now the correct high byte
+    ld a, high tile_map     ; A = tile map base
+    add a, c                ; C = screen row
+    ld h, a                 ; H = correct high byte
  
     ld a, d                 ; A = tile map column offset
     add a, b                ; B = screen column
@@ -1074,17 +1072,17 @@ RENDER_TILE macro
  
     ; make HL pointer to address of tile bitmap
     ; bit trickery because `charset` is aligned on 2048 boundary
-    ld l, a                 ; move upper 3 bits of low byte to lower 3 bits
-    and %11100000           ;  of high byte
-    rlca
-    rlca
-    rlca
+    ld l, a                 ; save for later
+    and %11100000           ; move upper 3 bits of low byte to lower 3 bits
+    rlca                    ;  of high byte
+    rlca                    ;
+    rlca                    ;
     or high charset         ; set upper 5 bits in high byte
     ld h, a                 ; H = pointer high byte
-    ld a, l                 ; shift lower byte by 3 because a tile is 8
+    ld a, l                 ; A = tile id
+    add a, a                ; shift lower byte by 3 because a tile is 8
     add a, a                ;  bytes
-    add a, a
-    add a, a
+    add a, a                ;
     ld l, a                 ; L = pointer low byte
     ; HL = bitmap source
 
