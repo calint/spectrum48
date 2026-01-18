@@ -1,3 +1,4 @@
+[ ] when scrolling 1 tile left or right do copy screen and render edge tile
 [x] consider controller keys to be more "spectrum era" such as q/o/p
 [ ] fix bug when hero falls below the screen into the color attributes
     generating color artifacts
