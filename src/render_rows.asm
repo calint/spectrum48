@@ -12,12 +12,10 @@
     ;       low bits of the high byte of the pointer, then left shift
     ;       tile index byte by 3 (high bits have already been moved to
     ;       high byte) then compose HL
-    ; note: using SP gives 162 T, 28 B  vs  168 T, 30 B when copying
-    ;       8 scanlines from HL to DE
+    ; note: using SP gives 213 T, 41 B vs 251 T, 51 B per tile
 
     ; row 0
-    ld d, $40
-    ld e, b          ; screen column offset
+    ; SP to tile bitmap
     ld h, (high tile_map) + 0
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -33,41 +31,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld l, b          ; screen column offset
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 1
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 32
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 1
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -83,41 +74,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 32
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 2
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 64
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 2
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -133,41 +119,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 64
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 3
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 96
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 3
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -183,41 +164,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 96
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 4
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 128
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 4
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -233,41 +209,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 128
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 5
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 160
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 5
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -283,41 +254,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 160
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 6
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 192
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 6
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -333,41 +299,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 192
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 7
-    ld d, $40
-    ld a, b          ; screen column offset
-    add a, 224
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 7
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -383,39 +344,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $40
+    ld a, b          ; screen column offset
+    add a, 224
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 8
-    ld d, $48
-    ld e, b          ; screen column offset
+    ; SP to tile bitmap
     ld h, (high tile_map) + 8
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -431,41 +389,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld l, b          ; screen column offset
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 9
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 32
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 9
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -481,41 +432,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 32
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 10
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 64
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 10
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -531,41 +477,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 64
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 11
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 96
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 11
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -581,41 +522,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 96
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 12
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 128
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 12
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -631,41 +567,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 128
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 13
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 160
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 13
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -681,41 +612,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 160
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 14
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 192
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 14
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -731,41 +657,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 192
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 15
-    ld d, $48
-    ld a, b          ; screen column offset
-    add a, 224
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 15
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -781,39 +702,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $48
+    ld a, b          ; screen column offset
+    add a, 224
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 16
-    ld d, $50
-    ld e, b          ; screen column offset
+    ; SP to tile bitmap
     ld h, (high tile_map) + 16
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -829,41 +747,34 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld l, b          ; screen column offset
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 17
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 32
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 17
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -879,41 +790,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 32
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 18
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 64
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 18
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -929,41 +835,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 64
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 19
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 96
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 19
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -979,41 +880,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 96
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 20
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 128
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 20
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -1029,41 +925,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 128
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 21
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 160
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 21
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -1079,41 +970,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 160
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 22
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 192
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 22
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -1129,41 +1015,36 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 192
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
     ; row 23
-    ld d, $50
-    ld a, b          ; screen column offset
-    add a, 224
-    ld e, a          ; DE = screen dest
+    ; SP to tile bitmap
     ld h, (high tile_map) + 23
     ld l, c          ; tile map offset
     ld a, (hl)       ; A = tile index
@@ -1179,33 +1060,31 @@
     add a, a         ; x4
     add a, a         ; x8
     ld l, a          ; HL = bitmap address
-
     ld sp, hl
-    pop hl           ; scanline 0, 1
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 2, 3
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 4, 5
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
-    inc d
-    pop hl           ; scanline 6, 7
-    ld a, l
-    ld (de), a
-    inc d
-    ld a, h
-    ld (de), a
+
+    ; HL to screen destination
+    ld h, $50
+    ld a, b          ; screen column offset
+    add a, 224
+    ld l, a          ; HL = screen destination
+
+    pop de           ; scanline 0, 1
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 2, 3
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 4, 5
+    ld (hl), e
+    inc h
+    ld (hl), d
+    inc h
+    pop de           ; scanline 6, 7
+    ld (hl), e
+    inc h
+    ld (hl), d
 
