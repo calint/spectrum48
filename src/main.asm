@@ -1073,15 +1073,15 @@ RENDER_TILE macro
     ; make HL pointer to address of tile bitmap
     ; bit trickery because `charset` is aligned on 2048 boundary
     ld l, a                 ; save for later
-    and %11100000           ; move upper 3 bits of low byte to lower 3 bits
-    rlca                    ;  of high byte
+    and %11100000           ; move upper 3 bits of low byte to lower 3 bits of
+    rlca                    ;  high byte
     rlca                    ;
-    rlca                    ;
-    or high charset         ; set upper 5 bits in high byte
+    rlca                    ; A = lower 3 bits of high byte
+    or high charset         ; set upper 5 bits of high byte
     ld h, a                 ; H = pointer high byte
     ld a, l                 ; A = tile id
-    add a, a                ; shift lower byte by 3 because a tile is 8
-    add a, a                ;  bytes
+    add a, a                ; shift lower byte by 3 because a tile is 8 bytes
+    add a, a                ;
     add a, a                ;
     ld l, a                 ; L = pointer low byte
     ; HL = bitmap source
