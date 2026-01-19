@@ -873,9 +873,9 @@ _shift_done:
     ; byte E
     ld a, e                     ; load left sprite byte
     and (hl)                    ; check collision with screen content
-    jr z, _no_col_d             ; skip if no collision
+    jr z, _no_col_e             ; skip if no collision
     ld (sprite_collided), a     ; store any non-zero = collision
-_no_col_d:
+_no_col_e:
     ld a, e                     ; reload left sprite byte
     or (hl)                     ; OR with screen content
     ld (hl), a                  ; write back to screen
@@ -884,9 +884,9 @@ _no_col_d:
     ; byte D
     ld a, d
     and (hl)
-    jr z, _no_col_e
+    jr z, _no_col_d
     ld (sprite_collided), a
-_no_col_e:
+_no_col_d:
     ld a, d
     or (hl)
     ld (hl), a
