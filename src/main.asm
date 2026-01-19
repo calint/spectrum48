@@ -871,46 +871,52 @@ _shift_done:
     ; E = left, D = middle, C = right (spill)
 
     ; byte E
-    ld a, (hl)                  ; load current screen pixels
-    ld b, a                     ; save screen pixels
-    and e                       ; check collision
+    ld a, e                     ; load left sprite byte
+    and (hl)                    ; check collision with screen content
     jr z, _no_col_d             ; skip if no collision
     ld (sprite_collided), a     ; store any non-zero = collision
 _no_col_d:
-    ld a, b                     ; reload screen pixels
-    or e                        ; OR with sprite left byte
+    ld a, e                     ; reload left sprite byte
+    or (hl)                     ; OR with screen content
     ld (hl), a                  ; write back to screen
-    inc l
+    inc l                       ; increase screen column
 
     ; byte D
-    ld a, (hl)
-    ld b, a
-    and d
+    ld a, d
+    and (hl)
     jr z, _no_col_e
     ld (sprite_collided), a
 _no_col_e:
-    ld a, b
-    or d
+    ld a, d
+    or (hl)
     ld (hl), a
     inc l
 
     ; byte C
-    ld a, (hl)
-    ld b, a
-    and c
+    ld a, c
+    and (hl)
     jr z, _no_col_c
     ld (sprite_collided), a
 _no_col_c:
-    ld a, b
-    or c
+    ld a, c
+    or (hl)
     ld (hl), a
 
-    ; move HL back to starting position
-    dec l
-    dec l
+endm
 
-    ; move down 1 scanline
-
+;-------------------------------------------------------------------------------
+; helper macro for `render_sprite` to avoid label clashes in `rept` block
+;
+; input:
+;   HL = screen destination
+;
+; output:
+;   HL = screen destination at next scanline
+;
+; clobbers:
+;   AF
+;-------------------------------------------------------------------------------
+ADVANCE_SCAN_LINE macro
     inc h                      ; increment high byte (pixel row)
     ld a, h
     and 7                      ; check if we crossed 8-line char boundary
@@ -926,7 +932,6 @@ _no_col_c:
     ld a, h
     sub 8
     ld h, a
-
 _end:
 endm
 
@@ -987,11 +992,17 @@ render_sprite:
     ld iyl, a               ; save for later use
 
     ld (saved_sp), sp       ; save SP that will be used when rendering
-    ld sp, ix
+    ld sp, ix               ; point SP to sprite data
+
     ; render over the tiles that enclose the sprite
-rept SPRITE_HEIGHT
+rept SPRITE_HEIGHT - 1
     RENDER_SPRITE_LINE
+    dec l                   ; restore HL to start of line
+    dec l                   ;
+    ADVANCE_SCAN_LINE
 endm 
+    RENDER_SPRITE_LINE
+
     ld sp, (saved_sp)       ; restore SP to previous
 
     ret
