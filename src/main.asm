@@ -175,7 +175,7 @@ endm
 ;   rate = address of animation rate field
 ;   ptr = address of pointer to animation table
 ;   sprite = address of sprite field
-; 
+;
 ; output:
 ;   adjusts `(ptr)` and `(sprite)`
 ;
