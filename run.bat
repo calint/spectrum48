@@ -5,4 +5,4 @@ cd resources
 call update.bat
 cd ..
 %PASMO_HOME%\pasmo -I src --alocal --tapbas src/main.asm main.tap
-%FUSE_HOME%\fuse main.tap
+%FUSE_HOME%\fuse --machine 48 --tape main.tap
