@@ -916,7 +916,7 @@ endm
 ; clobbers:
 ;   AF
 ;-------------------------------------------------------------------------------
-ADVANCE_SCAN_LINE macro
+ADVANCE_SCANLINE macro
     inc h                      ; increment high byte (pixel row)
     ld a, h
     and 7                      ; check if we crossed 8-line char boundary
@@ -999,7 +999,7 @@ rept SPRITE_HEIGHT - 1
     RENDER_SPRITE_LINE
     dec l                   ; restore HL to start of line
     dec l                   ;
-    ADVANCE_SCAN_LINE
+    ADVANCE_SCANLINE
 endm 
     RENDER_SPRITE_LINE
 
