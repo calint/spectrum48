@@ -932,7 +932,7 @@ ADVANCE_SCANLINE macro
     ld a, h
     sub 8
     ld h, a
-    
+
 _end:
 endm
 
