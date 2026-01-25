@@ -231,6 +231,33 @@ _end:
 endm
 
 ;-------------------------------------------------------------------------------
+; checks if hero is within range of a pickable and if so replaces pickable tile
+;
+; input:
+;   HL = pointer to tile
+;
+; clobbers:
+;   AF, D
+;-------------------------------------------------------------------------------
+HERO_PICKABLE macro
+    ld a, (hl)              ; A = tile id
+    cp TILE_ID_PICKABLE
+    jr nz, _end
+
+    ; overwrite the picked tile
+    ld (hl), TILE_ID_PICKED
+
+    push hl
+    ; call render_tile
+    ld a, (camera_x)
+    ld d, a
+    call render_tile
+    pop hl
+
+_end:
+endm
+
+;-------------------------------------------------------------------------------
 start:
 ;-------------------------------------------------------------------------------
 
@@ -543,66 +570,23 @@ collision_tiles:
     add a, d
     ld h, a
 
-_top_left:
-    ld a, (hl)              ; A = tile id
-    cp TILE_ID_PICKABLE
-    jr nz, _top_right
+    ; top left
+    HERO_PICKABLE
 
-    ; overwrite the picked tile
-    ld (hl), TILE_ID_PICKED
-
-    push hl
-    ; call render_tile
-    ld a, (camera_x)
-    ld d, a
-    call render_tile
-    pop hl
-
-_top_right:
+    ; top right
     inc l
     inc b
-    ld a, (hl)              ; A = tile id
-    cp TILE_ID_PICKABLE
-    jr nz, _bottom_right
+    HERO_PICKABLE
 
-    ld (hl), TILE_ID_PICKED
-
-    push hl
-    ; call render_tile
-    ld a, (camera_x)
-    ld d, a
-    call render_tile
-    pop hl
-
-_bottom_right:
+    ; bottom right
     inc h
     inc c
-    ld a, (hl)              ; A = tile id
-    cp TILE_ID_PICKABLE
-    jr nz, _bottom_left
+    HERO_PICKABLE
 
-    ld (hl), TILE_ID_PICKED
-
-    push hl
-    ; call render_tile
-    ld a, (camera_x)
-    ld d, a
-    call render_tile
-    pop hl
-
-_bottom_left:
+    ; bottom left
     dec l
     dec b
-    ld a, (hl)              ; A = tile id
-    cp TILE_ID_PICKABLE
-    jr nz, _end
-
-    ld (hl), TILE_ID_PICKED
-
-    ; call render_tile
-    ld a, (camera_x)
-    ld d, a
-    call render_tile
+    HERO_PICKABLE
 
 _end:
 
